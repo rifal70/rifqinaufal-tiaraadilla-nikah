@@ -39,7 +39,7 @@ describe("verbatim event content", () => {
     expect(WEDDING.groom.name).toBe("Rifqi Naufal Gahara, S.T");
     expect(WEDDING.bride.father).toBe("Bapak Drs. H. Supriadi (Alm.)");
     expect(WEDDING.bride.mother).toBe("Ibu Hj. Pambudi Ningsih");
-    expect(WEDDING.groom.father).toBe("Bapak H. Wawan Gunawan");
+    expect(WEDDING.groom.father).toBe("Bapak Drs. H. Wawan Gunawan");
     expect(WEDDING.groom.mother).toBe("Ibu Hj. Indah Setyowati");
     expect(WEDDING.date).toBe("Selasa, 29 Desember 2026");
     expect(WEDDING.venue.address).toBe(
