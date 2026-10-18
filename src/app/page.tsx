@@ -6,6 +6,7 @@ import InvitationShell from "@/components/InvitationShell";
 import BankCard from "@/components/BankCard";
 import Gallery from "@/components/Gallery";
 import CouplePhoto from "@/components/CouplePhoto";
+import ImageModal from "@/components/ImageModal";
 
 export const dynamic = "force-dynamic";
 
@@ -160,13 +161,7 @@ export default async function Home() {
                 Denah Lokasi
               </p>
               {mapImageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={mapImageUrl}
-                  alt="Denah lokasi acara"
-                  className="rounded-xl max-h-[480px] md:max-h-[500px] w-full object-contain shadow-xl border border-gold-500/20 transition-transform hover:scale-[1.01]"
-                  loading="lazy"
-                />
+                <ImageModal src={mapImageUrl} alt="Denah lokasi acara" />
               ) : (
                 <Placeholder label="gambar Denah Lokasi" />
               )}
