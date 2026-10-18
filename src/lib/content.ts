@@ -1,3 +1,4 @@
+import { getSettings, formatWeddingDate } from "@/lib/data";
 /**
  * Verbatim content from the owner's invitation (Section 0).
  * DO NOT paraphrase or "correct". Items marked PLACEHOLDER must be supplied by the owner.
@@ -17,8 +18,8 @@ export const WEDDING = {
     father: "Bapak Drs. H. Wawan Gunawan",
     mother: "Ibu Hj. Indah Setyowati",
   },
-  date: "Selasa, 29 Desember 2026",
-  dateISO: "2026-12-29T08:00:00+07:00",
+  date: "Selasa, 29 Desember 2026" as string,
+  dateISO: "2026-12-29T08:00:00+07:00" as string,
   akad: { title: "Akad Nikah", time: "08.00 WIB s.d. selesai" },
   resepsi: { title: "Resepsi", time: "10.00 s.d. 21.00 WIB" },
   venue: {
@@ -26,8 +27,6 @@ export const WEDDING = {
     address:
       "Unit 1 Jl. Simamora RT 6 RW 3 (Tugu Garuda), Desa Penawar Jaya, Kec. Banjar Margo, Kab. Tulang Bawang",
   },
-  // Opening/closing greetings, Google Maps link, Denah Lokasi image and music are
-  // owner-supplied and managed in the admin panel (site_settings). Never invented here.
 } as const;
 
 export interface BankAccount {

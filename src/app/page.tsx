@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
-import { getBanks, getGallery, getSettings, signedUrl } from "@/lib/data";
+import { getBanks, getGallery, getSettings, signedUrl, formatWeddingDate } from "@/lib/data";
 import { WEDDING } from "@/lib/content";
 import InvitationShell from "@/components/InvitationShell";
 import BankCard from "@/components/BankCard";
@@ -32,21 +32,36 @@ export default async function Home() {
     signedUrl(settings.groom_photo_path),
     signedUrl(settings.bride_photo_path),
   ]);
-  const W = WEDDING;
+
+  // --- LOGIKA TANGGAL DINAMIS ---
+  let weddingDate = WEDDING.date;
+  if (settings.event_date) {
+    let cleanDate = settings.event_date.trim().replace(/^["']|["']$/g, "");
+    if (cleanDate.includes(" ") && !cleanDate.includes("+")) {
+      cleanDate = cleanDate.replace(" ", "+");
+    }
+    const parsed = new Date(cleanDate);
+    if (!isNaN(parsed.getTime())) {
+      weddingDate = formatWeddingDate(parsed);
+    }
+  }
+
+  // Gabungkan objek WEDDING dengan tanggal dinamis
+  const W = {
+    ...WEDDING,
+    date: weddingDate,
+  };
 
   // Filter rekening khusus yang dicentang untuk tamu ini
   const visibleBanks =
     banks?.filter((b) => {
-      // 1. Validasi teks rekening
       const isValid = b.is_enabled && b.bank_name?.trim() !== "-" && b.account_number?.trim() !== "-";
       if (!isValid) return false;
 
-      // 2. Cocokkan dengan array visible_bank_ids dari session tamu
       if (session.visible_bank_ids && Array.isArray(session.visible_bank_ids)) {
         return session.visible_bank_ids.includes(b.id);
       }
 
-      // Fallback: Jika tamu belum di-set pilihannya (null/undefined), tampilkan semua rekening aktif
       return true;
     }) ?? [];
 
@@ -83,7 +98,6 @@ export default async function Home() {
         <div className="grid gap-10 md:grid-cols-[1fr_auto_1fr] items-center max-w-5xl w-full mx-auto">
           {/* Mempelai Pria */}
           <div className="glass-card flex flex-col items-center justify-center p-6 sm:p-10 text-center" data-reveal>
-            {/* Foto Pria (Bisa Diklik & Membesar) */}
             {groomPhotoUrl ? (
               <CouplePhoto src={groomPhotoUrl} alt={W.groom.name} />
             ) : null}
@@ -99,7 +113,6 @@ export default async function Home() {
 
           {/* Mempelai Wanita */}
           <div className="glass-card flex flex-col items-center justify-center p-6 sm:p-10 text-center" data-reveal>
-            {/* Foto Wanita (Bisa Diklik & Membesar) */}
             {bridePhotoUrl ? (
               <CouplePhoto src={bridePhotoUrl} alt={W.bride.name} />
             ) : null}
@@ -140,9 +153,8 @@ export default async function Home() {
         <Divider />
 
         <div className="mx-auto max-w-6xl w-full space-y-8" data-reveal>
-          {/* Grid Kustom: Kolom pertama (Denah) dibuat jauh lebih lebar dari kolom kedua (QR) */}
           <div className="grid gap-6 md:grid-cols-[3fr_2fr] items-stretch">
-            {/* 1. Denah Lokasi (Kolom Utama - Diperbesar) */}
+            {/* 1. Denah Lokasi */}
             <div className="glass-card flex flex-col items-center justify-center p-6 md:p-8 h-full">
               <p className="text-xs uppercase tracking-widest text-gold-300 mb-4 font-semibold">
                 Denah Lokasi
@@ -160,7 +172,7 @@ export default async function Home() {
               )}
             </div>
 
-            {/* 2. Scan QR Code Maps (Kolom Pendamping - Lebih Ringkas) */}
+            {/* 2. Scan QR Code Maps */}
             <div className="glass-card flex flex-col items-center justify-center p-6 h-full bg-emerald-950/20">
               <p className="text-xs uppercase tracking-widest text-gold-300 mb-6 font-semibold">
                 Scan QR Google Maps

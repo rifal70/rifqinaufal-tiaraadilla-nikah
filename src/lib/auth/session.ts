@@ -3,27 +3,47 @@ import crypto from "crypto";
 import { createServiceClient } from "@/lib/supabase/server";
 
 const SESSION_COOKIE_NAME = "wedding_session";
-const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+// Fallback jika belum diisi di database
+const DEFAULT_EXPIRY_DAYS = 30;
 
 /**
- * Hash a raw invitation token with SHA-256.
- * The raw token is never stored — only the hash.
+ * Mengambil tanggal kedaluwarsa dinamis dari database site_settings
  */
+export async function getDynamicExpiryDate(): Promise<Date> {
+  const supabase = createServiceClient();
+  const { data: settings } = await supabase
+    .from("site_settings")
+    .select("key, value")
+    .in("key", ["event_date", "event_expiry_days"]);
+
+  const settingsMap = new Map((settings ?? []).map((s) => [s.key, s.value]));
+
+  const eventDateStr = settingsMap.get("event_date");
+  const expiryDaysStr = settingsMap.get("event_expiry_days");
+
+  const expiryDays = expiryDaysStr ? parseInt(expiryDaysStr, 10) || DEFAULT_EXPIRY_DAYS : DEFAULT_EXPIRY_DAYS;
+
+  if (eventDateStr) {
+    const baseEventDate = new Date(eventDateStr);
+    if (!isNaN(baseEventDate.getTime())) {
+      // Tanggal acara + X hari (pukul 23:59:59)
+      return new Date(baseEventDate.getTime() + expiryDays * 24 * 60 * 60 * 1000);
+    }
+  }
+
+  // Fallback jika event_date kosong: sekarang + X hari
+  return new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000);
+}
+
 export function hashToken(rawToken: string): string {
   return crypto.createHash("sha256").update(rawToken).digest("hex");
 }
 
-/**
- * Generate a cryptographically secure random token (256 bits = 32 bytes).
- * Returned as a URL-safe base64 string.
- */
 export function generateToken(): string {
   return crypto.randomBytes(32).toString("base64url");
 }
 
-/**
- * Generate a cryptographically secure session ID.
- */
 export function generateSessionId(): string {
   return crypto.randomUUID();
 }
@@ -37,8 +57,7 @@ export interface SessionData {
 }
 
 /**
- * Validate the invitation token, create a session, and set the session cookie.
- * Returns the session data if successful, or null if the token is invalid.
+ * Validate token, create session, dan set cookie dengan expiry dinamis
  */
 export async function validateTokenAndCreateSession(
   rawToken: string
@@ -46,23 +65,16 @@ export async function validateTokenAndCreateSession(
   const supabase = createServiceClient();
   const tokenHash = hashToken(rawToken);
 
-  // Look up invitation by token hash
   const { data: invitation, error } = await supabase
     .from("invitations")
     .select("id, guest_name, visible_bank_ids, is_revoked, expires_at")
     .eq("token_hash", tokenHash)
     .single();
 
-  if (error || !invitation) {
+  if (error || !invitation || invitation.is_revoked) {
     return null;
   }
 
-  // Check if revoked
-  if (invitation.is_revoked) {
-    return null;
-  }
-
-  // Check if expired (if expiry is set)
   if (invitation.expires_at) {
     const expiresAt = new Date(invitation.expires_at);
     if (expiresAt < new Date()) {
@@ -70,14 +82,57 @@ export async function validateTokenAndCreateSession(
     }
   }
 
-  // Create a new session
+  // Ambil tanggal expiry dinamis dari site_settings
+  const targetExpiryDate = await getDynamicExpiryDate();
+  const now = Date.now();
+  const expiryTime = targetExpiryDate.getTime();
+
+  if (now >= expiryTime) {
+    return null;
+  }
+
+  const cookieStore = await cookies();
+  const existingSessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+  const maxAgeInSeconds = Math.max(0, Math.floor((expiryTime - now) / 1000));
+  const expiresAtIso = targetExpiryDate.toISOString();
+
+  // Re-use session jika sudah ada di browser ini & masih valid
+  if (existingSessionId) {
+    const { data: existingSession } = await supabase
+      .from("sessions")
+      .select("id, invitation_id, expires_at")
+      .eq("id", existingSessionId)
+      .single();
+
+    if (
+      existingSession &&
+      existingSession.invitation_id === invitation.id &&
+      new Date(existingSession.expires_at) > new Date()
+    ) {
+      cookieStore.set(SESSION_COOKIE_NAME, existingSession.id, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: maxAgeInSeconds,
+      });
+
+      return {
+        id: existingSession.id,
+        invitation_id: invitation.id,
+        guest_name: invitation.guest_name,
+        visible_bank_ids: invitation.visible_bank_ids ?? null,
+        expires_at: existingSession.expires_at,
+      };
+    }
+  }
+
   const sessionId = generateSessionId();
-  const expiresAt = new Date(Date.now() + SESSION_DURATION_MS).toISOString();
 
   const { error: sessionError } = await supabase.from("sessions").insert({
     id: sessionId,
     invitation_id: invitation.id,
-    expires_at: expiresAt,
+    expires_at: expiresAtIso,
   });
 
   if (sessionError) {
@@ -85,14 +140,12 @@ export async function validateTokenAndCreateSession(
     return null;
   }
 
-  // Set the session cookie
-  const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE_NAME, sessionId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: SESSION_DURATION_MS / 1000, // in seconds
+    maxAge: maxAgeInSeconds,
   });
 
   return {
@@ -100,14 +153,10 @@ export async function validateTokenAndCreateSession(
     invitation_id: invitation.id,
     guest_name: invitation.guest_name,
     visible_bank_ids: invitation.visible_bank_ids ?? null,
-    expires_at: expiresAt,
+    expires_at: expiresAtIso,
   };
 }
 
-/**
- * Get the current session from the cookie.
- * Returns session data with guest info, or null if no valid session.
- */
 export async function getSession(): Promise<{
   session_id: string;
   invitation_id: string;
@@ -123,7 +172,6 @@ export async function getSession(): Promise<{
 
   const supabase = createServiceClient();
 
-  // Validate session exists and is not expired
   const { data: session, error } = await supabase
     .from("sessions")
     .select("id, invitation_id, expires_at")
@@ -134,14 +182,11 @@ export async function getSession(): Promise<{
     return null;
   }
 
-  // Check expiry
   if (new Date(session.expires_at) < new Date()) {
-    // Clean up expired session
     await supabase.from("sessions").delete().eq("id", session.id);
     return null;
   }
 
-  // Get invitation data
   const { data: invitation } = await supabase
     .from("invitations")
     .select("id, guest_name, visible_bank_ids, is_revoked")
@@ -149,7 +194,6 @@ export async function getSession(): Promise<{
     .single();
 
   if (!invitation || invitation.is_revoked) {
-    // Invitation was revoked — destroy session
     await supabase.from("sessions").delete().eq("id", session.id);
     return null;
   }
@@ -162,9 +206,6 @@ export async function getSession(): Promise<{
   };
 }
 
-/**
- * Destroy the current session (logout).
- */
 export async function destroySession(): Promise<void> {
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get(SESSION_COOKIE_NAME);

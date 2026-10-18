@@ -191,13 +191,27 @@ export async function updateInvitationBanksAction(formData: FormData) {
 export async function updateSettingsAction(form: FormData) {
   await requireAdmin();
   const now = new Date().toISOString();
-  const rows = (["opening_greeting", "closing_greeting", "maps_url"] as const).map((key) => ({
+
+  // Tambahkan event_date dan event_expiry_days
+  const settingKeys = [
+    "opening_greeting",
+    "closing_greeting",
+    "maps_url",
+    "event_date",
+    "event_expiry_days",
+  ] as const;
+
+  const rows = settingKeys.map((key) => ({
     key,
     value: String(form.get(key) ?? "").slice(0, 5000),
     updated_at: now,
   }));
-  const maps = rows.find((r) => r.key === "maps_url")!;
-  if (maps.value && !/^https:\/\//.test(maps.value)) maps.value = "";
+
+  const maps = rows.find((r) => r.key === "maps_url");
+  if (maps && maps.value && !/^https:\/\//.test(maps.value)) {
+    maps.value = "";
+  }
+
   await createServiceClient().from("site_settings").upsert(rows);
   revalidatePath("/admin");
   revalidatePath("/");

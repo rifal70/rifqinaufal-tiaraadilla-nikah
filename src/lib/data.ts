@@ -13,6 +13,8 @@ export interface SiteSettings {
   map_image_path: string;
   groom_photo_path?: string;
   bride_photo_path?: string;
+  event_date?: string;
+  event_expiry_days?: string;
 }
 
 export const SETTING_KEYS = [
@@ -23,6 +25,8 @@ export const SETTING_KEYS = [
   "music_path",
   "groom_photo_path",
   "bride_photo_path",
+  "event_date",
+  "event_expiry_days",
 ] as const;
 
 export type SettingKey = (typeof SETTING_KEYS)[number];
@@ -38,6 +42,8 @@ export async function getSettings(): Promise<SiteSettings> {
     map_image_path: "",
     groom_photo_path: "",
     bride_photo_path: "",
+    event_date: "",
+    event_expiry_days: "",
   };
 
   try {
@@ -51,6 +57,39 @@ export async function getSettings(): Promise<SiteSettings> {
     /* use empty → placeholders shown */
   }
   return empty;
+}
+
+/** Format objek Date ke teks representasi Indonesia (contoh: "Selasa, 29 Desember 2026") */
+export function formatWeddingDate(date: Date): string {
+  return new Intl.DateTimeFormat("id-ID", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "Asia/Jakarta",
+  }).format(date);
+}
+
+/** Mengambil tanggal acara display & ISO dinamis dari site_settings dengan fallback default */
+export async function getDynamicWeddingDate(fallbackIso = "2026-12-29T08:00:00+07:00") {
+  const settings = await getSettings();
+  const rawDate = settings.event_date;
+
+  if (rawDate) {
+    const parsed = new Date(rawDate);
+    if (!isNaN(parsed.getTime())) {
+      return {
+        dateText: formatWeddingDate(parsed),
+        dateISO: parsed.toISOString(),
+      };
+    }
+  }
+
+  const fallbackDate = new Date(fallbackIso);
+  return {
+    dateText: formatWeddingDate(fallbackDate),
+    dateISO: fallbackIso,
+  };
 }
 
 export async function getBanks(includeDisabled = true): Promise<BankAccount[]> {

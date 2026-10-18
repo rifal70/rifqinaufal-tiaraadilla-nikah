@@ -177,10 +177,3 @@ ADD COLUMN IF NOT EXISTS visible_bank_ids UUID[] DEFAULT NULL;
 -- 2. GIN index for fast containment checks if filtered via SQL queries
 CREATE INDEX IF NOT EXISTS idx_invitations_visible_bank_ids 
 ON invitations USING GIN (visible_bank_ids);
-
-
-ALTER TABLE site_settings
-ADD COLUMN IF NOT EXISTS groom_photo_path TEXT DEFAULT NULL,
-ADD COLUMN IF NOT EXISTS bride_photo_path TEXT DEFAULT NULL;
-
-NOTIFY pgrst, 'reload schema';
