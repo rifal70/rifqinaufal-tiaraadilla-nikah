@@ -167,3 +167,13 @@ CREATE INDEX IF NOT EXISTS idx_sessions_invitation ON sessions (invitation_id);
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('gallery', 'gallery', false)
 ON CONFLICT (id) DO NOTHING;
+
+
+
+-- 1. Add visible_bank_ids array column to invitations
+ALTER TABLE invitations 
+ADD COLUMN IF NOT EXISTS visible_bank_ids UUID[] DEFAULT NULL;
+
+-- 2. GIN index for fast containment checks if filtered via SQL queries
+CREATE INDEX IF NOT EXISTS idx_invitations_visible_bank_ids 
+ON invitations USING GIN (visible_bank_ids);

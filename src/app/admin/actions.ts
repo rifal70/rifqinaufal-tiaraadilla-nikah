@@ -45,36 +45,67 @@ export async function logoutAction() {
 /* ---------------- Invitations ---------------- */
 
 /** Bulk create: one guest name per line, optional ";count". Raw links returned ONCE as CSV. */
-export async function createInvitationsAction(_: ActionState, form: FormData): Promise<ActionState> {
+export async function createInvitationsAction(formData: FormData) {
   await requireAdmin();
-  if (!siteUrl()) return { error: "NEXT_PUBLIC_SITE_URL belum diatur." };
 
-  const lines = String(form.get("names") ?? "")
-    .split(/\r?\n/)
+  const rawGuests = formData.get("guests")?.toString() ?? "";
+  const lines = rawGuests
+    .split("\n")
     .map((l) => l.trim())
     .filter(Boolean);
-  if (!lines.length) return { error: "Masukkan minimal satu nama." };
-  if (lines.length > 2000) return { error: "Maksimal 2000 nama per proses." };
 
-  const rows: { guest_name: string; guest_count: number; token_hash: string }[] = [];
-  const out: string[] = ["nama,jumlah,link"];
-  for (const line of lines) {
-    const [rawName, rawCount] = line.split(";");
-    const name = rawName.trim().slice(0, 200);
-    const count = Math.max(1, Math.min(50, parseInt(rawCount ?? "1", 10) || 1));
-    if (!name) continue;
-    const token = generateToken();
-    rows.push({ guest_name: name, guest_count: count, token_hash: hashToken(token) });
-    out.push(`"${name.replace(/"/g, '""')}",${count},${siteUrl()}/invite/${token}`);
-  }
+  if (!lines.length) return;
 
   const supabase = createServiceClient();
-  for (let i = 0; i < rows.length; i += 500) {
-    const { error } = await supabase.from("invitations").insert(rows.slice(i, i + 500));
-    if (error) return { error: "Gagal menyimpan undangan. Tidak ada link yang valid dari batch yang gagal." };
+
+  // 1. Ambil data master rekening aktif untuk pemetaan urutan -> ID
+  const { data: allBanks } = await supabase
+    .from("bank_accounts")
+    .select("id, display_order, account_number")
+    .eq("is_enabled", true);
+
+  const activeBankList = allBanks ?? [];
+
+  // 2. Parse tiap baris: nama;jumlah;norek_atau_urutan
+  const records = lines.map((line) => {
+    const parts = line.split(";").map((s) => s.trim());
+    const name = parts[0] || "Tamu";
+    const count = Math.max(1, parseInt(parts[1] || "1", 10) || 1);
+    const bankRef = parts[2]?.toLowerCase(); // bisa: "1", "1,2", "all", "none", atau nomor rekening asli
+
+    let matchedBankIds: string[] | null = null;
+
+    if (!bankRef || bankRef === "all") {
+      // Default / "all": tampilkan semua rekening yang aktif
+      matchedBankIds = activeBankList.map((b) => b.id);
+    } else if (bankRef === "none" || bankRef === "0" || bankRef === "-") {
+      // "none": sembunyikan amplop sepenuhnya
+      matchedBankIds = [];
+    } else {
+      // Cari kecocokan berdasarkan nomor urut (display_order) atau string nomor rekening asli
+      const targets = bankRef.split(",").map((t) => t.trim());
+      matchedBankIds = activeBankList
+        .filter((b) =>
+          targets.includes(String(b.display_order)) ||
+          targets.includes(b.account_number)
+        )
+        .map((b) => b.id);
+    }
+
+    return {
+      guest_name: name,
+      guest_count: count,
+      visible_bank_ids: matchedBankIds,
+    };
+  });
+
+  const { error } = await supabase.from("invitations").insert(records);
+
+  if (error) {
+    throw new Error(`Gagal membuat undangan: ${error.message}`);
   }
+
   revalidatePath("/admin");
-  return { ok: true, message: `${rows.length} undangan dibuat. Unduh CSV sekarang — link tidak bisa ditampilkan lagi.`, csv: out.join("\n") };
 }
 
 /** Regenerate a single invitation's link (old link stops working). */
@@ -219,4 +250,21 @@ export async function deleteGalleryAction(form: FormData) {
   if (data) await supabase.storage.from(STORAGE_BUCKET).remove([data.storage_path]);
   await supabase.from("gallery_images").delete().eq("id", id);
   revalidatePath("/admin");
+}
+
+export async function updateInvitationBanksAction(formData: FormData) {
+  await requireAdmin();
+  const invitation_id = formData.get("invitation_id")?.toString();
+  const bank_ids = formData.getAll("bank_ids") as string[];
+
+  const supabase = createServiceClient();
+  const { error } = await supabase
+    .from("invitations")
+    .update({ visible_bank_ids: bank_ids })
+    .eq("id", invitation_id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin");
+  revalidatePath("/");
 }

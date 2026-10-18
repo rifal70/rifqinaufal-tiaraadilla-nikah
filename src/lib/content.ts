@@ -4,14 +4,14 @@
  */
 export const WEDDING = {
   bride: {
-    name: "Maghfira Tiara Adilla, S.Gz.",
+    name: "Maghfira Tiara Adilla, S.Gz",
     shortName: "Dilla",
     childOrder: "Putri pertama dari",
     father: "Bapak Drs. H. Supriadi (Alm.)",
     mother: "Ibu Hj. Pambudi Ningsih",
   },
   groom: {
-    name: "Rifqi Naufal Gahara, S.T.",
+    name: "Rifqi Naufal Gahara, S.T",
     shortName: "Naufal",
     childOrder: "Putra pertama dari",
     father: "Bapak Drs. H. Wawan Gunawan",

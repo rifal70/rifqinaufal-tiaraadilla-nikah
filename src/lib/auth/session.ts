@@ -32,6 +32,7 @@ export interface SessionData {
   id: string;
   invitation_id: string;
   guest_name: string;
+  visible_bank_ids: string[] | null;
   expires_at: string;
 }
 
@@ -48,7 +49,7 @@ export async function validateTokenAndCreateSession(
   // Look up invitation by token hash
   const { data: invitation, error } = await supabase
     .from("invitations")
-    .select("id, guest_name, is_revoked, expires_at")
+    .select("id, guest_name, visible_bank_ids, is_revoked, expires_at")
     .eq("token_hash", tokenHash)
     .single();
 
@@ -98,6 +99,7 @@ export async function validateTokenAndCreateSession(
     id: sessionId,
     invitation_id: invitation.id,
     guest_name: invitation.guest_name,
+    visible_bank_ids: invitation.visible_bank_ids ?? null,
     expires_at: expiresAt,
   };
 }
@@ -110,6 +112,7 @@ export async function getSession(): Promise<{
   session_id: string;
   invitation_id: string;
   guest_name: string;
+  visible_bank_ids: string[] | null;
 } | null> {
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get(SESSION_COOKIE_NAME);
@@ -141,7 +144,7 @@ export async function getSession(): Promise<{
   // Get invitation data
   const { data: invitation } = await supabase
     .from("invitations")
-    .select("id, guest_name, is_revoked")
+    .select("id, guest_name, visible_bank_ids, is_revoked")
     .eq("id", session.invitation_id)
     .single();
 
@@ -155,6 +158,7 @@ export async function getSession(): Promise<{
     session_id: session.id,
     invitation_id: invitation.id,
     guest_name: invitation.guest_name,
+    visible_bank_ids: invitation.visible_bank_ids ?? null,
   };
 }
 

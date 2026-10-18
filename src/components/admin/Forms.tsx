@@ -33,41 +33,38 @@ export function ActionForm({
 }
 
 /** Bulk invitation creator — offers the one-time CSV download of raw links. */
-export function InviteCreator({ action }: { action: Action }) {
-  const [state, formAction, pending] = useActionState(action, {});
-  const [downloaded, setDownloaded] = useState(false);
 
-  const download = () => {
-    if (!state.csv) return;
-    const blob = new Blob(["\ufeff" + state.csv], { type: "text/csv;charset=utf-8" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `undangan-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
-    setDownloaded(true);
-  };
-
+export function InviteCreator({
+  action,
+}: {
+  action: (formData: FormData) => Promise<void>;
+}) {
   return (
-    <form action={formAction} id="create-invites" onSubmit={() => setDownloaded(false)}>
-      <label htmlFor="names" className="admin-label">
-        Nama tamu (satu per baris, opsional <code>;jumlah</code> — contoh: <code>Keluarga Budi;4</code>)
-      </label>
-      <textarea id="names" name="names" rows={6} className="admin-input" required />
-      <button type="submit" className="btn-gold mt-3" disabled={pending} id="create-invites-submit">
-        {pending ? "Membuat…" : "Buat Link Undangan"}
+    <form action={action} className="space-y-4">
+      <div>
+        <label className="admin-label" htmlFor="guests">
+          Format input (satu per baris): <span className="text-gold-300 font-mono">nama;jumlah;urutan_rekening</span>
+        </label>
+        <p className="text-xs text-green-200/80 mb-2">
+          Contoh: <br />
+          • <span className="font-mono">Keluarga Budi;4;1</span> (Urutan #1 saja) <br />
+          • <span className="font-mono">Siti Rahma;2;1,2</span> (Urutan #1 dan #2) <br />
+          • <span className="font-mono">Ahmad Subarjo;1;all</span> (Tampilkan semua rekening aktif) <br />
+          • <span className="font-mono">Rian;1;none</span> (Tanpa rekening / amplop disembunyikan)
+        </p>
+        <textarea
+          id="guests"
+          name="guests"
+          rows={6}
+          className="admin-input font-mono text-sm"
+          placeholder={"Keluarga Budi;4;1\nSiti Rahma;2;1,2\nAhmad Subarjo;1;all\nRian;1;none"}
+          required
+        />
+      </div>
+
+      <button type="submit" className="btn-gold" id="create-invites">
+        Buat Link Undangan
       </button>
-      {state.error && <p className="mt-2 text-sm text-red-300">{state.error}</p>}
-      {state.message && (
-        <div className="mt-3 rounded-lg border border-gold-500/40 p-3">
-          <p className="text-sm text-gold-200">{state.message}</p>
-          {state.csv && (
-            <button type="button" id="download-csv" className="btn-copy mt-2" onClick={download}>
-              {downloaded ? "CSV terunduh ✓ (unduh lagi)" : "Unduh CSV"}
-            </button>
-          )}
-        </div>
-      )}
     </form>
   );
 }

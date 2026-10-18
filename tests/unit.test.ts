@@ -35,8 +35,8 @@ describe("bank accounts (exact strings)", () => {
 
 describe("verbatim event content", () => {
   it("matches the owner's invitation", () => {
-    expect(WEDDING.bride.name).toBe("Maghfira Tiara Adilla, S.Gz.");
-    expect(WEDDING.groom.name).toBe("Rifqi Naufal Gahara, S.T.");
+    expect(WEDDING.bride.name).toBe("Maghfira Tiara Adilla, S.Gz");
+    expect(WEDDING.groom.name).toBe("Rifqi Naufal Gahara, S.T");
     expect(WEDDING.bride.father).toBe("Bapak Drs. H. Supriadi (Alm.)");
     expect(WEDDING.bride.mother).toBe("Ibu Hj. Pambudi Ningsih");
     expect(WEDDING.groom.father).toBe("Bapak H. Wawan Gunawan");
