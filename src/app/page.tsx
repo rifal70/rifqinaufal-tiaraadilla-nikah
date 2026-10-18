@@ -1,69 +1,153 @@
-import Image from "next/image";
+import { notFound } from "next/navigation";
+import { getSession } from "@/lib/auth/session";
+import { getBanks, getGallery, getSettings, signedUrl } from "@/lib/data";
+import { WEDDING } from "@/lib/content";
+import InvitationShell from "@/components/InvitationShell";
+import BankCard from "@/components/BankCard";
+import Gallery from "@/components/Gallery";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+function Divider() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="ornament-divider" aria-hidden>
+      <span className="ornament-diamond" />
     </div>
+  );
+}
+
+function Placeholder({ label }: { label: string }) {
+  return <p className="placeholder-box">[PLACEHOLDER — {label}]</p>;
+}
+
+export default async function Home() {
+  const session = await getSession();
+  if (!session) notFound();
+
+  const [banks, gallery, settings] = await Promise.all([getBanks(), getGallery(), getSettings()]);
+  const [musicUrl, mapImageUrl] = await Promise.all([signedUrl(settings.music_path), signedUrl(settings.map_image_path)]);
+  const W = WEDDING;
+
+  return (
+    <InvitationShell
+      guestName={session.guest_name}
+      coupleNames={`${W.groom.shortName} & ${W.bride.shortName}`}
+      date={W.date}
+      musicUrl={musicUrl}
+    >
+      {/* Hero */}
+      <section className="section-wedding hero-bg text-center" id="hero">
+        <p className="text-xs uppercase tracking-[0.4em] text-gold-300" data-reveal>The Wedding of</p>
+        <h1 className="mt-6 font-display text-5xl md:text-7xl text-gold-shimmer" data-reveal>
+          {W.groom.shortName} &amp; {W.bride.shortName}
+        </h1>
+        <Divider />
+        <p className="font-display text-2xl text-cream" data-reveal>{W.date}</p>
+      </section>
+
+      {/* Opening */}
+      <section className="section-wedding text-center" id="pembuka">
+        <div className="max-w-2xl" data-reveal>
+          {settings.opening_greeting ? (
+            <p className="font-display text-xl leading-relaxed text-cream whitespace-pre-line">{settings.opening_greeting}</p>
+          ) : (
+            <Placeholder label="teks salam pembuka dari pemilik" />
+          )}
+        </div>
+      </section>
+
+      {/* Couple */}
+      <section className="section-wedding text-center" id="mempelai">
+        <div className="grid gap-10 md:grid-cols-[1fr_auto_1fr] items-center max-w-5xl w-full">
+          {[W.groom, W.bride].map((p, i) => (
+            <div key={p.name} className={`glass-card ${i === 1 ? "md:order-3" : ""}`} data-reveal>
+              <h3 className="font-display text-3xl md:text-4xl text-gold-shimmer">{p.name}</h3>
+              <p className="mt-4 text-sm text-green-100">{p.childOrder}</p>
+              <p className="mt-1 text-cream">{p.father}</p>
+              <p className="text-cream">dan {p.mother}</p>
+            </div>
+          ))}
+          <span className="font-display text-6xl text-gold-400 md:order-2" data-reveal>&amp;</span>
+        </div>
+      </section>
+
+      {/* Events */}
+      <section className="section-wedding text-center" id="acara">
+        <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>Waktu &amp; Tempat</h2>
+        <Divider />
+        <div className="grid gap-6 md:grid-cols-2 max-w-4xl w-full">
+          {[W.akad, W.resepsi].map((e) => (
+            <div key={e.title} className="glass-card-gold" data-reveal>
+              <h3 className="font-display text-3xl text-gold-300">{e.title}</h3>
+              <p className="mt-4 text-cream">{W.date}</p>
+              <p className="mt-1 text-lg font-medium text-gold-100">{e.time}</p>
+            </div>
+          ))}
+        </div>
+        <div className="glass-card mt-6 max-w-4xl w-full" data-reveal>
+          <p className="text-xs uppercase tracking-[0.3em] text-gold-300">Bertempat di</p>
+          <p className="mt-3 font-display text-2xl text-cream">{W.venue.name}</p>
+          <p className="mt-2 text-green-100">{W.venue.address}</p>
+        </div>
+      </section>
+
+      {/* Location */}
+      <section className="section-wedding text-center" id="lokasi">
+        <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>Denah Lokasi</h2>
+        <Divider />
+        <div className="max-w-3xl w-full" data-reveal>
+          {mapImageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={mapImageUrl} alt="Denah lokasi acara" className="rounded-xl w-full" loading="lazy" />
+          ) : (
+            <Placeholder label="gambar Denah Lokasi" />
+          )}
+          {settings.maps_url ? (
+            <a id="maps-link" href={settings.maps_url} target="_blank" rel="noopener noreferrer" className="btn-gold inline-block mt-6">
+              Buka di Google Maps
+            </a>
+          ) : (
+            <Placeholder label="tautan Google Maps" />
+          )}
+        </div>
+      </section>
+
+      {/* Gallery */}
+      <section className="section-wedding text-center" id="galeri">
+        <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>Galeri</h2>
+        <Divider />
+        <div className="max-w-5xl w-full" data-reveal>
+          {gallery.length ? <Gallery items={gallery} /> : <Placeholder label="foto galeri dari pemilik" />}
+        </div>
+      </section>
+
+      {/* Gifts */}
+      <section className="section-wedding text-center" id="amplop">
+        <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>Amplop Digital</h2>
+        <Divider />
+        <div className="grid gap-6 md:grid-cols-3 max-w-5xl w-full">
+          {banks.map((b) => (
+            <div key={b.id} data-reveal>
+              <BankCard account={b} />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Closing */}
+      <section className="section-wedding text-center" id="penutup">
+        <div className="max-w-2xl" data-reveal>
+          {settings.closing_greeting ? (
+            <p className="font-display text-xl leading-relaxed text-cream whitespace-pre-line">{settings.closing_greeting}</p>
+          ) : (
+            <Placeholder label="teks salam penutup dari pemilik" />
+          )}
+        </div>
+        <Divider />
+        <p className="font-display text-4xl text-gold-shimmer" data-reveal>
+          {W.groom.shortName} &amp; {W.bride.shortName}
+        </p>
+      </section>
+    </InvitationShell>
   );
 }
