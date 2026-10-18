@@ -77,13 +77,6 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
                 );
               })}
             </div>
-
-            {/* Hover Hint */}
-            <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-black/35 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-              <span className="rounded-full border border-gold-400 bg-emerald-950/90 px-4 py-1.5 text-xs tracking-wider text-gold-300 shadow-xl backdrop-blur-sm">
-                🔍 Klik untuk memperbesar
-              </span>
-            </div>
           </div>
         </div>
 

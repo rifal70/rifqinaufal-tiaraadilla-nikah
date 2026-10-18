@@ -5,6 +5,7 @@ import { WEDDING } from "@/lib/content";
 import InvitationShell from "@/components/InvitationShell";
 import BankCard from "@/components/BankCard";
 import Gallery from "@/components/Gallery";
+import CouplePhoto from "@/components/CouplePhoto";
 
 export const dynamic = "force-dynamic";
 
@@ -25,23 +26,29 @@ export default async function Home() {
   if (!session) notFound();
 
   const [banks, gallery, settings] = await Promise.all([getBanks(), getGallery(), getSettings()]);
-  const [musicUrl, mapImageUrl] = await Promise.all([signedUrl(settings.music_path), signedUrl(settings.map_image_path)]);
+  const [musicUrl, mapImageUrl, groomPhotoUrl, bridePhotoUrl] = await Promise.all([
+    signedUrl(settings.music_path),
+    signedUrl(settings.map_image_path),
+    signedUrl(settings.groom_photo_path),
+    signedUrl(settings.bride_photo_path),
+  ]);
   const W = WEDDING;
 
   // Filter rekening khusus yang dicentang untuk tamu ini
-  const visibleBanks = banks?.filter((b) => {
-    // 1. Validasi teks rekening
-    const isValid = b.is_enabled && b.bank_name?.trim() !== "-" && b.account_number?.trim() !== "-";
-    if (!isValid) return false;
+  const visibleBanks =
+    banks?.filter((b) => {
+      // 1. Validasi teks rekening
+      const isValid = b.is_enabled && b.bank_name?.trim() !== "-" && b.account_number?.trim() !== "-";
+      if (!isValid) return false;
 
-    // 2. Cocokkan dengan array visible_bank_ids dari session tamu
-    if (session.visible_bank_ids && Array.isArray(session.visible_bank_ids)) {
-      return session.visible_bank_ids.includes(b.id);
-    }
+      // 2. Cocokkan dengan array visible_bank_ids dari session tamu
+      if (session.visible_bank_ids && Array.isArray(session.visible_bank_ids)) {
+        return session.visible_bank_ids.includes(b.id);
+      }
 
-    // Fallback: Jika tamu belum di-set pilihannya (null/undefined), tampilkan semua rekening aktif
-    return true;
-  }) ?? [];
+      // Fallback: Jika tamu belum di-set pilihannya (null/undefined), tampilkan semua rekening aktif
+      return true;
+    }) ?? [];
 
   return (
     <InvitationShell
@@ -75,7 +82,12 @@ export default async function Home() {
       <section className="section-wedding text-center" id="mempelai">
         <div className="grid gap-10 md:grid-cols-[1fr_auto_1fr] items-center max-w-5xl w-full mx-auto">
           {/* Mempelai Pria */}
-          <div className="glass-card" data-reveal>
+          <div className="glass-card flex flex-col items-center justify-center p-6 sm:p-10 text-center" data-reveal>
+            {/* Foto Pria (Bisa Diklik & Membesar) */}
+            {groomPhotoUrl ? (
+              <CouplePhoto src={groomPhotoUrl} alt={W.groom.name} />
+            ) : null}
+
             <h3 className="font-display text-3xl md:text-4xl text-gold-shimmer">{W.groom.name}</h3>
             <p className="mt-4 text-sm text-green-100">{W.groom.childOrder}</p>
             <p className="mt-1 text-cream">{W.groom.father}</p>
@@ -86,7 +98,12 @@ export default async function Home() {
           <span className="font-display text-6xl text-gold-400" data-reveal>&amp;</span>
 
           {/* Mempelai Wanita */}
-          <div className="glass-card" data-reveal>
+          <div className="glass-card flex flex-col items-center justify-center p-6 sm:p-10 text-center" data-reveal>
+            {/* Foto Wanita (Bisa Diklik & Membesar) */}
+            {bridePhotoUrl ? (
+              <CouplePhoto src={bridePhotoUrl} alt={W.bride.name} />
+            ) : null}
+
             <h3 className="font-display text-3xl md:text-4xl text-gold-shimmer">{W.bride.name}</h3>
             <p className="mt-4 text-sm text-green-100">{W.bride.childOrder}</p>
             <p className="mt-1 text-cream">{W.bride.father}</p>
@@ -125,7 +142,6 @@ export default async function Home() {
         <div className="mx-auto max-w-6xl w-full space-y-8" data-reveal>
           {/* Grid Kustom: Kolom pertama (Denah) dibuat jauh lebih lebar dari kolom kedua (QR) */}
           <div className="grid gap-6 md:grid-cols-[3fr_2fr] items-stretch">
-
             {/* 1. Denah Lokasi (Kolom Utama - Diperbesar) */}
             <div className="glass-card flex flex-col items-center justify-center p-6 md:p-8 h-full">
               <p className="text-xs uppercase tracking-widest text-gold-300 mb-4 font-semibold">
@@ -162,7 +178,6 @@ export default async function Home() {
                 Arahkan kamera HP ke QR Code untuk rute langsung
               </p>
             </div>
-
           </div>
 
           {/* 3. Tombol Buka Google Maps */}
@@ -194,7 +209,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Gifts / Amplop Digital (Hanya dirender jika ada rekening yang aktif & dicentang) */}
+      {/* Gifts / Amplop Digital */}
       {visibleBanks.length > 0 && (
         <section className="section-wedding text-center" id="amplop">
           <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>

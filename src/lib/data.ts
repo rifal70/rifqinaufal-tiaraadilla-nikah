@@ -11,24 +11,39 @@ export interface SiteSettings {
   music_path: string;
   maps_url: string;
   map_image_path: string;
+  groom_photo_path?: string;
+  bride_photo_path?: string;
 }
 
-export const SETTING_KEYS: (keyof SiteSettings)[] = [
+export const SETTING_KEYS = [
   "opening_greeting",
   "closing_greeting",
-  "music_path",
   "maps_url",
   "map_image_path",
-];
+  "music_path",
+  "groom_photo_path",
+  "bride_photo_path",
+] as const;
+
+export type SettingKey = (typeof SETTING_KEYS)[number];
 
 const isPlaceholder = (v?: string | null) => !v || v.trim() === "" || v.startsWith("[PLACEHOLDER");
 
 export async function getSettings(): Promise<SiteSettings> {
-  const empty: SiteSettings = { opening_greeting: "", closing_greeting: "", music_path: "", maps_url: "", map_image_path: "" };
+  const empty: SiteSettings = {
+    opening_greeting: "",
+    closing_greeting: "",
+    music_path: "",
+    maps_url: "",
+    map_image_path: "",
+    groom_photo_path: "",
+    bride_photo_path: "",
+  };
+
   try {
     const { data } = await createServiceClient().from("site_settings").select("key, value");
     for (const row of data ?? []) {
-      if ((SETTING_KEYS as string[]).includes(row.key) && !isPlaceholder(row.value)) {
+      if ((SETTING_KEYS as readonly string[]).includes(row.key) && !isPlaceholder(row.value)) {
         empty[row.key as keyof SiteSettings] = row.value;
       }
     }
@@ -54,7 +69,7 @@ export async function getBanks(includeDisabled = true): Promise<BankAccount[]> {
 }
 
 /** Turn a storage path into a short-lived signed URL; external http(s) URLs pass through. */
-export async function signedUrl(path: string): Promise<string> {
+export async function signedUrl(path?: string | null): Promise<string> {
   if (!path) return "";
   if (/^https?:\/\//.test(path) || path.startsWith("/")) return path;
   const { data } = await createServiceClient().storage.from(STORAGE_BUCKET).createSignedUrl(path, SIGNED_URL_TTL);

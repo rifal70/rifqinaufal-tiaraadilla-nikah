@@ -44,7 +44,7 @@ export async function logoutAction() {
 
 /* ---------------- Invitations ---------------- */
 
-/** Bulk create: one guest name per line, optional ";count". Raw links returned ONCE as CSV. */
+/** Bulk create: one guest name per line, optional ";count;bankRef". */
 export async function createInvitationsAction(formData: FormData) {
   await requireAdmin();
 
@@ -115,7 +115,10 @@ export async function regenerateLinkAction(_: ActionState, form: FormData): Prom
   if (!id.success || !siteUrl()) return { error: "Data tidak valid." };
   const token = generateToken();
   const supabase = createServiceClient();
-  const { error } = await supabase.from("invitations").update({ token_hash: hashToken(token), updated_at: new Date().toISOString() }).eq("id", id.data);
+  const { error } = await supabase
+    .from("invitations")
+    .update({ token_hash: hashToken(token), updated_at: new Date().toISOString() })
+    .eq("id", id.data);
   if (error) return { error: "Gagal membuat link baru." };
   await supabase.from("sessions").delete().eq("invitation_id", id.data);
   return { ok: true, message: `${siteUrl()}/invite/${token}` };
@@ -126,7 +129,10 @@ export async function setRevokedAction(form: FormData) {
   const id = z.string().uuid().parse(form.get("id"));
   const revoke = form.get("revoke") === "1";
   const supabase = createServiceClient();
-  await supabase.from("invitations").update({ is_revoked: revoke, updated_at: new Date().toISOString() }).eq("id", id);
+  await supabase
+    .from("invitations")
+    .update({ is_revoked: revoke, updated_at: new Date().toISOString() })
+    .eq("id", id);
   if (revoke) await supabase.from("sessions").delete().eq("invitation_id", id);
   revalidatePath("/admin");
 }
@@ -147,7 +153,7 @@ export async function updateBankAction(form: FormData) {
       id: z.string().uuid(),
       bank_name: z.string().trim().min(1).max(100),
       account_holder: z.string().trim().min(1).max(200),
-      account_number: z.string().trim().min(1).max(64), // kept as exact string
+      account_number: z.string().trim().min(1).max(64),
     })
     .parse({
       id: form.get("id"),
@@ -159,6 +165,23 @@ export async function updateBankAction(form: FormData) {
     .from("bank_accounts")
     .update({ ...data, is_enabled: form.get("is_enabled") === "on" })
     .eq("id", data.id);
+  revalidatePath("/admin");
+  revalidatePath("/");
+}
+
+export async function updateInvitationBanksAction(formData: FormData) {
+  await requireAdmin();
+  const invitation_id = formData.get("invitation_id")?.toString();
+  const bank_ids = formData.getAll("bank_ids") as string[];
+
+  const supabase = createServiceClient();
+  const { error } = await supabase
+    .from("invitations")
+    .update({ visible_bank_ids: bank_ids })
+    .eq("id", invitation_id);
+
+  if (error) throw new Error(error.message);
+
   revalidatePath("/admin");
   revalidatePath("/");
 }
@@ -182,7 +205,7 @@ export async function updateSettingsAction(form: FormData) {
 
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 const AUDIO_TYPES = ["audio/mpeg", "audio/mp4", "audio/aac", "audio/ogg", "audio/x-m4a"];
-const MAX_BYTES = 5 * 1024 * 1024;
+const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 
 async function upload(file: File, prefix: string, allowed: string[]) {
   if (!file || file.size === 0) throw new Error("File kosong.");
@@ -199,13 +222,28 @@ async function upload(file: File, prefix: string, allowed: string[]) {
 
 export async function uploadAssetAction(_: ActionState, form: FormData): Promise<ActionState> {
   await requireAdmin();
-  const kind = form.get("kind");
-  const key = kind === "music" ? "music_path" : kind === "map" ? "map_image_path" : null;
-  if (!key || !SETTING_KEYS.includes(key)) return { error: "Jenis tidak valid." };
+  const kind = form.get("kind")?.toString();
+
+  // Pemetaan kind -> key database site_settings
+  const keyMap: Record<string, string> = {
+    music: "music_path",
+    map: "map_image_path",
+    groom_photo: "groom_photo_path",
+    bride_photo: "bride_photo_path",
+  };
+
+  const key = kind ? keyMap[kind] : null;
+  if (!key) return { error: "Jenis aset tidak valid." };
+
   try {
-    const path = await upload(form.get("file") as File, "assets", kind === "music" ? AUDIO_TYPES : IMAGE_TYPES);
-    await createServiceClient().from("site_settings").upsert({ key, value: path, updated_at: new Date().toISOString() });
+    const isAudio = kind === "music";
+    const path = await upload(form.get("file") as File, "assets", isAudio ? AUDIO_TYPES : IMAGE_TYPES);
+    await createServiceClient()
+      .from("site_settings")
+      .upsert({ key, value: path, updated_at: new Date().toISOString() });
+
     revalidatePath("/admin");
+    revalidatePath("/");
     return { ok: true, message: "Berhasil diunggah." };
   } catch (e) {
     return { error: (e as Error).message };
@@ -219,13 +257,19 @@ export async function uploadGalleryAction(_: ActionState, form: FormData): Promi
   const files = form.getAll("files").filter((f): f is File => f instanceof File && f.size > 0);
   if (!files.length) return { error: "Pilih minimal satu foto." };
   const supabase = createServiceClient();
-  const { data: last } = await supabase.from("gallery_images").select("display_order").order("display_order", { ascending: false }).limit(1);
+  const { data: last } = await supabase
+    .from("gallery_images")
+    .select("display_order")
+    .order("display_order", { ascending: false })
+    .limit(1);
   let order = (last?.[0]?.display_order ?? 0) + 1;
   let done = 0;
   for (const f of files) {
     try {
       const path = await upload(f, "photos", IMAGE_TYPES);
-      await supabase.from("gallery_images").insert({ storage_path: path, display_order: order++, alt_text: "Foto galeri" });
+      await supabase
+        .from("gallery_images")
+        .insert({ storage_path: path, display_order: order++, alt_text: "Foto galeri" });
       done++;
     } catch (e) {
       return { error: `${done} foto terunggah, lalu gagal: ${(e as Error).message}` };
@@ -238,7 +282,10 @@ export async function uploadGalleryAction(_: ActionState, form: FormData): Promi
 export async function toggleGalleryAction(form: FormData) {
   await requireAdmin();
   const id = z.string().uuid().parse(form.get("id"));
-  await createServiceClient().from("gallery_images").update({ is_visible: form.get("visible") === "1" }).eq("id", id);
+  await createServiceClient()
+    .from("gallery_images")
+    .update({ is_visible: form.get("visible") === "1" })
+    .eq("id", id);
   revalidatePath("/admin");
 }
 
@@ -250,21 +297,4 @@ export async function deleteGalleryAction(form: FormData) {
   if (data) await supabase.storage.from(STORAGE_BUCKET).remove([data.storage_path]);
   await supabase.from("gallery_images").delete().eq("id", id);
   revalidatePath("/admin");
-}
-
-export async function updateInvitationBanksAction(formData: FormData) {
-  await requireAdmin();
-  const invitation_id = formData.get("invitation_id")?.toString();
-  const bank_ids = formData.getAll("bank_ids") as string[];
-
-  const supabase = createServiceClient();
-  const { error } = await supabase
-    .from("invitations")
-    .update({ visible_bank_ids: bank_ids })
-    .eq("id", invitation_id);
-
-  if (error) throw new Error(error.message);
-
-  revalidatePath("/admin");
-  revalidatePath("/");
 }
