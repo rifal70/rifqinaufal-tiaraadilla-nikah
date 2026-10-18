@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Undangan Pernikahan Rifqi & Tiara",
+  title: "Undangan Pernikahan Naufal & Dilla",
   description: "Undangan Pernikahan Rifqi Naufal Gahara & Maghfira Tiara Adilla — 29 Desember 2026",
   robots: {
     index: false,
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Undangan Pernikahan Rifqi & Tiara",
+    title: "Undangan Pernikahan Naufal & Dilla",
     description: "Selasa, 29 Desember 2026",
     type: "website",
   },
