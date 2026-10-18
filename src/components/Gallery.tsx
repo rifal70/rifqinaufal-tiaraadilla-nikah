@@ -34,20 +34,13 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
         {/* ========================================================= */}
         <div
           onClick={() => setIsOpen(true)}
-          className="group relative aspect-square w-full cursor-pointer select-none overflow-hidden rounded-[2.5rem] p-8 sm:p-11 shadow-[0_20px_50px_rgba(0,0,0,0.85)] transition-transform duration-300 hover:scale-[1.01]"
+          className="group relative aspect-square w-full cursor-pointer select-none overflow-hidden rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.85)] transition-transform duration-300 hover:scale-[1.01]"
         >
-          {/* Layer Gambar Frame Asli dari public/frame-java.png (Di Luar Kotak Foto) */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/frame-java.png"
-            alt="Bingkai Jawa"
-            className="pointer-events-none absolute inset-0 z-20 h-full w-full object-fill drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]"
-          />
-
           {/* ========================================================= */}
           {/* 2. KOTAK DALAM (TEMPAT SLIDER FOTO BERADA)               */}
+          {/* Menggunakan inset persentase agar selalu pas di dalam frame */}
           {/* ========================================================= */}
-          <div className="relative z-10 h-full w-full overflow-hidden rounded-2xl bg-black/60 shadow-[inset_0_0_25px_rgba(0,0,0,0.9)] border border-gold-500/20">
+          <div className="absolute inset-[13%] sm:inset-[12%] z-10 overflow-hidden rounded-xl bg-black/60 shadow-[inset_0_0_25px_rgba(0,0,0,0.9)] border border-gold-500/20">
             <div
               className="flex h-full w-full transition-transform duration-700 ease-in-out"
               style={{ transform: `translateX(-${currentIndex * 100}%)` }}
@@ -57,7 +50,7 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
                 return (
                   <div
                     key={item.id || idx}
-                    className="relative flex h-full w-full flex-shrink-0 items-center justify-center p-3"
+                    className="relative flex h-full w-full flex-shrink-0 items-center justify-center p-2"
                   >
                     {/* Background Blur Halus */}
                     <div
@@ -70,7 +63,7 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
                     <img
                       src={imgUrl}
                       alt={`Foto galeri ${idx + 1}`}
-                      className="relative max-h-full max-w-full rounded-lg object-contain shadow-md"
+                      className="relative max-h-full max-w-full rounded-md object-contain shadow-md"
                       loading={idx === 0 ? "eager" : "lazy"}
                     />
                   </div>
@@ -78,10 +71,18 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
               })}
             </div>
           </div>
+
+          {/* Layer Gambar Frame Asli (Berada di atas/z-20 menutupi pinggiran foto) */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/frame-java.png"
+            alt="Bingkai Jawa"
+            className="pointer-events-none absolute inset-0 z-20 h-full w-full object-fill drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]"
+          />
         </div>
 
         {/* ========================================================= */}
-        {/* 3. INDIKATOR TITIK (DOTS)                                 */}
+        {/* 3. INDIKATOR TITIK (DOTS)                                */}
         {/* ========================================================= */}
         {items.length > 1 && (
           <div className="mt-5 flex flex-col items-center gap-1.5">
@@ -92,8 +93,8 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
                   type="button"
                   onClick={() => setCurrentIndex(idx)}
                   className={`h-2 rounded-full transition-all duration-300 ${currentIndex === idx
-                    ? "w-6 bg-gold-400 shadow-md"
-                    : "w-2 bg-white/30 hover:bg-white/60"
+                      ? "w-6 bg-gold-400 shadow-md"
+                      : "w-2 bg-white/30 hover:bg-white/60"
                     }`}
                   aria-label={`Slide ${idx + 1}`}
                 />
@@ -105,7 +106,6 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
           </div>
         )}
       </div>
-
       {/* ========================================================= */}
       {/* 4. MODAL FULLSCREEN / LIGHTBOX                            */}
       {/* ========================================================= */}
