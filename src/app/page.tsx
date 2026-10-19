@@ -115,15 +115,37 @@ export default async function Home() {
           />
         </div>
       </section>
-
       {/* Opening */}
-      <section className="section-wedding text-center" id="pembuka">
-        <div className="max-w-2xl" data-reveal>
+      <section className="section-wedding text-center relative overflow-hidden min-h-[60vh] flex flex-col justify-between" id="pembuka">
+        {/* Mega Mendung Top (Pojok Kiri Atas) */}
+        <div data-reveal className="pointer-events-none select-none absolute top-0 left-0 z-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/mega_mendung.png"
+            alt=""
+            aria-hidden="true"
+            className="w-48 sm:w-64 md:w-80 h-auto object-contain rotate-[24deg] -translate-x-33 translate-y-2 drop-shadow-[0_-4px_20px_rgba(0,0,0,0.35)]"
+          />
+        </div>
+
+        {/* Konten Salam Pembuka */}
+        <div className="relative z-10 max-w-2xl mx-auto px-6 py-24 sm:py-32 my-auto" data-reveal>
           {settings.opening_greeting ? (
             <p className="font-display text-xl leading-relaxed text-cream whitespace-pre-line">{settings.opening_greeting}</p>
           ) : (
             <Placeholder label="teks salam pembuka dari pemilik" />
           )}
+        </div>
+
+        {/* Mega Mendung Bottom (Pojok Kanan Bawah & Miring) */}
+        <div data-reveal className="pointer-events-none select-none absolute bottom-0 right-0 z-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/mega_mendung.png"
+            alt=""
+            aria-hidden="true"
+            className="w-48 sm:w-64 md:w-80 h-auto object-contain rotate-[24deg] translate-x-33 translate-y-2 drop-shadow-[0_-4px_20px_rgba(0,0,0,0.35)]"
+          />
         </div>
       </section>
 
