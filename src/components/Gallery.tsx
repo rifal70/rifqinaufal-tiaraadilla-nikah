@@ -154,7 +154,7 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setCurrentIndex((prev) => (prev - 1 + items.length) % items.length);
+                setCurrentIndex((prev) => (prev + 1) % items.length);
               }}
               className="absolute right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-2xl text-white hover:bg-white/20"
             >
