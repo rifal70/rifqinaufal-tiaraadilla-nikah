@@ -162,19 +162,9 @@ export default async function Home() {
               </div>
             ) : null}
 
-            <div className="w-full my-2 flex justify-center">
-              <svg viewBox="0 0 500 48" className="w-full max-w-[340px] sm:max-w-md h-auto overflow-visible">
-                <text
-                  x="50%"
-                  y="50%"
-                  dominantBaseline="central"
-                  textAnchor="middle"
-                  className="font-display fill-current text-gold-shimmer text-[26px] font-semibold"
-                >
-                  {W.groom.name}
-                </text>
-              </svg>
-            </div>
+            <h3 className="font-display text-1xl sm:text-2xl font-bold text-gold-shimmer my-2 tracking-wide leading-snug drop-shadow-[0_2px_10px_rgba(212,175,55,0.35)]">
+              {W.groom.name}
+            </h3>
 
             <p className="mt-4 text-sm text-green-100">{W.groom.childOrder}</p>
             <p className="mt-1 text-cream">{W.groom.father}</p>
@@ -192,19 +182,9 @@ export default async function Home() {
               </div>
             ) : null}
 
-            <div className="w-full my-2 flex justify-center">
-              <svg viewBox="0 0 500 48" className="w-full max-w-[340px] sm:max-w-md h-auto overflow-visible">
-                <text
-                  x="50%"
-                  y="50%"
-                  dominantBaseline="central"
-                  textAnchor="middle"
-                  className="font-display fill-current text-gold-shimmer text-[26px] font-semibold"
-                >
-                  {W.bride.name}
-                </text>
-              </svg>
-            </div>
+            <h3 className="font-display text-1xl sm:text-2xl font-bold text-gold-shimmer my-2 tracking-wide leading-snug drop-shadow-[0_2px_10px_rgba(212,175,55,0.35)]">
+              {W.bride.name}
+            </h3>
 
             <p className="mt-4 text-sm text-green-100">{W.bride.childOrder}</p>
             <p className="mt-1 text-cream">{W.bride.father}</p>
