@@ -94,11 +94,32 @@ export default async function Home() {
           </p>
         </div>
 
-        {/* Ornamen Wayang Gunungan - Sejajar Nama Dilla & Gagang Tersembunyi */}
+        {/* Ornamen Wayang Gunungan Kiri - Sejajar Nama Rifqi & Gagang Tersembunyi */}
         <div
           aria-hidden
           className="pointer-events-none select-none z-0 absolute top-1/2
-            /* Mobile: Ditarik ke atas (-translate-y-[62%]) agar puncak & badan sejajar teks nama, gagang tenggelam di bawah */
+            /* Mobile: Ditarik ke atas (-translate-y-[60%]) agar puncak & badan sejajar teks nama, gagang tenggelam di bawah */
+            -left-34 -translate-y-[60%] w-44 opacity-85
+            /* Tablet Kecil */
+            sm:-left-36 sm:-translate-y-[58%] sm:w-56 sm:opacity-95
+            /* Desktop / Layar Lebar */
+            md:-left-50 md:-translate-y-[55%] md:w-72 md:opacity-100
+            lg:-left-54 lg:-translate-y-[55%] lg:w-84
+            xl:-left-50 xl:-translate-y-[55%] xl:w-96"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/wayang_green.png"
+            alt=""
+            className="w-full h-auto drop-shadow-[6px_6px_24px_rgba(212,175,55,0.28)] animate-gunungan-fast-left object-contain"
+          />
+        </div>
+
+        {/* Ornamen Wayang Gunungan Kanan - Sejajar Nama Dilla & Gagang Tersembunyi */}
+        <div
+          aria-hidden
+          className="pointer-events-none select-none z-0 absolute top-1/2
+            /* Mobile: Ditarik ke atas (-translate-y-[60%]) agar puncak & badan sejajar teks nama, gagang tenggelam di bawah */
             -right-34 -translate-y-[60%] w-44 opacity-85
             /* Tablet Kecil */
             sm:-right-36 sm:-translate-y-[58%] sm:w-56 sm:opacity-95

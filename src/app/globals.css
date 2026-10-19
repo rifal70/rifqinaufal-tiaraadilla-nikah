@@ -659,3 +659,27 @@ body {
   /* Kunci di gagang bawah agar diam, hanya pucuk atas yang gerak */
   will-change: transform;
 }
+
+@keyframes gununganTipFastLeft {
+
+  0%,
+  100% {
+    transform: rotate(24deg);
+  }
+
+  30% {
+    transform: rotate(30deg);
+    /* Meliuk lebih miring ke kanan */
+  }
+
+  70% {
+    transform: rotate(20deg);
+  }
+}
+
+.animate-gunungan-fast-left {
+  animation: gununganTipFastLeft 4.5s ease-in-out infinite;
+  transform-origin: 10% 90%;
+  /* Kunci di gagang bawah agar diam, hanya pucuk atas yang gerak */
+  will-change: transform;
+}
