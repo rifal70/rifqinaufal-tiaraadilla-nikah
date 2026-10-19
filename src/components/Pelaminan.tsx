@@ -15,7 +15,7 @@ export default function PelaminanScene() {
     }, []);
 
     return (
-        <div className="relative w-full aspect-[1920/1000] max-w-sm xs:max-w-md sm:max-w-lg md:max-w-xl max-h-[38vh] mx-auto select-none pointer-events-none">
+        <div className="relative w-full aspect-[1920/1000] max-w-sm xs:max-w-md sm:max-w-lg md:max-w-xl max-h-[38vh] landscape:max-h-[20vh] landscape:max-w-[220px] landscape:sm:max-w-[260px] landscape:md:max-w-[300px] landscape:lg:max-w-[340px] mx-auto select-none pointer-events-none">
 
             {/* 1. Bangunan Utama: Rumah Joglo (Datang dari arah atas/skala kecil) */}
             <img
