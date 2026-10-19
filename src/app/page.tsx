@@ -218,11 +218,26 @@ export default async function Home() {
       <section className="section-wedding text-center" id="acara">
         <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>Waktu &amp; Tempat</h2>
         <Divider />
+
+        {/* Save The Date */}
+        <div className="flex flex-col items-center mb-8 w-full max-w-sm mx-auto" data-reveal>
+          <div className="relative overflow-hidden rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.35)] border border-gold-500/30 max-w-[260px] sm:max-w-[280px] transition-transform duration-300 hover:scale-[1.02]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/save_the_date.jpg"
+              alt="Save The Date"
+              className="w-full h-auto object-contain rounded-2xl"
+              loading="lazy"
+            />
+          </div>
+          <p className="mt-4 font-display text-xl sm:text-2xl text-white-300 bg-[#621917] font-semibold tracking-wide p-4 rounded-md">
+            {W.date}
+          </p>
+        </div>
         <div className="grid gap-6 md:grid-cols-2 max-w-4xl w-full">
           {[W.akad, W.resepsi].map((e) => (
             <div key={e.title} className="glass-card-gold" data-reveal>
               <h3 className="font-display text-3xl text-gold-300">{e.title}</h3>
-              <p className="mt-4 text-cream">{W.date}</p>
               <p className="mt-1 text-lg font-medium text-gold-100">{e.time}</p>
             </div>
           ))}
