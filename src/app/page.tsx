@@ -346,7 +346,7 @@ export default async function Home() {
           Cerita Cinta Kami
         </h2>
         <Divider />
-        <div className="w-full max-w-3xl mx-auto">
+        <div className="w-full max-w-3xl mx-auto font-serif">
           <LoveStory />
         </div>
       </section>
