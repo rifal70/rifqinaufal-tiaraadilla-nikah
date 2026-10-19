@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth/session";
 import { getBanks, getGallery, getSettings, signedUrl, formatWeddingDate } from "@/lib/data";
 import { WEDDING } from "@/lib/content";
 import InvitationShell from "@/components/InvitationShell";
-import BankCard from "@/components/BankCard";
+import DigitalGift from "@/components/DigitalGift";
 import Gallery from "@/components/Gallery";
 import CouplePhoto from "@/components/CouplePhoto";
 import ImageModal from "@/components/ImageModal";
@@ -310,13 +310,7 @@ export default async function Home() {
             Kado Digital
           </h2>
           <Divider />
-          <div className="mx-auto flex flex-wrap justify-center gap-6 max-w-5xl w-full">
-            {visibleBanks.map((b) => (
-              <div key={b.id} data-reveal className="w-full sm:w-80">
-                <BankCard account={b} />
-              </div>
-            ))}
-          </div>
+          <DigitalGift accounts={visibleBanks} />
         </section>
       )}
 
