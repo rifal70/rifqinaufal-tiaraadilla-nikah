@@ -116,12 +116,10 @@ body {
   content: "";
   height: 1px;
   width: 60px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--gold-400),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      var(--gold-400),
+      transparent);
 }
 
 .ornament-diamond {
@@ -134,19 +132,22 @@ body {
 
 /* === Gold Shimmer Animation === */
 @keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
 }
 
 .text-gold-shimmer {
-  background: linear-gradient(
-    90deg,
-    var(--gold-600) 0%,
-    var(--gold-300) 25%,
-    var(--gold-400) 50%,
-    var(--gold-300) 75%,
-    var(--gold-600) 100%
-  );
+  background: linear-gradient(90deg,
+      var(--gold-600) 0%,
+      var(--gold-300) 25%,
+      var(--gold-400) 50%,
+      var(--gold-300) 75%,
+      var(--gold-600) 100%);
   background-size: 200% auto;
   background-clip: text;
   -webkit-background-clip: text;
@@ -160,6 +161,7 @@ body {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -171,13 +173,33 @@ body {
   opacity: 0;
 }
 
-.animate-delay-100 { animation-delay: 0.1s; }
-.animate-delay-200 { animation-delay: 0.2s; }
-.animate-delay-300 { animation-delay: 0.3s; }
-.animate-delay-400 { animation-delay: 0.4s; }
-.animate-delay-500 { animation-delay: 0.5s; }
-.animate-delay-600 { animation-delay: 0.6s; }
-.animate-delay-700 { animation-delay: 0.7s; }
+.animate-delay-100 {
+  animation-delay: 0.1s;
+}
+
+.animate-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animate-delay-300 {
+  animation-delay: 0.3s;
+}
+
+.animate-delay-400 {
+  animation-delay: 0.4s;
+}
+
+.animate-delay-500 {
+  animation-delay: 0.5s;
+}
+
+.animate-delay-600 {
+  animation-delay: 0.6s;
+}
+
+.animate-delay-700 {
+  animation-delay: 0.7s;
+}
 
 /* === Section Styling === */
 .section-wedding {
@@ -310,8 +332,13 @@ body {
 }
 
 @keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .music-btn.playing .music-icon {
@@ -378,11 +405,13 @@ body {
     linear-gradient(180deg, var(--green-900), var(--green-800));
   transition: transform 1s cubic-bezier(0.7, 0, 0.3, 1), opacity 1s ease;
 }
+
 .cover-hidden {
   transform: translateY(-100%);
   opacity: 0;
   pointer-events: none;
 }
+
 .cover-glow {
   position: absolute;
   width: 420px;
@@ -405,6 +434,7 @@ body {
   transform: translateY(30px);
   transition: opacity 0.9s ease, transform 0.9s ease;
 }
+
 [data-reveal].revealed {
   opacity: 1;
   transform: none;
@@ -425,9 +455,13 @@ body {
   grid-template-columns: repeat(2, 1fr);
   gap: 0.75rem;
 }
+
 @media (min-width: 768px) {
-  .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+  .gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
+
 .gallery-item {
   overflow: hidden;
   border-radius: 0.75rem;
@@ -437,13 +471,18 @@ body {
   cursor: zoom-in;
   background: var(--green-900);
 }
+
 .gallery-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.6s ease;
 }
-.gallery-item:hover img { transform: scale(1.06); }
+
+.gallery-item:hover img {
+  transform: scale(1.06);
+}
+
 .lightbox {
   position: fixed;
   inset: 0;
@@ -455,11 +494,13 @@ body {
   padding: 1rem;
   animation: fadeInUp 0.3s ease-out;
 }
+
 .lightbox img {
   max-width: 100%;
   max-height: 90vh;
   border-radius: 0.75rem;
 }
+
 .lightbox-close {
   position: absolute;
   top: 1rem;
@@ -479,12 +520,14 @@ body {
   font-size: 1.75rem;
   color: var(--gold-300);
 }
+
 .admin-label {
   display: block;
   font-size: 0.8rem;
   color: var(--green-100);
   margin-bottom: 0.35rem;
 }
+
 .admin-input {
   width: 100%;
   background: rgba(0, 0, 0, 0.25);
@@ -494,19 +537,95 @@ body {
   color: var(--cream);
   font-size: 0.9rem;
 }
+
 .admin-input:focus {
   outline: 2px solid var(--gold-400);
   outline-offset: 1px;
 }
-.admin-table { width: 100%; font-size: 0.875rem; border-collapse: collapse; }
-.admin-table th { text-align: left; color: var(--gold-300); font-weight: 500; padding: 0.5rem; border-bottom: 1px solid rgba(212,175,55,0.25); }
-.admin-table td { padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); vertical-align: top; }
-.btn-gold:disabled { opacity: 0.6; cursor: wait; }
+
+.admin-table {
+  width: 100%;
+  font-size: 0.875rem;
+  border-collapse: collapse;
+}
+
+.admin-table th {
+  text-align: left;
+  color: var(--gold-300);
+  font-weight: 500;
+  padding: 0.5rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+.admin-table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  vertical-align: top;
+}
+
+.btn-gold:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  *, [data-reveal] {
+
+  *,
+  [data-reveal] {
     animation: none !important;
     transition: none !important;
   }
-  [data-reveal] { opacity: 1; transform: none; }
+
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0.95;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 1.2s ease-out forwards;
+}
+
+@keyframes janurSwayLeft {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-4px) rotate(-1.5deg);
+  }
+}
+
+@keyframes janurSwayRight {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-4px) rotate(1.5deg);
+  }
+}
+
+.animate-janur-left {
+  animation: janurSwayLeft 4.5s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+.animate-janur-right {
+  animation: janurSwayRight 4.5s ease-in-out infinite;
+  transform-origin: bottom center;
 }

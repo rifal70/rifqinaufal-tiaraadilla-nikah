@@ -13,16 +13,16 @@ export default function CouplePhoto({
 
     return (
         <>
-            {/* Wadah Foto di Kartu (Bisa diklik, tanpa tulisan petunjuk) */}
+            {/* Wadah Foto di Kartu (Kotak / Rasio Vertikal Full Body) */}
             <div
                 onClick={() => setIsOpen(true)}
-                className="group relative mx-auto mb-6 h-60 w-60 sm:h-72 sm:w-72 cursor-pointer overflow-hidden rounded-full border-4 border-gold-400 p-1.5 shadow-[0_0_35px_rgba(212,175,55,0.4)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_45px_rgba(212,175,55,0.6)]"
+                className="group relative mx-auto mb-6 aspect-[3/4] h-72 w-54 sm:h-96 sm:w-72 cursor-pointer overflow-hidden rounded-2xl border-4 border-gold-400 p-1.5 shadow-[0_0_35px_rgba(212,175,55,0.4)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_45px_rgba(212,175,55,0.6)]"
             >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                     src={src}
                     alt={alt}
-                    className="h-full w-full rounded-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                    className="h-full w-full rounded-xl object-cover object-[center_15%] transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
                 />
             </div>
