@@ -88,7 +88,7 @@ export default function InvitationShell({ guestName, coupleNames, date, musicUrl
           id="music-toggle"
           type="button"
           onClick={toggle}
-          className={`music-btn ${playing ? "playing" : ""}`}
+          className={`fixed bottom-6 left-6 z-50 music-btn ${playing ? "playing" : ""}`}
           aria-label={playing ? "Jeda musik" : "Putar musik"}
         >
           <svg className="music-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
