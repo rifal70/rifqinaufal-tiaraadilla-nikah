@@ -307,7 +307,7 @@ export default async function Home() {
       {visibleBanks.length > 0 && (
         <section className="section-wedding text-center" id="amplop">
           <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>
-            Amplop Digital
+            Kado Digital
           </h2>
           <Divider />
           <div className="mx-auto flex flex-wrap justify-center gap-6 max-w-5xl w-full">
