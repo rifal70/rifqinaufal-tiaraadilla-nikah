@@ -13,18 +13,29 @@ export default function CouplePhoto({
 
     return (
         <>
-            {/* Wadah Foto di Kartu (Kotak / Rasio Vertikal Full Body) */}
+            {/* Wadah frame tunggal: foto di dalam mengikuti persis bentuk bingkai */}
             <div
                 onClick={() => setIsOpen(true)}
-                className="group relative mx-auto mb-6 aspect-[3/4] h-72 w-54 sm:h-96 sm:w-72 cursor-pointer overflow-hidden rounded-2xl border-4 border-gold-400 p-1.5 shadow-[0_0_35px_rgba(212,175,55,0.4)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_45px_rgba(212,175,55,0.6)]"
+                className="group relative mx-auto w-64 sm:w-72 aspect-[3/4] cursor-pointer select-none transition-transform duration-300 hover:scale-[1.02]"
+                title={`Lihat foto ${alt}`}
             >
+                {/* 1. Foto Pengantin (Ditarik margin masuk agar tidak keluar garis bingkai) */}
+                <div className="absolute inset-[15%] overflow-hidden rounded-[2rem] bg-emerald-950/40">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                        src={src}
+                        alt={alt}
+                        className="h-full w-full object-cover object-[center_18%] transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                    />
+                </div>
+
+                {/* 2. Bingkai Utama Menempel Sempurna Mengitari Foto */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                    src={src}
-                    alt={alt}
-                    className="h-full w-full rounded-xl object-cover object-[center_15%] transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                />
+                    src="/frame-couple.png"
+                    alt="Bingkai Mempelai"
+                    className="pointer-events-none absolute inset-0 z-10 h-[100%] w-[105%] object-contain scale-130 -translate-x-0 translate-y-0 drop-shadow-[0_10px_20px_rgba(0,0,0,0.55)]" />
             </div>
 
             {/* Modal Lightbox saat foto diklik */}
@@ -33,7 +44,6 @@ export default function CouplePhoto({
                     className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 backdrop-blur-md"
                     onClick={() => setIsOpen(false)}
                 >
-                    {/* Tombol Tutup */}
                     <button
                         onClick={() => setIsOpen(false)}
                         className="absolute top-5 right-5 z-50 rounded-full bg-white/10 p-2.5 text-2xl text-white/80 transition-colors hover:bg-white/20 hover:text-white"
@@ -42,7 +52,6 @@ export default function CouplePhoto({
                         ✕
                     </button>
 
-                    {/* Foto Ukuran Penuh */}
                     <div
                         className="relative flex max-h-[85vh] max-w-[90vw] items-center justify-center"
                         onClick={(e) => e.stopPropagation()}

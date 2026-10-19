@@ -152,15 +152,15 @@ export default async function Home() {
       {/* Couple */}
       <section className="section-wedding text-center" id="mempelai">
         <div className="grid gap-10 md:grid-cols-[1fr_auto_1fr] items-center max-w-5xl w-full mx-auto">
+
           {/* Mempelai Pria */}
           <div className="glass-card relative flex flex-col items-center justify-center px-4 py-8 sm:px-8 sm:py-10 text-center w-full min-w-0" data-reveal>
             {groomPhotoUrl ? (
-              <div className="w-full max-w-[220px] sm:max-w-[260px] mx-auto mb-4 flex justify-center">
+              <div className="w-full max-w-[280px] mx-auto mb-4 flex justify-center">
                 <CouplePhoto src={groomPhotoUrl} alt={W.groom.name} />
               </div>
             ) : null}
 
-            {/* Nama Mempelai Pria + Gelar */}
             <div className="w-full my-2 flex justify-center">
               <svg viewBox="0 0 500 48" className="w-full max-w-[340px] sm:max-w-md h-auto overflow-visible">
                 <text
@@ -186,12 +186,11 @@ export default async function Home() {
           {/* Mempelai Wanita */}
           <div className="glass-card relative flex flex-col items-center justify-center px-4 py-8 sm:px-8 sm:py-10 text-center w-full min-w-0" data-reveal>
             {bridePhotoUrl ? (
-              <div className="w-full max-w-[220px] sm:max-w-[260px] mx-auto mb-4 flex justify-center">
+              <div className="w-full max-w-[280px] mx-auto mb-4 flex justify-center">
                 <CouplePhoto src={bridePhotoUrl} alt={W.bride.name} />
               </div>
             ) : null}
 
-            {/* Nama Mempelai Wanita + Gelar */}
             <div className="w-full my-2 flex justify-center">
               <svg viewBox="0 0 500 48" className="w-full max-w-[340px] sm:max-w-md h-auto overflow-visible">
                 <text
@@ -210,6 +209,7 @@ export default async function Home() {
             <p className="mt-1 text-cream">{W.bride.father}</p>
             <p className="text-cream">dan {W.bride.mother}</p>
           </div>
+
         </div>
       </section>
 
