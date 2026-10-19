@@ -126,31 +126,86 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Surat Ar-Rum: 21 */}
+      <section className="section-wedding text-center" id="ar-rum">
+        <div className="glass-card max-w-3xl mx-auto p-6 sm:p-10 space-y-6" data-reveal>
+          <p
+            lang="ar"
+            dir="rtl"
+            className="text-xl sm:text-2xl md:text-3xl leading-[2.2] sm:leading-[2.4] font-serif text-gold-300"
+          >
+            وَمِنْ اٰيٰتِهٖٓ اَنْ خَلَقَ لَكُمْ مِّنْ اَنْفُسِكُمْ اَزْوَاجًا لِّتَسْكُنُوْٓا اِلَيْهَا وَجَعَلَ بَيْنَكُمْ مَّوَدَّةً وَّرَحْمَةً ۗاِنَّ فِيْ ذٰلِكَ لَاٰيٰتٍ لِّقَوْمٍ يَّتَفَكَّرُوْنَ
+          </p>
+
+          <Divider />
+
+          <p className="text-sm sm:text-base leading-relaxed text-cream/90 italic font-light">
+            &ldquo;Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang. Sungguh, pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir.&rdquo;
+          </p>
+
+          <p className="text-xs sm:text-sm font-semibold tracking-widest uppercase text-gold-400">
+            — QS. Ar-Rum: 21 —
+          </p>
+        </div>
+      </section>
+
       {/* Couple */}
       <section className="section-wedding text-center" id="mempelai">
         <div className="grid gap-10 md:grid-cols-[1fr_auto_1fr] items-center max-w-5xl w-full mx-auto">
           {/* Mempelai Pria */}
-          <div className="glass-card flex flex-col items-center justify-center p-6 sm:p-10 text-center" data-reveal>
+          <div className="glass-card relative flex flex-col items-center justify-center px-4 py-8 sm:px-8 sm:py-10 text-center w-full min-w-0" data-reveal>
             {groomPhotoUrl ? (
-              <CouplePhoto src={groomPhotoUrl} alt={W.groom.name} />
+              <div className="w-full max-w-[220px] sm:max-w-[260px] mx-auto mb-4 flex justify-center">
+                <CouplePhoto src={groomPhotoUrl} alt={W.groom.name} />
+              </div>
             ) : null}
 
-            <h3 className="font-display text-3xl md:text-4xl text-gold-shimmer">{W.groom.name}</h3>
+            {/* Nama Mempelai Pria + Gelar */}
+            <div className="w-full my-2 flex justify-center">
+              <svg viewBox="0 0 500 48" className="w-full max-w-[340px] sm:max-w-md h-auto overflow-visible">
+                <text
+                  x="50%"
+                  y="50%"
+                  dominantBaseline="central"
+                  textAnchor="middle"
+                  className="font-display fill-current text-gold-shimmer text-[26px] font-semibold"
+                >
+                  {W.groom.name}
+                </text>
+              </svg>
+            </div>
+
             <p className="mt-4 text-sm text-green-100">{W.groom.childOrder}</p>
             <p className="mt-1 text-cream">{W.groom.father}</p>
             <p className="text-cream">dan {W.groom.mother}</p>
           </div>
 
           {/* Simbol & */}
-          <span className="font-display text-6xl text-gold-400" data-reveal>&amp;</span>
+          <span className="font-display text-4xl sm:text-5xl md:text-6xl text-gold-400" data-reveal>&amp;</span>
 
           {/* Mempelai Wanita */}
-          <div className="glass-card flex flex-col items-center justify-center p-6 sm:p-10 text-center" data-reveal>
+          <div className="glass-card relative flex flex-col items-center justify-center px-4 py-8 sm:px-8 sm:py-10 text-center w-full min-w-0" data-reveal>
             {bridePhotoUrl ? (
-              <CouplePhoto src={bridePhotoUrl} alt={W.bride.name} />
+              <div className="w-full max-w-[220px] sm:max-w-[260px] mx-auto mb-4 flex justify-center">
+                <CouplePhoto src={bridePhotoUrl} alt={W.bride.name} />
+              </div>
             ) : null}
 
-            <h3 className="font-display text-3xl md:text-4xl text-gold-shimmer">{W.bride.name}</h3>
+            {/* Nama Mempelai Wanita + Gelar */}
+            <div className="w-full my-2 flex justify-center">
+              <svg viewBox="0 0 500 48" className="w-full max-w-[340px] sm:max-w-md h-auto overflow-visible">
+                <text
+                  x="50%"
+                  y="50%"
+                  dominantBaseline="central"
+                  textAnchor="middle"
+                  className="font-display fill-current text-gold-shimmer text-[26px] font-semibold"
+                >
+                  {W.bride.name}
+                </text>
+              </svg>
+            </div>
+
             <p className="mt-4 text-sm text-green-100">{W.bride.childOrder}</p>
             <p className="mt-1 text-cream">{W.bride.father}</p>
             <p className="text-cream">dan {W.bride.mother}</p>
