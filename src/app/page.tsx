@@ -74,13 +74,48 @@ export default async function Home() {
       musicUrl={musicUrl}
     >
       {/* Hero */}
-      <section className="section-wedding hero-bg text-center" id="hero">
-        <p className="text-xs uppercase tracking-[0.4em] text-gold-300" data-reveal>The Wedding of</p>
-        <h1 className="mt-6 font-display text-5xl md:text-7xl text-gold-shimmer" data-reveal>
-          {W.groom.shortName} &amp; {W.bride.shortName}
-        </h1>
-        <Divider />
-        <p className="font-display text-2xl text-cream" data-reveal>{W.date}</p>
+      <section className="section-wedding hero-bg relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-4 py-12 text-center" id="hero">
+
+        {/* Konten Utama Teks */}
+        {/* Di mobile max-w dibatasi agar wrap aman, di desktop (md ke atas) dibuka penuh (max-w-none) */}
+        <div className="relative z-10 mx-auto flex w-full max-w-[280px] sm:max-w-md md:max-w-none flex-col items-center" data-reveal>
+          <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] text-gold-300">
+            The Wedding of
+          </p>
+
+          {/* md:whitespace-nowrap menjamin "Naufal & Dilla" selalu 1 baris di desktop */}
+          <h1 className="mt-4 sm:mt-6 font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-gold-shimmer leading-tight md:whitespace-nowrap">
+            {W.groom.shortName} &amp; {W.bride.shortName}
+          </h1>
+
+          <Divider />
+
+          <p className="font-display text-lg sm:text-2xl text-cream md:whitespace-nowrap">
+            {W.date}
+          </p>
+        </div>
+
+        {/* Gambar Wayang */}
+        <div
+          aria-hidden
+          className="pointer-events-none select-none z-0 absolute top-1/2 -translate-y-1/2
+            /* Mobile: geser keluar (-right-24) dengan ukuran kecil agar tidak nabrak teks */
+            -right-20 w-36 opacity-70
+            /* Tablet */
+            sm:-right-12 sm:w-52 sm:opacity-85
+            /* Desktop (md): Geser menempel tepi kanan layar */
+            md:-right-5 md:w-64 md:opacity-95
+            /* Desktop Lebar (lg/xl): Ukuran megah */
+            lg:-right-3 lg:w-80 lg:opacity-100
+            xl:right-2 xl:w-96"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/wayang.png"
+            alt=""
+            className="w-full h-auto drop-shadow-[0_4px_24px_rgba(212,175,55,0.3)] animate-wayang object-contain"
+          />
+        </div>
       </section>
 
       {/* Opening */}

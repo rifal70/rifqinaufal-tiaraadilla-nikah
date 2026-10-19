@@ -629,3 +629,26 @@ body {
   animation: janurSwayRight 4.5s ease-in-out infinite;
   transform-origin: bottom center;
 }
+
+@keyframes wayangSway {
+
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0px);
+  }
+
+  25% {
+    transform: rotate(1.8deg) translateY(-4px);
+  }
+
+  75% {
+    transform: rotate(-1.5deg) translateY(2px);
+  }
+}
+
+.animate-wayang {
+  animation: wayangSway 4.5s ease-in-out infinite;
+  transform-origin: bottom center;
+  /* engsel ayunan di bagian bawah agar natural */
+  will-change: transform;
+}
