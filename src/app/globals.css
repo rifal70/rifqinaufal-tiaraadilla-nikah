@@ -143,16 +143,14 @@ body {
 
 .text-gold-shimmer {
   display: inline-block;
-  background: linear-gradient(
-    110deg,
-    #b38228 0%,
-    #e8c56c 20%,
-    #fff4c4 40%,
-    #ffffff 50%,
-    #fff4c4 60%,
-    #d4af37 80%,
-    #8e6417 100%
-  );
+  background: linear-gradient(110deg,
+      #b38228 0%,
+      #e8c56c 20%,
+      #fff4c4 40%,
+      #ffffff 50%,
+      #fff4c4 60%,
+      #d4af37 80%,
+      #8e6417 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -682,4 +680,71 @@ body {
   transform-origin: 10% 90%;
   /* Kunci di gagang bawah agar diam, hanya pucuk atas yang gerak */
   will-change: transform;
-}
+}
+
+/* Animasi Masuk Halus */
+@keyframes cloudRevealTop {
+  0% {
+    opacity: 0;
+    transform: translate3d(-35px, -35px, 0) scale(0.92);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes cloudRevealBottom {
+  0% {
+    opacity: 0;
+    transform: translate3d(35px, 35px, 0) scale(0.92);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* Animasi Melayang Pelan & Halus (Idle Floating) */
+@keyframes cloudFloatTop {
+
+  0%,
+  100% {
+    transform: rotate(18deg) translate(0, 0);
+  }
+
+  50% {
+    transform: rotate(20deg) translate(6px, 8px);
+  }
+}
+
+@keyframes cloudFloatBottom {
+
+  0%,
+  100% {
+    transform: rotate(18deg) translate(0, 0);
+  }
+
+  50% {
+    transform: rotate(16deg) translate(-6px, -8px);
+  }
+}
+
+/* Class Animasi */
+.cloud-animate-top {
+  animation: cloudRevealTop 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.cloud-animate-bottom {
+  animation: cloudRevealBottom 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+.cloud-float-top {
+  animation: cloudFloatTop 8s ease-in-out infinite;
+}
+
+.cloud-float-bottom {
+  animation: cloudFloatBottom 9s ease-in-out infinite;
+}

@@ -136,16 +136,20 @@ export default async function Home() {
           />
         </div>
       </section>
+
       {/* Opening */}
       <section className="section-wedding text-center relative overflow-hidden min-h-[60vh] flex flex-col justify-between" id="pembuka">
         {/* Mega Mendung Top (Pojok Kiri Atas) */}
-        <div data-reveal className="pointer-events-none select-none absolute top-0 left-0 z-0">
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute -top-4 -left-6 sm:-top-8 -translate-x-30 sm:-left-8 z-0"
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/mega_mendung.png"
             alt=""
-            aria-hidden="true"
-            className="w-48 sm:w-64 md:w-80 h-auto object-contain rotate-[24deg] -translate-x-33 translate-y-2 drop-shadow-[0_-4px_20px_rgba(0,0,0,0.35)]"
+            className="cloud-float-top w-44 sm:w-60 md:w-72 lg:w-80 h-auto object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)] will-change-transform"
           />
         </div>
 
@@ -158,14 +162,17 @@ export default async function Home() {
           )}
         </div>
 
-        {/* Mega Mendung Bottom (Pojok Kanan Bawah & Miring) */}
-        <div data-reveal className="pointer-events-none select-none absolute bottom-0 right-0 z-0">
+        {/* Mega Mendung Bottom (Pojok Kanan Bawah) */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute -bottom-4 -right-6 translate-x-30 sm:-bottom-8 sm:-right-8 z-0"
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/mega_mendung.png"
             alt=""
-            aria-hidden="true"
-            className="w-48 sm:w-64 md:w-80 h-auto object-contain rotate-[24deg] translate-x-33 translate-y-2 drop-shadow-[0_-4px_20px_rgba(0,0,0,0.35)]"
+            className="cloud-float-bottom w-44 sm:w-60 md:w-72 lg:w-80 h-auto object-contain drop-shadow-[0_-8px_24px_rgba(0,0,0,0.35)] will-change-transform"
           />
         </div>
       </section>
