@@ -630,25 +630,26 @@ body {
   transform-origin: bottom center;
 }
 
-@keyframes wayangSway {
+@keyframes gununganTipFast {
 
   0%,
   100% {
-    transform: rotate(0deg) translateY(0px);
+    transform: rotate(-24deg);
   }
 
-  25% {
-    transform: rotate(1.8deg) translateY(-4px);
+  30% {
+    transform: rotate(-30deg);
+    /* Meliuk lebih miring ke kiri */
   }
 
-  75% {
-    transform: rotate(-1.5deg) translateY(2px);
+  70% {
+    transform: rotate(-20deg);
   }
 }
 
-.animate-wayang {
-  animation: wayangSway 4.5s ease-in-out infinite;
-  transform-origin: bottom center;
-  /* engsel ayunan di bagian bawah agar natural */
+.animate-gunungan-fast {
+  animation: gununganTipFast 4.5s ease-in-out infinite;
+  transform-origin: 90% 90%;
+  /* Kunci di gagang bawah agar diam, hanya pucuk atas yang gerak */
   will-change: transform;
 }
