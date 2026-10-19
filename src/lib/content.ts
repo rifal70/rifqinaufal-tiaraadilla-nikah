@@ -43,3 +43,10 @@ export const FALLBACK_BANKS: BankAccount[] = [
   { id: "2", bank_name: "Mandiri", account_holder: "Maghfira Tiara Adilla", account_number: "113-000-6987-589", is_enabled: true },
   { id: "3", bank_name: "BRI", account_holder: "Pambudi Ningsih", account_number: "5642-01-027719-53-0", is_enabled: true },
 ];
+
+export const LOVE_STORY = {
+  story: `
+Berawal kenal dari game online di tahun 2016, saat itu kami sama-sama masih berkuliah. Sempat lost contact beberapa tahun, sampai akhirnya di tahun 2021 Naufal mengucapkan selamat ulang tahun ke Dilla. Dari ucapan sederhana itu, komunikasi kami pun kembali terjalin.
+Sejak saat itu, kami mulai sering ngobrol dan ketemu. Kebetulan, Dilla sering mengantar adik bungsunya untuk bersekolah di Bekasi dan Dilla sering mampir ke rumah Naufal. Dari yang awalnya cuma teman kenal, lama-lama jadi makin dekat, sampai akhirnya menjalin hubungan.
+Kami nggak pernah menyangka, perkenalan dari game online yang sempat terputus ini justru membawa kami sampai sejauh ini. Sekarang, kami siap memulai babak baru bersama dan melanjutkan cerita ini untuk selamanya. ❤️`,
+};

@@ -7,6 +7,7 @@ import DigitalGift from "@/components/DigitalGift";
 import Gallery from "@/components/Gallery";
 import CouplePhoto from "@/components/CouplePhoto";
 import ImageModal from "@/components/ImageModal";
+import LoveStory from "@/components/LoveStory";
 
 export const dynamic = "force-dynamic";
 
@@ -291,6 +292,17 @@ export default async function Home() {
               <Placeholder label="tautan Google Maps" />
             )}
           </div>
+        </div>
+      </section>
+
+      {/* Love Story */}
+      <section className="section-wedding text-center" id="cerita">
+        <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>
+          Cerita Cinta Kami
+        </h2>
+        <Divider />
+        <div className="w-full max-w-3xl mx-auto">
+          <LoveStory />
         </div>
       </section>
 
