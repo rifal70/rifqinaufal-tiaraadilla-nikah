@@ -138,7 +138,7 @@ export default async function Home() {
       </section>
 
       {/* Opening */}
-      <section className="section-wedding text-center relative min-h-[60vh] flex flex-col justify-between" id="pembuka">
+      <section className="section-wedding text-center relative overflow-x-clip min-h-[60vh] flex flex-col justify-between" id="pembuka">
         {/* Mega Mendung Top (Pojok Kiri Atas) */}
         <div
           aria-hidden="true"
@@ -149,7 +149,7 @@ export default async function Home() {
           <img
             src="/mega_mendung_left.png"
             alt=""
-            className="cloud-float-top w-44 sm:w-60 md:w-72 lg:w-80 h-auto -translate-x-32 object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)] will-change-transform"
+            className="cloud-float-top w-28 sm:w-48 md:w-64 lg:w-80 h-auto object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)] will-change-transform"
           />
         </div>
 
@@ -172,7 +172,7 @@ export default async function Home() {
           <img
             src="/mega_mendung_right.png"
             alt=""
-            className="cloud-float-bottom w-44 sm:w-60 md:w-72 lg:w-80 h-auto translate-x-32 object-contain drop-shadow-[0_-8px_24px_rgba(0,0,0,0.35)] will-change-transform"
+            className="cloud-float-bottom w-28 sm:w-48 md:w-64 lg:w-80 h-auto object-contain drop-shadow-[0_-8px_24px_rgba(0,0,0,0.35)] will-change-transform"
           />
         </div>
       </section>
