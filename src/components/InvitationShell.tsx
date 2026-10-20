@@ -77,9 +77,9 @@ export default function InvitationShell({
     <>
       {musicUrl && <audio ref={audioRef} src={musicUrl} loop preload="none" />}
 
-      {/* Container Cover: gunakan justify-end agar amplop dan tombol berkumpul tepat di atas pelaminan */}
+      {/* Container Cover */}
       <div
-        className={`cover fixed inset-0 z-50 flex h-dvh min-h-dvh w-full flex-col items-center justify-end landscape:justify-center overflow-x-hidden overflow-y-auto landscape:overflow-hidden px-4 pb-0 ${opened
+        className={`cover fixed inset-0 z-50 h-dvh min-h-dvh w-full overflow-hidden flex flex-col items-center justify-end landscape:block pb-0 ${opened
           ? "cover-hidden pointer-events-none opacity-0 transition-opacity duration-700"
           : ""
           }`}
@@ -90,7 +90,7 @@ export default function InvitationShell({
           src="/ornament_top.png"
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute top-0 right-0 z-5 w-44 xs:w-32 sm:w-48 md:w-84 landscape:w-20 landscape:sm:w-28 landscape:md:w-36 select-none opacity-90 transition-opacity duration-1000 animate-fade-in"
+          className="pointer-events-none absolute top-0 right-0 z-10 w-44 xs:w-32 sm:w-48 md:w-72 lg:w-96 xl:w-[420px] landscape:w-20 landscape:sm:w-28 landscape:md:w-56 landscape:lg:w-80 select-none opacity-90 transition-all duration-1000 animate-fade-in"
         />
 
         {/* Ornamen Pojok Kiri Bawah */}
@@ -98,7 +98,7 @@ export default function InvitationShell({
           src="/ornament_bottom.png"
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-0 left-0 z-5 w-44 xs:w-32 sm:w-48 md:w-84 landscape:w-20 landscape:sm:w-28 landscape:md:w-36 select-none opacity-90 transition-opacity duration-1000 animate-fade-in"
+          className="pointer-events-none absolute bottom-0 left-0 z-10 w-44 xs:w-32 sm:w-48 md:w-72 lg:w-96 xl:w-[420px] landscape:w-20 landscape:sm:w-28 landscape:md:w-56 landscape:lg:w-80 select-none opacity-90 transition-all duration-1000 animate-fade-in"
         />
 
         {/* Janur Kiri */}
@@ -106,7 +106,7 @@ export default function InvitationShell({
           src="/janur_left.png"
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute -left-12 xs:-left-16 sm:-left-24 md:-left-32 top-1/2 -translate-y-1/2 z-10 w-36 xs:w-44 sm:w-56 md:w-72 landscape:w-32 landscape:-left-16 landscape:sm:w-40 landscape:sm:-left-20 landscape:md:w-48 landscape:md:-left-24 select-none opacity-80 sm:opacity-90 -rotate-[6deg] origin-bottom-left animate-janur-left"
+          className="pointer-events-none absolute -left-12 xs:-left-16 sm:-left-24 md:-left-28 lg:-left-36 xl:-left-44 top-1/2 -translate-y-1/2 z-20 w-36 xs:w-44 sm:w-56 md:w-80 lg:w-[420px] xl:w-[500px] landscape:w-24 landscape:-left-10 landscape:sm:w-32 landscape:sm:-left-14 landscape:md:w-64 landscape:md:-left-24 landscape:lg:w-96 landscape:lg:-left-32 select-none opacity-80 sm:opacity-90 -rotate-[6deg] origin-bottom-left animate-janur-left transition-all"
         />
 
         {/* Janur Kanan */}
@@ -114,13 +114,14 @@ export default function InvitationShell({
           src="/janur_right.png"
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute -right-12 xs:-right-16 sm:-right-24 md:-right-32 top-1/2 -translate-y-1/2 z-10 w-36 xs:w-44 sm:w-56 md:w-72 landscape:w-32 landscape:-right-16 landscape:sm:w-40 landscape:sm:-right-20 landscape:md:w-48 landscape:md:-right-24 select-none opacity-80 sm:opacity-90 rotate-[6deg] origin-bottom-right animate-janur-right"
+          className="pointer-events-none absolute -right-12 xs:-right-16 sm:-right-24 md:-right-28 lg:-right-36 xl:-right-44 top-1/2 -translate-y-1/2 z-20 w-36 xs:w-44 sm:w-56 md:w-80 lg:w-[420px] xl:w-[500px] landscape:w-24 landscape:-right-10 landscape:sm:w-32 landscape:sm:-right-14 landscape:md:w-64 landscape:md:-right-24 landscape:lg:w-96 landscape:lg:-right-32 select-none opacity-80 sm:opacity-90 rotate-[6deg] origin-bottom-right animate-janur-right transition-all"
         />
 
-        {/* Area Amplop & Surat + Tombol (jarak rapat tepat di atas genteng pelaminan) */}
-        <div className="relative z-30 flex flex-col items-center justify-center max-w-full mb-1 sm:mb-2 landscape:mb-14 landscape:sm:mb-20">
-          {/* Dimensi amplop */}
-          <div className="relative aspect-[4/3] w-[min(78vw,270px)] sm:w-[310px] md:w-[340px] landscape:w-[170px] landscape:sm:w-[200px] landscape:md:w-[230px] landscape:lg:w-[260px] transition-all">
+        {/* Area Amplop & Tombol */}
+        <div className="relative z-30 flex flex-col items-center justify-center max-w-full mb-1 sm:mb-2 landscape:absolute landscape:top-[42%] landscape:left-1/2 landscape:bottom-auto landscape:-translate-x-1/2 landscape:-translate-y-1/2 landscape:mb-0">
+          {/* Dimensi Amplop: Naik bertahap sampai desktop/layar lebar */}
+          <div className="relative aspect-[4/3] w-[min(78vw,270px)] sm:w-[320px] md:w-[380px] lg:w-[430px] landscape:w-auto landscape:h-[28dvh] landscape:max-h-[125px] md:landscape:h-[38dvh] md:landscape:max-h-[220px] lg:landscape:h-[44dvh] lg:landscape:max-h-[260px] transition-all">
+
             {/* Layer 1: Amplop Dasar */}
             <img
               src="/envelope.png"
@@ -130,8 +131,8 @@ export default function InvitationShell({
 
             {/* Layer 2: Kertas Surat */}
             <div
-              className={`absolute left-[11%] top-[3%] z-20 flex h-[88%] w-[78%] flex-col items-center justify-between p-2 sm:p-4 landscape:p-1.5 landscape:sm:p-2 text-center transition-all duration-700 ease-out ${isLetterOpen
-                ? "-translate-y-10 sm:-translate-y-14 landscape:-translate-y-6 landscape:sm:-translate-y-7 scale-[1.01] shadow-2xl"
+              className={`absolute left-[11%] top-[3%] z-20 flex h-[88%] w-[78%] @container flex-col items-center justify-between p-2 sm:p-3 md:p-4 landscape:p-1 md:landscape:p-2 text-center transition-all duration-700 ease-out ${isLetterOpen
+                ? "-translate-y-[45%] sm:-translate-y-[52%] md:-translate-y-[58%] landscape:-translate-y-[26%] md:landscape:-translate-y-[45%] scale-[1.01] shadow-2xl"
                 : "translate-y-0"
                 }`}
             >
@@ -141,26 +142,23 @@ export default function InvitationShell({
                 className="absolute inset-0 h-full w-full rounded-sm object-cover shadow-md"
               />
 
-              <div className="relative z-10 flex h-full w-full flex-col items-center justify-center">
-                <p className="animate-fade-in-up text-[7px] sm:text-[9px] landscape:text-[6.5px] landscape:sm:text-[7.5px] font-semibold uppercase tracking-[0.2em] text-[#7d535b]">
-                  Undangan Pernikahan
-                </p>
-
-                <h2 className="animate-fade-in-up animate-delay-200 mt-0.5 font-display text-xs sm:text-lg md:text-xl landscape:text-[11px] landscape:sm:text-sm landscape:md:text-base font-bold tracking-tight text-[#3e2b2f] leading-snug">
+              <div className="relative z-10 flex h-full w-full flex-col items-center justify-center px-1">
+                {/* Nama Pasangan */}
+                <h2 className="animate-fade-in-up animate-delay-200 font-display font-bold tracking-tight text-[#3e2b2f] leading-tight text-[clamp(11px,4.2vw,22px)] landscape:text-[clamp(8px,2.4dvh,11px)] md:landscape:text-[clamp(13px,2.8vw,19px)]">
                   {coupleNames}
                 </h2>
 
-                <p className="animate-fade-in-up animate-delay-300 mt-0.5 font-display text-[8px] sm:text-[11px] landscape:text-[7.5px] landscape:sm:text-[9px] font-medium text-[#6c4850]">
-                  {date}
-                </p>
+                {/* Garis Pemisah */}
+                <div className="my-1 sm:my-1.5 md:my-2 landscape:my-0.5 md:landscape:my-1 h-[1px] w-[28%] max-w-[55px] min-w-[20px] bg-[#7d535b]/25" />
 
-                <div className="my-1 sm:my-2 landscape:my-0.5 h-[1px] w-6 sm:w-12 landscape:w-8 bg-[#7d535b]/25" />
-
-                <div className="animate-fade-in-up animate-delay-400">
-                  <p className="text-[6.5px] sm:text-[8px] landscape:text-[6px] landscape:sm:text-[7px] font-normal text-[#8c656d]">
+                <div className="animate-fade-in-up animate-delay-400 w-full">
+                  {/* Label Yth */}
+                  <p className="font-normal text-[#8c656d] leading-none text-[clamp(8.5px,2.6vw,13px)] landscape:text-[clamp(6.5px,1.9dvh,8.5px)] md:landscape:text-[clamp(9.5px,1.8vw,12px)]">
                     Kepada Yth.
                   </p>
-                  <p className="mt-0.5 font-display text-[9px] sm:text-xs landscape:text-[8.5px] landscape:sm:text-[10px] font-bold tracking-wide text-[#3e2b2f] line-clamp-1">
+
+                  {/* Nama Tamu */}
+                  <p className="mt-0.5 font-display font-bold tracking-wide text-[#3e2b2f] line-clamp-1 text-[clamp(9.5px,3.2vw,16px)] landscape:text-[clamp(7.5px,2.2dvh,10px)] md:landscape:text-[clamp(11px,2.2vw,15px)]">
                     {guestName}
                   </p>
                 </div>
@@ -174,55 +172,61 @@ export default function InvitationShell({
               aria-hidden="true"
               className="pointer-events-none absolute inset-0 z-30 h-full w-full object-contain"
               style={{
-                clipPath: "polygon(0 32%, 50% 61%, 100% 32%, 100% 100%, 0 100%)",
+                clipPath: "polygon(0% 34%, 50% 58%, 100% 34%, 100% 100%, 0% 100%)",
               }}
+            />
+
+            {/* Layer 4: Segel Hati */}
+            <img
+              src="/seal-love.png"
+              alt="Segel Hati"
+              aria-hidden="true"
+              className="pointer-events-none absolute left-1/2 top-[58%] z-40 -translate-x-1/2 -translate-y-2 w-[14%] sm:w-[15%] object-contain drop-shadow-md"
             />
           </div>
 
-          {/* Tombol Buka Undangan (diberi jarak rapat ke atap pelaminan) */}
+          {/* Tombol Buka Undangan */}
           <button
             id="open-invitation"
             type="button"
             onClick={handleButtonClick}
-            className="btn-gold relative z-40 mt-1.5 sm:mt-2 landscape:mt-1 px-5 py-1.5 sm:px-6 sm:py-2 landscape:px-3.5 landscape:py-1 text-xs sm:text-sm landscape:text-[11px] landscape:sm:text-xs transition-transform duration-300 hover:scale-105 active:scale-95 shadow-md"
+            className="btn-gold relative z-40 mt-1.5 sm:mt-2.5 landscape:mt-1 md:landscape:mt-2.5 px-5 py-1.5 sm:px-6 sm:py-2 md:px-7 md:py-2.5 landscape:px-3 landscape:py-0.5 md:landscape:px-6 md:landscape:py-2 text-xs sm:text-sm md:text-base landscape:text-[9px] md:landscape:text-xs transition-transform duration-300 hover:scale-105 active:scale-95 shadow-md"
           >
             {isLetterOpen ? "Masuk" : "Buka Undangan"}
           </button>
         </div>
 
-        {/* Gambar Pelaminan: Rata di dasar bawah */}
-        <div className="relative z-30 flex justify-center w-full landscape:absolute landscape:bottom-0 landscape:left-0 landscape:right-0">
+        {/* Pelaminan: Terkunci di Tepi Paling Bawah Layar */}
+        <div className="relative z-20 flex justify-center w-full max-h-[35vh] landscape:absolute landscape:bottom-0 landscape:left-0 landscape:right-0 landscape:max-h-[22dvh] shrink-0">
           <PelaminanScene />
         </div>
       </div>
 
       <main className={opened ? "" : "invisible"}>{children}</main>
 
-      {
-        opened && musicUrl && (
-          <button
-            id="music-toggle"
-            type="button"
-            onClick={toggle}
-            className={`music-btn fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-50 p-2 sm:p-3 rounded-full bg-white/80 backdrop-blur shadow-md ${playing ? "playing" : ""
-              }`}
-            aria-label={playing ? "Jeda musik" : "Putar musik"}
+      {opened && musicUrl && (
+        <button
+          id="music-toggle"
+          type="button"
+          onClick={toggle}
+          className={`music-btn fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-50 p-2 sm:p-3 rounded-full bg-white/80 backdrop-blur shadow-md ${playing ? "playing" : ""
+            }`}
+          aria-label={playing ? "Jeda musik" : "Putar musik"}
+        >
+          <svg
+            className="music-icon h-4 w-4 sm:h-5 sm:w-5"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden
           >
-            <svg
-              className="music-icon h-4 w-4 sm:h-5 sm:w-5"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              aria-hidden
-            >
-              {playing ? (
-                <path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z" />
-              ) : (
-                <path d="M6 4l14 8-14 8V4z" />
-              )}
-            </svg>
-          </button>
-        )
-      }
+            {playing ? (
+              <path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z" />
+            ) : (
+              <path d="M6 4l14 8-14 8V4z" />
+            )}
+          </svg>
+        </button>
+      )}
     </>
   );
 }
