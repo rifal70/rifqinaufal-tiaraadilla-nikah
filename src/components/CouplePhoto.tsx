@@ -13,19 +13,19 @@ export default function CouplePhoto({
 
     return (
         <>
-            {/* Wadah frame tunggal: foto di dalam mengikuti persis bentuk bingkai */}
+            {/* Wadah frame tunggal: rasio diubah ke aspect-[2/3] agar lebih tinggi */}
             <div
                 onClick={() => setIsOpen(true)}
-                className="group relative mx-auto w-64 sm:w-72 aspect-[3/4] cursor-pointer select-none transition-transform duration-300 hover:scale-[1.02]"
+                className="group relative mx-auto w-64 sm:w-72 aspect-[2/3] cursor-pointer select-none transition-transform duration-300 hover:scale-[1.02]"
                 title={`Lihat foto ${alt}`}
             >
-                {/* 1. Foto Pengantin (Ditarik margin masuk agar tidak keluar garis bingkai) */}
-                <div className="absolute inset-[15%] overflow-hidden rounded-[2rem] bg-emerald-950/40">
+                {/* 1. Foto Pengantin (Ditinggiin dengan h-full dan inset yang pas) */}
+                <div className="absolute inset-[12%] overflow-hidden rounded-[2.5rem]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                         src={src}
                         alt={alt}
-                        className="h-full w-full object-cover object-[center_18%] transition-transform duration-500 group-hover:scale-105"
+                        className="h-full w-full object-cover object-[center_85%] transition-transform duration-500 group-hover:scale-105"
                         loading="lazy"
                     />
                 </div>
@@ -35,7 +35,8 @@ export default function CouplePhoto({
                 <img
                     src="/frame-couple.png"
                     alt="Bingkai Mempelai"
-                    className="pointer-events-none absolute inset-0 z-10 h-[100%] w-[105%] object-contain scale-130 -translate-x-0 translate-y-0 drop-shadow-[0_10px_20px_rgba(0,0,0,0.55)]" />
+                    className="pointer-events-none absolute inset-0 z-10 h-full w-full object-fill scale-105 drop-shadow-[0_1px_2px_rgba(0,0,0,0)]"
+                />
             </div>
 
             {/* Modal Lightbox saat foto diklik */}

@@ -90,7 +90,7 @@ export default function InvitationShell({
           src="/ornament_top.png"
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute top-0 right-0 z-5 w-24 xs:w-32 sm:w-48 md:w-64 landscape:w-20 landscape:sm:w-28 landscape:md:w-36 select-none opacity-90 transition-opacity duration-1000 animate-fade-in"
+          className="pointer-events-none absolute top-0 right-0 z-5 w-44 xs:w-32 sm:w-48 md:w-84 landscape:w-20 landscape:sm:w-28 landscape:md:w-36 select-none opacity-90 transition-opacity duration-1000 animate-fade-in"
         />
 
         {/* Ornamen Pojok Kiri Bawah */}
@@ -98,7 +98,7 @@ export default function InvitationShell({
           src="/ornament_bottom.png"
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-0 left-0 z-5 w-24 xs:w-32 sm:w-48 md:w-64 landscape:w-20 landscape:sm:w-28 landscape:md:w-36 select-none opacity-90 transition-opacity duration-1000 animate-fade-in"
+          className="pointer-events-none absolute bottom-0 left-0 z-5 w-44 xs:w-32 sm:w-48 md:w-84 landscape:w-20 landscape:sm:w-28 landscape:md:w-36 select-none opacity-90 transition-opacity duration-1000 animate-fade-in"
         />
 
         {/* Janur Kiri */}
