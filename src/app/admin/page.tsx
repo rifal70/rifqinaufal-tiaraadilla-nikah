@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/admin";
 import { createServiceClient } from "@/lib/supabase/server";
 import { STORAGE_BUCKET, getSettings } from "@/lib/data";
+import { LOVE_STORY, DIGITAL_GIFT_DEFAULT_TEXT } from "@/lib/content";
 import { ActionForm, InviteCreator } from "@/components/admin/Forms";
 import { ToastProvider, ToastSubmitButton } from "@/components/admin/ToastContext";
 import {
@@ -220,6 +221,10 @@ export default async function AdminPage({
             <textarea id="opening_greeting" name="opening_greeting" rows={5} className="admin-input" defaultValue={settings.opening_greeting} />
             <label className="admin-label" htmlFor="closing_greeting">Salam penutup</label>
             <textarea id="closing_greeting" name="closing_greeting" rows={5} className="admin-input" defaultValue={settings.closing_greeting} />
+            <label className="admin-label" htmlFor="love_story">Cerita cinta kami</label>
+            <textarea id="love_story" name="love_story" rows={6} className="admin-input" defaultValue={settings.love_story || LOVE_STORY.story} />
+            <label className="admin-label" htmlFor="digital_gift_text">Teks kado digital</label>
+            <textarea id="digital_gift_text" name="digital_gift_text" rows={4} className="admin-input" defaultValue={settings.digital_gift_text || DIGITAL_GIFT_DEFAULT_TEXT} />
             <label className="admin-label" htmlFor="maps_url">Link Google Maps (https://…)</label>
             <input id="maps_url" name="maps_url" type="url" className="admin-input" defaultValue={settings.maps_url} />
             <ToastSubmitButton className="btn-gold" id="settings-submit" successMessage="Pengaturan konten berhasil disimpan!">

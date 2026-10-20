@@ -1,4 +1,4 @@
-﻿-- Migration 001: Initial schema for wedding invitation website
+-- Migration 001: Initial schema for wedding invitation website
 -- Created: 2026-10-17
 -- Description: Creates invitations, sessions, bank_accounts, gallery_images, and site_settings tables.
 
@@ -116,8 +116,10 @@ ON CONFLICT (display_order) DO NOTHING;
 -- 9. SEED DEFAULT SITE SETTINGS
 -- ============================================================
 INSERT INTO site_settings (key, value) VALUES
-  ('opening_greeting', '[PLACEHOLDER â€” owner to provide exact religious greeting text]'),
-  ('closing_greeting', '[PLACEHOLDER â€” owner to provide exact closing text]'),
+  ('opening_greeting', '[PLACEHOLDER — owner to provide exact religious greeting text]'),
+  ('closing_greeting', '[PLACEHOLDER — owner to provide exact closing text]'),
+  ('love_story', '[PLACEHOLDER — owner to provide love story text]'),
+  ('digital_gift_text', '[PLACEHOLDER — owner to provide digital gift text]'),
   ('music_url', ''),
   ('couple_photo_url', '')
 ON CONFLICT (key) DO NOTHING;

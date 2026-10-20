@@ -15,6 +15,8 @@ export interface SiteSettings {
   bride_photo_path?: string;
   event_date?: string;
   event_expiry_days?: string;
+  love_story?: string;
+  digital_gift_text?: string;
 }
 
 export const SETTING_KEYS = [
@@ -27,6 +29,8 @@ export const SETTING_KEYS = [
   "bride_photo_path",
   "event_date",
   "event_expiry_days",
+  "love_story",
+  "digital_gift_text",
 ] as const;
 
 export type SettingKey = (typeof SETTING_KEYS)[number];
@@ -44,6 +48,8 @@ export async function getSettings(): Promise<SiteSettings> {
     bride_photo_path: "",
     event_date: "",
     event_expiry_days: "",
+    love_story: "",
+    digital_gift_text: "",
   };
 
   try {

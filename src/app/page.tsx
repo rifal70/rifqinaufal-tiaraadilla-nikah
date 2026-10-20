@@ -340,8 +340,12 @@ export default async function Home() {
           Cerita Cinta Kami
         </h2>
         <Divider />
-        <div className="w-full max-w-3xl mx-auto font-serif">
-          <LoveStory />
+        <div className="w-full max-w-3xl mx-auto font-serif" data-reveal>
+          {settings.love_story ? (
+            <LoveStory story={settings.love_story} />
+          ) : (
+            <Placeholder label="teks cerita cinta kami dari pemilik" />
+          )}
         </div>
       </section>
 
@@ -361,7 +365,7 @@ export default async function Home() {
             Kado Digital
           </h2>
           <Divider />
-          <DigitalGift accounts={visibleBanks} />
+          <DigitalGift accounts={visibleBanks} greeting={settings.digital_gift_text} />
         </section>
       )}
 

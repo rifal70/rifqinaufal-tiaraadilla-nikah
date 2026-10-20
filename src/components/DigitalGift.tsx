@@ -6,9 +6,10 @@ import BankCard from "@/components/BankCard";
 
 interface DigitalGiftProps {
   accounts: BankAccount[];
+  greeting?: string;
 }
 
-export default function DigitalGift({ accounts }: DigitalGiftProps) {
+export default function DigitalGift({ accounts, greeting }: DigitalGiftProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleOpen = () => {
@@ -18,14 +19,18 @@ export default function DigitalGift({ accounts }: DigitalGiftProps) {
   return (
     <div className="w-full max-w-4xl mx-auto flex flex-col items-center">
       {/* Pengantar / Ucapan */}
-      <p
-        className="font-display text-lg md:text-xl text-cream/90 max-w-xl mx-auto mb-6 px-4 leading-relaxed"
-        data-reveal
-      >
-        Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Dan jika memberi
-        adalah ungkapan tanda kasih Anda, Anda dapat memberi kado secara digital dengan
-        membuka kotak kado di bawah ini:
-      </p>
+      {greeting ? (
+        <p
+          className="font-display text-lg md:text-xl text-cream/90 max-w-xl mx-auto mb-6 px-4 leading-relaxed whitespace-pre-line"
+          data-reveal
+        >
+          {greeting}
+        </p>
+      ) : (
+        <div className="mb-6 max-w-xl mx-auto px-4 w-full" data-reveal>
+          <p className="placeholder-box text-center">[PLACEHOLDER — teks kado digital dari pemilik]</p>
+        </div>
+      )}
 
       {/* Area Kado Interaktif */}
       <div className="relative w-full flex flex-col items-center pt-2 sm:pt-4" data-reveal>

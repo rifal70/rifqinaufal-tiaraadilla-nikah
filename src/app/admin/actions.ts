@@ -196,6 +196,8 @@ export async function updateSettingsAction(form: FormData) {
   const settingKeys = [
     "opening_greeting",
     "closing_greeting",
+    "love_story",
+    "digital_gift_text",
     "maps_url",
     "event_date",
     "event_expiry_days",
