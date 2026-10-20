@@ -17,13 +17,13 @@ export default function ImageModal({
             <button
                 type="button"
                 onClick={() => setIsOpen(true)}
-                className="w-full cursor-pointer overflow-hidden rounded-xl border border-gold-500/20 bg-black/20 p-2 transition-all hover:scale-[1.01] hover:border-gold-500/50"
+                className="w-full h-full flex items-center justify-center cursor-pointer overflow-hidden rounded-xl border border-gold-500/20 bg-black/20 p-1 sm:p-1.5 transition-all hover:scale-[1.01] hover:border-gold-500/50"
             >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                     src={src}
                     alt={alt}
-                    className="max-h-[480px] md:max-h-[500px] w-full object-contain"
+                    className="max-h-[560px] md:max-h-[640px] w-full h-full object-contain rounded-lg"
                 />
             </button>
 

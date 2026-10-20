@@ -283,10 +283,7 @@ export default async function Home() {
         <div className="mx-auto max-w-6xl w-full space-y-8" data-reveal>
           <div className="grid gap-6 md:grid-cols-[3fr_2fr] items-stretch">
             {/* 1. Denah Lokasi */}
-            <div className="glass-card flex flex-col items-center justify-center p-6 md:p-8 h-full">
-              <p className="text-xs uppercase tracking-widest text-gold-300 mb-4 font-semibold">
-                Denah Lokasi
-              </p>
+            <div className="glass-card flex flex-col items-center justify-center p-2.5 sm:p-4 md:p-5 h-full">
               {mapImageUrl ? (
                 <ImageModal src={mapImageUrl} alt="Denah lokasi acara" />
               ) : (
@@ -308,28 +305,26 @@ export default async function Home() {
                   loading="lazy"
                 />
               </div>
-              <p className="text-xs text-green-200/70 mt-6 max-w-[200px] leading-relaxed">
+              <p className="text-xs text-green-200/70 mt-4 mb-5 max-w-[220px] leading-relaxed">
                 Arahkan kamera HP ke QR Code untuk rute langsung
               </p>
-            </div>
-          </div>
 
-          {/* 3. Tombol Buka Google Maps */}
-          <div className="pt-2">
-            {settings.maps_url ? (
-              <a
-                id="maps-link"
-                href={settings.maps_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-gold inline-flex items-center gap-2 px-8 py-3 text-sm font-semibold tracking-wider uppercase transition-all duration-200 hover:scale-[1.02] active:scale-95 shadow-md"
-              >
-                <span>Buka di Google Maps</span>
-                <span>↗</span>
-              </a>
-            ) : (
-              <Placeholder label="tautan Google Maps" />
-            )}
+              {/* Tombol Buka Google Maps */}
+              {settings.maps_url ? (
+                <a
+                  id="maps-link"
+                  href={settings.maps_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-gold inline-flex items-center gap-2 px-6 py-2.5 text-xs sm:text-sm font-semibold tracking-wider uppercase transition-all duration-200 hover:scale-[1.02] active:scale-95 shadow-md"
+                >
+                  <span>Buka di Google Maps</span>
+                  <span>↗</span>
+                </a>
+              ) : (
+                <Placeholder label="tautan Google Maps" />
+              )}
+            </div>
           </div>
         </div>
       </section>
