@@ -20,7 +20,7 @@ export default function CouplePhoto({
                 title={`Lihat foto ${alt}`}
             >
                 {/* 1. Foto Pengantin (Ditinggiin dengan h-full dan inset yang pas) */}
-                <div className="absolute inset-[12%] overflow-hidden rounded-[2.5rem]">
+                <div className="absolute inset-[12%] overflow-hidden rounded-[0.5rem]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                         src={src}

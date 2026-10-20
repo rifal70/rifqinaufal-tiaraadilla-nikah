@@ -79,19 +79,13 @@ export default async function Home() {
 
         {/* Konten Utama Teks - Tetap Presisi di Tengah Layar */}
         <div className="relative z-10 mx-auto flex w-full max-w-[280px] sm:max-w-md md:max-w-none flex-col items-center" data-reveal>
-          <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] text-gold-300">
+          <p className="text-[14px] sm:text-l uppercase tracking-[0.3em] sm:tracking-[0.4em] text-gold-300">
             The Wedding of
           </p>
 
-          <h1 className="mt-4 sm:mt-6 font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-gold-shimmer leading-tight md:whitespace-nowrap">
+          <h1 className="mt-4 sm:mt-6 font-display text-4xl sm:text-2xl md:text-6xl lg:text-7xl text-gold-shimmer leading-tight md:whitespace-nowrap">
             {W.groom.shortName} &amp; {W.bride.shortName}
           </h1>
-
-          <Divider />
-
-          <p className="font-display text-lg sm:text-2xl text-cream md:whitespace-nowrap">
-            {W.date}
-          </p>
         </div>
 
         {/* Ornamen Wayang Gunungan Kiri - Sejajar Nama Rifqi & Gagang Tersembunyi */}
