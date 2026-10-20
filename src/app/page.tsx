@@ -141,9 +141,23 @@ export default async function Home() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/mega_mendung_left.png"
+            src="/mega_mendung.png"
             alt=""
             className="cloud-float-top w-28 sm:w-48 md:w-64 lg:w-80 h-auto object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)] will-change-transform"
+          />
+        </div>
+
+        {/* Motive 4 - Pojok Kanan Atas */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute top-4 -right-8 sm:top-8 sm:-right-12 z-0 rotate-12"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/motive/motive_4.png"
+            alt=""
+            className="motive-ornament w-32 sm:w-48 md:w-64 lg:w-72 h-auto object-contain will-change-transform"
           />
         </div>
 
@@ -156,15 +170,29 @@ export default async function Home() {
           )}
         </div>
 
-        {/* Mega Mendung Bottom (Pojok Kanan Bawah) */}
+        {/* Motive 1 - Pojok Kiri Bawah */}
         <div
           aria-hidden="true"
           data-reveal
-          className="pointer-events-none select-none absolute bottom-0 right-0 z-0"
+          className="pointer-events-none select-none absolute -bottom-6 -left-8 sm:-bottom-10 sm:-left-12 z-0 -rotate-12"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/mega_mendung_right.png"
+            src="/motive/motive_1.png"
+            alt=""
+            className="motive-ornament w-32 sm:w-48 md:w-60 lg:w-72 h-auto object-contain will-change-transform"
+          />
+        </div>
+
+        {/* Mega Mendung Bottom (Pojok Kanan Bawah) - Menggunakan mega_mendung.png di-mirror */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute bottom-0 right-0 z-0 -scale-x-100"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/mega_mendung.png"
             alt=""
             className="cloud-float-bottom w-28 sm:w-48 md:w-64 lg:w-80 h-auto object-contain drop-shadow-[0_-8px_24px_rgba(0,0,0,0.35)] will-change-transform"
           />
@@ -172,8 +200,36 @@ export default async function Home() {
       </section>
 
       {/* Surat Ar-Rum: 21 */}
-      <section className="section-wedding text-center" id="ar-rum">
-        <div className="glass-card max-w-3xl mx-auto p-6 sm:p-10 space-y-6" data-reveal>
+      <section className="section-wedding text-center relative overflow-x-clip" id="ar-rum">
+        {/* Motive 1 - Pojok Kiri Atas */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute top-2 -left-8 sm:top-6 sm:-left-12 z-0 rotate-45"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/motive/motive_1.png"
+            alt=""
+            className="motive-ornament w-32 sm:w-48 md:w-64 lg:w-72 h-auto object-contain will-change-transform"
+          />
+        </div>
+
+        {/* Motive 3 - Pojok Kanan Bawah */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute -bottom-6 -right-8 sm:-bottom-10 sm:-right-12 z-0 -rotate-15"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/motive/motive_3.png"
+            alt=""
+            className="motive-ornament w-32 sm:w-48 md:w-64 lg:w-76 h-auto object-contain will-change-transform"
+          />
+        </div>
+
+        <div className="glass-card max-w-3xl mx-auto p-6 sm:p-10 space-y-6 relative z-10" data-reveal>
           <p
             lang="ar"
             dir="rtl"
@@ -195,8 +251,36 @@ export default async function Home() {
       </section>
 
       {/* Couple */}
-      <section className="section-wedding text-center" id="mempelai">
-        <div className="grid gap-10 md:grid-cols-[1fr_auto_1fr] items-center max-w-5xl w-full mx-auto">
+      <section className="section-wedding text-center relative overflow-x-clip" id="mempelai">
+        {/* Motive 2 - Pojok Kanan Atas */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute -top-8 -right-8 sm:-top-12 sm:-right-12 z-0"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/motive/motive_2.png"
+            alt=""
+            className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
+          />
+        </div>
+
+        {/* Motive 5 - Pojok Kiri Bawah */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute -bottom-10 -left-10 sm:-bottom-14 sm:-left-14 z-0 rotate-12"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/motive/motive_5.png"
+            alt=""
+            className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
+          />
+        </div>
+
+        <div className="grid gap-10 md:grid-cols-[1fr_auto_1fr] items-center max-w-5xl w-full mx-auto relative z-10">
 
           {/* Mempelai Pria */}
           <div className="glass-card relative flex flex-col items-center justify-center px-4 py-8 sm:px-8 sm:py-10 text-center w-full min-w-0" data-reveal>
@@ -239,144 +323,353 @@ export default async function Home() {
       </section>
 
       {/* Events */}
-      <section className="section-wedding text-center" id="acara">
-        <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>Waktu &amp; Tempat</h2>
-        <Divider />
+      <section className="section-wedding text-center relative overflow-x-clip" id="acara">
+        {/* Motive 3 - Pojok Kiri Atas */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute top-4 -left-10 sm:top-8 sm:-left-14 z-0 -rotate-12"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/motive/motive_3.png"
+            alt=""
+            className="motive-ornament w-32 sm:w-48 md:w-64 lg:w-76 h-auto object-contain will-change-transform"
+          />
+        </div>
 
-        {/* Save The Date */}
-        <div className="flex flex-col items-center mb-8 w-full max-w-sm mx-auto" data-reveal>
-          <div className="relative overflow-hidden rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.35)] border border-gold-500/30 max-w-[260px] sm:max-w-[280px] transition-transform duration-300 hover:scale-[1.02]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/save_the_date.jpg"
-              alt="Save The Date"
-              className="w-full h-auto object-contain rounded-2xl"
-              loading="lazy"
-            />
-          </div>
-          <p className="mt-4 font-display text-xl sm:text-2xl text-white-300 bg-[#621917] font-semibold tracking-wide p-4 rounded-md">
-            {W.date}
-          </p>
+        {/* Motive 1 - Pojok Kanan Bawah */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute -bottom-10 -right-10 sm:-bottom-14 sm:-right-16 z-0 rotate-45"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/motive/motive_1.png"
+            alt=""
+            className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
+          />
         </div>
-        <div className="grid gap-6 md:grid-cols-2 max-w-4xl w-full">
-          {[W.akad, W.resepsi].map((e) => (
-            <div key={e.title} className="glass-card-gold" data-reveal>
-              <h3 className="font-display text-3xl text-gold-300">{e.title}</h3>
-              <p className="mt-1 text-lg font-medium text-gold-100">{e.time}</p>
+
+        <div className="relative z-10 flex flex-col items-center w-full">
+          <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>Waktu &amp; Tempat</h2>
+          <Divider />
+
+          {/* Save The Date */}
+          <div className="flex flex-col items-center mb-8 w-full max-w-md mx-auto" data-reveal>
+            <div className="relative overflow-hidden rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.35)] border border-gold-500/30 max-w-[260px] sm:max-w-[280px] transition-transform duration-300 hover:scale-[1.02]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/save_the_date.jpg"
+                alt="Save The Date"
+                className="w-full h-auto object-contain rounded-2xl"
+                loading="lazy"
+              />
             </div>
-          ))}
-        </div>
-        <div className="glass-card mt-6 max-w-4xl w-full" data-reveal>
-          <p className="text-xs uppercase tracking-[0.3em] text-gold-300">Bertempat di</p>
-          <p className="mt-3 font-display text-2xl text-cream">{W.venue.name}</p>
-          <p className="mt-2 text-green-100">{W.venue.address}</p>
+            {/* Bingkai Tanggal Pernikahan (frame_date) */}
+            <div className="relative mt-4 w-full max-w-[340px] xs:max-w-[380px] sm:max-w-[420px] md:max-w-[450px] flex items-center justify-center transition-transform duration-300 hover:scale-[1.02]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/frame_date.png"
+                alt="Bingkai Tanggal"
+                className="w-full h-auto object-contain pointer-events-none select-none drop-shadow-[0_6px_20px_rgba(212,175,55,0.3)]"
+              />
+              <div className="absolute inset-0 flex items-center justify-center px-10 sm:px-12 py-3 text-center">
+                <p className="font-display italic text-sm xs:text-base sm:text-lg md:text-xl font-bold text-gold-shimmer tracking-wide leading-snug drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+                  {W.date}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 max-w-4xl w-full">
+            {[W.akad, W.resepsi].map((e) => (
+              <div key={e.title} className="glass-card-gold" data-reveal>
+                <h3 className="font-display text-3xl text-gold-300">{e.title}</h3>
+                <p className="mt-1 text-lg font-medium text-gold-100">{e.time}</p>
+              </div>
+            ))}
+          </div>
+          <div className="glass-card mt-6 max-w-4xl w-full" data-reveal>
+            <p className="text-xs uppercase tracking-[0.3em] text-gold-300">Bertempat di</p>
+            <p className="mt-3 font-display text-2xl text-cream">{W.venue.name}</p>
+            <p className="mt-2 text-green-100">{W.venue.address}</p>
+          </div>
         </div>
       </section>
 
       {/* Location */}
-      <section className="section-wedding text-center" id="lokasi">
-        <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>
-          Denah &amp; Lokasi
-        </h2>
-        <Divider />
+      <section className="section-wedding text-center relative overflow-x-clip" id="lokasi">
+        {/* Motive 4 - Pojok Kanan Atas */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute top-2 -right-8 sm:top-6 sm:-right-14 z-0 rotate-12"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/motive/motive_4.png"
+            alt=""
+            className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
+          />
+        </div>
 
-        <div className="mx-auto max-w-6xl w-full space-y-8" data-reveal>
-          <div className="grid gap-6 md:grid-cols-[3fr_2fr] items-stretch">
-            {/* 1. Denah Lokasi */}
-            <div className="glass-card flex flex-col items-center justify-center p-2.5 sm:p-4 md:p-5 h-full">
-              {mapImageUrl ? (
-                <ImageModal src={mapImageUrl} alt="Denah lokasi acara" />
-              ) : (
-                <Placeholder label="gambar Denah Lokasi" />
-              )}
-            </div>
+        {/* Motive 2 - Pojok Kiri Bawah (Rotated) */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute -bottom-8 -left-8 sm:-bottom-12 sm:-left-12 z-0 rotate-180"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/motive/motive_2.png"
+            alt=""
+            className="motive-ornament w-32 sm:w-48 md:w-64 lg:w-76 h-auto object-contain will-change-transform"
+          />
+        </div>
 
-            {/* 2. Scan QR Code Maps */}
-            <div className="glass-card flex flex-col items-center justify-center p-6 h-full bg-emerald-950/20">
-              <p className="text-xs uppercase tracking-widest text-gold-300 mb-6 font-semibold">
-                Scan QR Google Maps
-              </p>
-              <div className="relative p-3 bg-white rounded-2xl shadow-lg border border-gold-500/20 max-w-[200px] md:max-w-[220px]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/qr-maps.png"
-                  alt="Scan QR Google Maps"
-                  className="w-full h-auto aspect-square object-contain rounded-lg"
-                  loading="lazy"
-                />
+        <div className="relative z-10 flex flex-col items-center w-full">
+          <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>
+            Denah &amp; Lokasi
+          </h2>
+          <Divider />
+
+          <div className="mx-auto max-w-6xl w-full space-y-8" data-reveal>
+            <div className="grid gap-6 md:grid-cols-[3fr_2fr] items-stretch">
+              {/* 1. Denah Lokasi */}
+              <div className="glass-card flex flex-col items-center justify-center p-2.5 sm:p-4 md:p-5 h-full">
+                {mapImageUrl ? (
+                  <ImageModal src={mapImageUrl} alt="Denah lokasi acara" />
+                ) : (
+                  <Placeholder label="gambar Denah Lokasi" />
+                )}
               </div>
-              <p className="text-xs text-green-200/70 mt-4 mb-5 max-w-[220px] leading-relaxed">
-                Arahkan kamera HP ke QR Code untuk rute langsung
-              </p>
 
-              {/* Tombol Buka Google Maps */}
-              {settings.maps_url ? (
-                <a
-                  id="maps-link"
-                  href={settings.maps_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-gold inline-flex items-center gap-2 px-6 py-2.5 text-xs sm:text-sm font-semibold tracking-wider uppercase transition-all duration-200 hover:scale-[1.02] active:scale-95 shadow-md"
-                >
-                  <span>Buka di Google Maps</span>
-                  <span>↗</span>
-                </a>
-              ) : (
-                <Placeholder label="tautan Google Maps" />
-              )}
+              {/* 2. Scan QR Code Maps */}
+              <div className="glass-card flex flex-col items-center justify-center p-6 h-full bg-emerald-950/20">
+                <p className="text-xs uppercase tracking-widest text-gold-300 mb-6 font-semibold">
+                  Scan QR Google Maps
+                </p>
+                <div className="relative p-3 bg-white rounded-2xl shadow-lg border border-gold-500/20 max-w-[200px] md:max-w-[220px]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/qr-maps.png"
+                    alt="Scan QR Google Maps"
+                    className="w-full h-auto aspect-square object-contain rounded-lg"
+                    loading="lazy"
+                  />
+                </div>
+                <p className="text-xs text-green-200/70 mt-4 mb-5 max-w-[220px] leading-relaxed">
+                  Arahkan kamera HP ke QR Code untuk rute langsung
+                </p>
+
+                {/* Tombol Buka Google Maps */}
+                {settings.maps_url ? (
+                  <a
+                    id="maps-link"
+                    href={settings.maps_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-gold inline-flex items-center gap-2 px-6 py-2.5 text-xs sm:text-sm font-semibold tracking-wider uppercase transition-all duration-200 hover:scale-[1.02] active:scale-95 shadow-md"
+                  >
+                    <span>Buka di Google Maps</span>
+                    <span>↗</span>
+                  </a>
+                ) : (
+                  <Placeholder label="tautan Google Maps" />
+                )}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Love Story */}
-      <section className="section-wedding text-center" id="cerita">
-        <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>
-          Cerita Cinta Kami
-        </h2>
-        <Divider />
-        <div className="w-full max-w-3xl mx-auto font-serif" data-reveal>
-          {settings.love_story ? (
-            <LoveStory story={settings.love_story} />
-          ) : (
-            <Placeholder label="teks cerita cinta kami dari pemilik" />
-          )}
+      <section className="section-wedding text-center relative overflow-x-clip" id="cerita">
+        {/* Motive 2 - Pojok Kiri Atas */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute top-2 -left-8 sm:top-6 sm:-left-12 z-0 rotate-12"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/motive/motive_2.png"
+            alt=""
+            className="motive-ornament w-32 sm:w-48 md:w-64 lg:w-76 h-auto object-contain will-change-transform"
+          />
+        </div>
+
+        {/* Motive 5 - Pojok Kanan Bawah */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute -bottom-8 -right-8 sm:-bottom-12 sm:-right-12 z-0 rotate-180"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/motive/motive_5.png"
+            alt=""
+            className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
+          />
+        </div>
+
+        <div className="relative z-10 flex flex-col items-center w-full">
+          <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>
+            Cerita Cinta Kami
+          </h2>
+          <Divider />
+          <div className="w-full max-w-3xl mx-auto font-serif" data-reveal>
+            {settings.love_story ? (
+              <LoveStory story={settings.love_story} />
+            ) : (
+              <Placeholder label="teks cerita cinta kami dari pemilik" />
+            )}
+          </div>
         </div>
       </section>
 
       {/* Gallery */}
-      <section className="section-wedding text-center" id="galeri">
-        <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>Galeri</h2>
-        <Divider />
-        <div className="max-w-5xl w-full" data-reveal>
-          {gallery.length ? <Gallery items={gallery} /> : <Placeholder label="foto galeri dari pemilik" />}
+      <section className="section-wedding text-center relative overflow-x-clip" id="galeri">
+        {/* Motive 5 - Pojok Kiri Atas (Flipped) */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute top-0 -left-8 sm:top-4 sm:-left-12 z-0 -scale-x-100 rotate-6"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/motive/motive_5.png"
+            alt=""
+            className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
+          />
+        </div>
+
+        {/* Motive 3 - Pojok Kanan Bawah */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute -bottom-8 -right-8 sm:-bottom-12 sm:-right-14 z-0 rotate-180"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/motive/motive_3.png"
+            alt=""
+            className="motive-ornament w-32 sm:w-48 md:w-64 lg:w-76 h-auto object-contain will-change-transform"
+          />
+        </div>
+
+        {/* Motive 1 - Sisi Kanan Tengah */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute top-1/2 -right-12 sm:-right-16 -translate-y-1/2 z-0 -rotate-45 hidden md:block"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/motive/motive_1.png"
+            alt=""
+            className="motive-ornament w-32 sm:w-44 md:w-56 h-auto object-contain will-change-transform"
+          />
+        </div>
+
+        <div className="relative z-10 flex flex-col items-center w-full">
+          <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>Galeri</h2>
+          <Divider />
+          <div className="max-w-5xl w-full" data-reveal>
+            {gallery.length ? <Gallery items={gallery} /> : <Placeholder label="foto galeri dari pemilik" />}
+          </div>
         </div>
       </section>
 
       {/* Gifts / Amplop Digital */}
       {visibleBanks.length > 0 && (
-        <section className="section-wedding text-center" id="amplop">
-          <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>
-            Kado Digital
-          </h2>
-          <Divider />
-          <DigitalGift accounts={visibleBanks} greeting={settings.digital_gift_text} />
+        <section className="section-wedding text-center relative overflow-x-clip" id="amplop">
+          {/* Motive 1 - Pojok Kanan Atas */}
+          <div
+            aria-hidden="true"
+            data-reveal
+            className="pointer-events-none select-none absolute top-2 -right-8 sm:top-6 sm:-right-14 z-0 rotate-15"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/motive/motive_1.png"
+              alt=""
+              className="motive-ornament w-32 sm:w-48 md:w-64 lg:w-76 h-auto object-contain will-change-transform"
+            />
+          </div>
+
+          {/* Motive 4 - Pojok Kiri Bawah */}
+          <div
+            aria-hidden="true"
+            data-reveal
+            className="pointer-events-none select-none absolute -bottom-6 -left-8 sm:-bottom-10 sm:-left-12 z-0 -rotate-12"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/motive/motive_4.png"
+              alt=""
+              className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
+            />
+          </div>
+
+          <div className="relative z-10 flex flex-col items-center w-full">
+            <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>
+              Kado Digital
+            </h2>
+            <Divider />
+            <DigitalGift accounts={visibleBanks} greeting={settings.digital_gift_text} />
+          </div>
         </section>
       )}
 
       {/* Closing */}
-      <section className="section-wedding text-center" id="penutup">
-        <div className="max-w-2xl" data-reveal>
+      <section
+        className="section-wedding text-center relative overflow-hidden min-h-[100svh] landscape:min-h-[100dvh] flex flex-col justify-center items-center py-12 sm:py-16 md:py-20 landscape:py-6 px-4"
+        id="penutup"
+      >
+        {/* Motive 6 - Pojok Kiri Bawah */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute -bottom-6 -left-8 sm:-bottom-10 sm:-left-12 z-0 -rotate-12"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/motive/motive_6.png"
+            alt=""
+            className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
+          />
+        </div>
+
+        {/* Motive 7 - Pojok Kanan Bawah */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none absolute -bottom-6 -right-8 sm:-bottom-10 sm:-right-12 z-0 rotate-12"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/motive/motive_7.png"
+            alt=""
+            className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
+          />
+        </div>
+
+        {/* Kotak Salam Penutup (Tetap Presisi di Tengah tanpa tergeser) */}
+        <div className="glass-card max-w-xl md:max-w-2xl w-full mx-auto relative z-10 p-6 sm:p-8 md:p-10 space-y-4 sm:space-y-6 landscape:py-4 landscape:space-y-3 text-center my-auto bg-black/35 backdrop-blur-md shadow-2xl" data-reveal>
           {settings.closing_greeting ? (
             <p className="font-display text-xl leading-relaxed text-cream whitespace-pre-line">{settings.closing_greeting}</p>
           ) : (
             <Placeholder label="teks salam penutup dari pemilik" />
           )}
+
+          <Divider />
+
+          <p className="font-display text-3xl sm:text-4xl text-gold-shimmer">
+            {W.groom.shortName} &amp; {W.bride.shortName}
+          </p>
         </div>
-        <Divider />
-        <p className="font-display text-4xl text-gold-shimmer" data-reveal>
-          {W.groom.shortName} &amp; {W.bride.shortName}
-        </p>
       </section>
     </InvitationShell>
   );
