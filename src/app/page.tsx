@@ -376,7 +376,7 @@ export default async function Home() {
                 className="w-full h-auto object-contain pointer-events-none select-none drop-shadow-[0_6px_20px_rgba(212,175,55,0.3)]"
               />
               <div className="absolute inset-0 flex items-center justify-center px-10 sm:px-12 py-3 text-center">
-                <p className="font-display italic text-sm xs:text-base sm:text-lg md:text-xl font-bold text-gold-shimmer tracking-wide leading-snug drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+                <p className="font-display italic text-m xs:text-base sm:text-lg md:text-xl font-bold text-gold-shimmer tracking-wide leading-snug drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
                   {W.date}
                 </p>
               </div>
