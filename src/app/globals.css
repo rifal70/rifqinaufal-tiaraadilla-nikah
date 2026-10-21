@@ -751,13 +751,14 @@ body {
 
 /* === Motive Edge Ornaments === */
 .motive-ornament {
-  filter: brightness(0) invert(0.85) sepia(0.65) saturate(2.6) hue-rotate(5deg) drop-shadow(0 4px 18px rgba(212, 175, 55, 0.22));
-  opacity: 0.35;
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  filter: brightness(0) saturate(100%) invert(39%) sepia(26%) saturate(468%) hue-rotate(39deg) brightness(94%) contrast(89%) drop-shadow(0 4px 18px rgba(92, 106, 66, 0.45));
+  opacity: 0.85;
+  transition: opacity 0.5s ease, transform 0.5s ease, filter 0.5s ease;
 }
 
 @media (hover: hover) {
   .motive-ornament:hover {
-    opacity: 0.5;
+    opacity: 1;
+    filter: brightness(0) saturate(100%) invert(39%) sepia(26%) saturate(550%) hue-rotate(39deg) brightness(105%) contrast(92%) drop-shadow(0 6px 24px rgba(92, 106, 66, 0.65));
   }
 }
