@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 export default function CouplePhoto({
     src,
@@ -10,6 +11,32 @@ export default function CouplePhoto({
     alt: string;
 }) {
     const [isOpen, setIsOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const originalOverflow = document.body.style.overflow;
+        const originalOverscroll = document.body.style.overscrollBehavior;
+        document.body.style.overflow = "hidden";
+        document.body.style.overscrollBehavior = "none";
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setIsOpen(false);
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            document.body.style.overflow = originalOverflow;
+            document.body.style.overscrollBehavior = originalOverscroll;
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [isOpen]);
 
     return (
         <>
@@ -40,14 +67,16 @@ export default function CouplePhoto({
             </div>
 
             {/* Modal Lightbox saat foto diklik */}
-            {isOpen && (
+            {mounted && isOpen && createPortal(
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 backdrop-blur-md"
+                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 p-4 backdrop-blur-md select-none touch-none overscroll-contain"
                     onClick={() => setIsOpen(false)}
+                    onTouchMove={(e) => e.preventDefault()}
+                    onWheel={(e) => e.stopPropagation()}
                 >
                     <button
                         onClick={() => setIsOpen(false)}
-                        className="absolute top-5 right-5 z-50 rounded-full bg-white/10 p-2.5 text-2xl text-white/80 transition-colors hover:bg-white/20 hover:text-white"
+                        className="absolute top-5 right-5 z-[10000] rounded-full bg-white/10 p-2.5 text-2xl text-white/80 transition-colors hover:bg-white/20 hover:text-white"
                         aria-label="Tutup"
                     >
                         ✕
@@ -64,7 +93,8 @@ export default function CouplePhoto({
                             className="max-h-[82vh] max-w-full rounded-2xl border-2 border-gold-400/50 object-contain shadow-[0_0_50px_rgba(0,0,0,0.9)]"
                         />
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 type GalleryItem = {
   id: string;
@@ -12,6 +13,12 @@ type GalleryItem = {
 export default function Gallery({ items }: { items: GalleryItem[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!items || items.length <= 1 || isOpen) return;
@@ -19,10 +26,37 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % items.length);
     }, 4500);
-    // 4,5 second
 
     return () => clearInterval(interval);
   }, [items, isOpen]);
+
+  // Lock body scroll and handle keyboard navigation when modal is open
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    const originalOverscroll = document.body.style.overscrollBehavior;
+    document.body.style.overflow = "hidden";
+    document.body.style.overscrollBehavior = "none";
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsOpen(false);
+      } else if (e.key === "ArrowLeft") {
+        setCurrentIndex((prev) => (prev - 1 + items.length) % items.length);
+      } else if (e.key === "ArrowRight") {
+        setCurrentIndex((prev) => (prev + 1) % items.length);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.overscrollBehavior = originalOverscroll;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, items.length]);
 
   if (!items || items.length === 0) return null;
 
@@ -107,16 +141,29 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
         )}
       </div>
       {/* ========================================================= */}
-      {/* 4. MODAL FULLSCREEN / LIGHTBOX                            */}
+      {/* 4. MODAL FULLSCREEN / LIGHTBOX (PORTAL KE BODY)           */}
       {/* ========================================================= */}
-      {isOpen && (
+      {mounted && isOpen && createPortal(
         <div
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 p-4 backdrop-blur-md"
+          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black/95 p-4 backdrop-blur-md select-none touch-none overscroll-contain"
           onClick={() => setIsOpen(false)}
+          onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
+          onTouchEnd={(e) => {
+            if (touchStartX === null) return;
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            const threshold = 40;
+            if (diff > threshold) {
+              setCurrentIndex((prev) => (prev + 1) % items.length);
+            } else if (diff < -threshold) {
+              setCurrentIndex((prev) => (prev - 1 + items.length) % items.length);
+            }
+            setTouchStartX(null);
+          }}
+          onWheel={(e) => e.stopPropagation()}
         >
           <button
             onClick={() => setIsOpen(false)}
-            className="absolute top-5 right-5 z-50 rounded-full bg-white/10 p-2.5 text-2xl text-white/80 transition-colors hover:bg-white/20 hover:text-white"
+            className="absolute top-5 right-5 z-[10000] rounded-full bg-white/10 p-2.5 text-2xl text-white/80 transition-colors hover:bg-white/20 hover:text-white"
             aria-label="Tutup"
           >
             ✕
@@ -128,7 +175,7 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
                 e.stopPropagation();
                 setCurrentIndex((prev) => (prev - 1 + items.length) % items.length);
               }}
-              className="absolute left-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-2xl text-white hover:bg-white/20"
+              className="absolute left-4 z-[10000] flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-2xl text-white hover:bg-white/20"
             >
               ‹
             </button>
@@ -156,12 +203,13 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
                 e.stopPropagation();
                 setCurrentIndex((prev) => (prev + 1) % items.length);
               }}
-              className="absolute right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-2xl text-white hover:bg-white/20"
+              className="absolute right-4 z-[10000] flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-2xl text-white hover:bg-white/20"
             >
               ›
             </button>
           )}
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

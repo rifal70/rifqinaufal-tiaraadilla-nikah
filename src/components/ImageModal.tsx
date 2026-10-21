@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 export default function ImageModal({
     src,
@@ -10,6 +11,32 @@ export default function ImageModal({
     alt: string;
 }) {
     const [isOpen, setIsOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const originalOverflow = document.body.style.overflow;
+        const originalOverscroll = document.body.style.overscrollBehavior;
+        document.body.style.overflow = "hidden";
+        document.body.style.overscrollBehavior = "none";
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setIsOpen(false);
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            document.body.style.overflow = originalOverflow;
+            document.body.style.overscrollBehavior = originalOverscroll;
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [isOpen]);
 
     return (
         <>
@@ -28,16 +55,18 @@ export default function ImageModal({
             </button>
 
             {/* Modal Popup Full Lebar */}
-            {isOpen && (
+            {mounted && isOpen && createPortal(
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-2 sm:p-6 backdrop-blur-sm"
+                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-2 sm:p-6 backdrop-blur-sm select-none touch-none overscroll-contain"
                     onClick={() => setIsOpen(false)}
+                    onTouchMove={(e) => e.preventDefault()}
+                    onWheel={(e) => e.stopPropagation()}
                 >
                     {/* Tombol Tutup */}
                     <button
                         type="button"
                         onClick={() => setIsOpen(false)}
-                        className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-xl text-gold-300 hover:bg-white/20 hover:text-white"
+                        className="absolute top-4 right-4 z-[10000] flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-xl text-gold-300 hover:bg-white/20 hover:text-white"
                     >
                         ✕
                     </button>
@@ -54,7 +83,8 @@ export default function ImageModal({
                             className="max-h-[92vh] w-auto max-w-full rounded-xl border border-gold-500/30 object-contain shadow-2xl"
                         />
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );
