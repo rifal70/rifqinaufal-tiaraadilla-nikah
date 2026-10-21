@@ -143,7 +143,7 @@ export default async function Home() {
           <img
             src="/mega_mendung.png"
             alt=""
-            className="cloud-float-top w-28 sm:w-48 md:w-64 lg:w-80 h-auto object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)] will-change-transform"
+            className="cloud-float-top w-28 sm:w-48 md:w-64 lg:w-80 h-auto object-contain will-change-transform"
           />
         </div>
 
@@ -194,7 +194,7 @@ export default async function Home() {
           <img
             src="/mega_mendung.png"
             alt=""
-            className="cloud-float-bottom w-28 sm:w-48 md:w-64 lg:w-80 h-auto object-contain drop-shadow-[0_-8px_24px_rgba(0,0,0,0.35)] will-change-transform"
+            className="cloud-float-bottom w-28 sm:w-48 md:w-64 lg:w-80 h-auto object-contain will-change-transform"
           />
         </div>
       </section>
