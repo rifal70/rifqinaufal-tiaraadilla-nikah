@@ -237,7 +237,7 @@ export default async function AdminPage({
             <ActionForm action={uploadAssetAction} submitLabel="Unggah Foto Pria" id="upload-groom">
               <input type="hidden" name="kind" value="groom_photo" />
               <label className="admin-label" htmlFor="groom-file">
-                Foto Mempelai Pria (JPG/PNG/WebP, ≤5 MB) {settings.groom_photo_path ? "✓ sudah ada" : ""}
+                Foto Mempelai Pria (JPG/PNG/WebP, ≤255 KB) {settings.groom_photo_path ? "✓ sudah ada" : ""}
               </label>
               <input id="groom-file" name="file" type="file" accept="image/jpeg,image/png,image/webp,image/avif" required className="admin-input" />
             </ActionForm>
@@ -245,20 +245,20 @@ export default async function AdminPage({
             <ActionForm action={uploadAssetAction} submitLabel="Unggah Foto Wanita" id="upload-bride">
               <input type="hidden" name="kind" value="bride_photo" />
               <label className="admin-label" htmlFor="bride-file">
-                Foto Mempelai Wanita (JPG/PNG/WebP, ≤5 MB) {settings.bride_photo_path ? "✓ sudah ada" : ""}
+                Foto Mempelai Wanita (JPG/PNG/WebP, ≤255 KB) {settings.bride_photo_path ? "✓ sudah ada" : ""}
               </label>
               <input id="bride-file" name="file" type="file" accept="image/jpeg,image/png,image/webp,image/avif" required className="admin-input" />
             </ActionForm>
 
             <ActionForm action={uploadAssetAction} submitLabel="Unggah Denah Lokasi" id="upload-map">
               <input type="hidden" name="kind" value="map" />
-              <label className="admin-label" htmlFor="map-file">Gambar Denah Lokasi (JPG/PNG/WebP, ≤5 MB) {settings.map_image_path ? "✓ sudah ada" : ""}</label>
+              <label className="admin-label" htmlFor="map-file">Gambar Denah Lokasi (JPG/PNG/WebP, ≤255 KB) {settings.map_image_path ? "✓ sudah ada" : ""}</label>
               <input id="map-file" name="file" type="file" accept="image/jpeg,image/png,image/webp,image/avif" required className="admin-input" />
             </ActionForm>
 
             <ActionForm action={uploadAssetAction} submitLabel="Unggah Musik" id="upload-music">
               <input type="hidden" name="kind" value="music" />
-              <label className="admin-label" htmlFor="music-file">Musik latar (MP3/M4A/OGG, ≤5 MB) {settings.music_path ? "✓ sudah ada" : ""}</label>
+              <label className="admin-label" htmlFor="music-file">Musik latar (MP3/M4A/OGG, ≤155 KB) {settings.music_path ? "✓ sudah ada" : ""}</label>
               <input id="music-file" name="file" type="file" accept="audio/*" required className="admin-input" />
             </ActionForm>
           </div>
@@ -268,7 +268,7 @@ export default async function AdminPage({
         <section className="glass-card space-y-4">
           <h2 className="admin-h2">Galeri</h2>
           <ActionForm action={uploadGalleryAction} submitLabel="Unggah Foto" id="upload-gallery">
-            <label className="admin-label" htmlFor="gallery-files">Foto (JPG/PNG/WebP, maks 5 MB per unggahan — pilih beberapa sekaligus bila kecil)</label>
+            <label className="admin-label" htmlFor="gallery-files">Foto (JPG/PNG/WebP, maks 255 KB per unggahan — pilih beberapa sekaligus bila kecil)</label>
             <input id="gallery-files" name="files" type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif" required className="admin-input" />
           </ActionForm>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

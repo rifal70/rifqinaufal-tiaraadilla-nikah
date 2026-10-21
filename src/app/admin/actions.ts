@@ -221,12 +221,16 @@ export async function updateSettingsAction(form: FormData) {
 
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 const AUDIO_TYPES = ["audio/mpeg", "audio/mp4", "audio/aac", "audio/ogg", "audio/x-m4a"];
-const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+const MAX_IMAGE_BYTES = 255 * 1024; // 255 KB
+const MAX_AUDIO_BYTES = 1200 * 1024; // 1.2 MB
 
 async function upload(file: File, prefix: string, allowed: string[]) {
   if (!file || file.size === 0) throw new Error("File kosong.");
   if (!allowed.includes(file.type)) throw new Error("Tipe file tidak didukung.");
-  if (file.size > MAX_BYTES) throw new Error("Ukuran file maksimal 5 MB.");
+  const isAudio = AUDIO_TYPES.includes(file.type);
+  const maxBytes = isAudio ? MAX_AUDIO_BYTES : MAX_IMAGE_BYTES;
+  const maxLabel = isAudio ? "1.2 MB" : "255 KB";
+  if (file.size > maxBytes) throw new Error(`Ukuran file maksimal ${maxLabel}.`);
   const ext = (file.name.split(".").pop() || "bin").toLowerCase().replace(/[^a-z0-9]/g, "");
   const path = `${prefix}/${crypto.randomUUID()}.${ext}`;
   const { error } = await createServiceClient()

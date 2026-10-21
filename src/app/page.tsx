@@ -129,6 +129,33 @@ export default async function Home() {
             className="w-full h-auto drop-shadow-[-6px_6px_24px_rgba(212,175,55,0.28)] animate-gunungan-fast object-contain"
           />
         </div>
+
+        {/* Karakter Animasi Pengantin Berbingkai Jawa - Paling Bawah Section */}
+        <div
+          aria-hidden="true"
+          data-reveal
+          className="pointer-events-none select-none z-10 absolute bottom-0 left-0 right-0 flex justify-center items-end"
+        >
+          <div className="relative aspect-square w-[min(72vw,250px)] sm:w-[290px] md:w-[360px] lg:w-[420px] xl:w-[460px] landscape:w-auto landscape:h-[38dvh] landscape:max-h-[175px] md:landscape:h-[42dvh] md:landscape:max-h-[220px] flex items-center justify-center drop-shadow-[0_16px_40px_rgba(0,0,0,0.65)]">
+            {/* Kartu Dalam */}
+            <div className="absolute inset-[9%] sm:inset-[8%] z-10 overflow-hidden rounded-2xl bg-gradient-to-b from-[#152a19]/85 via-[#0d1d11]/90 to-[#071309]/95 backdrop-blur-sm border border-gold-400/30 flex items-end justify-center p-1 sm:p-1.5 shadow-[inset_0_0_20px_rgba(212,175,55,0.12)]">
+              {/* Gambar Karakter */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/animated_naufaldilla.webp"
+                alt="Ilustrasi Pengantin Rifqi &amp; Dilla"
+                className="max-h-full max-w-full object-contain drop-shadow-md"
+              />
+            </div>
+            {/* Frame Ukiran Jawa */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/frame_dillanaufalanimated.png"
+              alt=""
+              className="pointer-events-none absolute inset-0 z-20 h-full w-full object-fill drop-shadow-[0_4px_14px_rgba(212,175,55,0.35)]"
+            />
+          </div>
+        </div>
       </section>
 
       {/* Opening */}
