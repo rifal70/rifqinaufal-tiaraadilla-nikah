@@ -1,6 +1,7 @@
 import "server-only";
 import { query } from "@/lib/neon/db";
 import { FALLBACK_BANKS, type BankAccount } from "@/lib/content";
+import { getMediaUrl } from "@/lib/media";
 
 export const STORAGE_BUCKET = "gallery";
 
@@ -115,14 +116,13 @@ export async function getBanks(includeDisabled = true): Promise<BankAccount[]> {
   }
 }
 
+
 /**
  * Returns public URL for a given media path.
  * External URLs pass through unchanged.
  */
 export async function signedUrl(path?: string | null): Promise<string> {
-  if (!path) return "";
-  if (/^https?:\/\//.test(path) || path.startsWith("/")) return path;
-  return `/api/media/${path.replace(/^\/+/, "")}`;
+  return getMediaUrl(path);
 }
 
 export interface GalleryItem {
@@ -139,11 +139,18 @@ export async function getGallery(): Promise<GalleryItem[]> {
 
     if (!rows.length) return [];
 
-    return rows.map((d) => ({
-      id: d.id,
-      url: `/api/media/${d.storage_path.replace(/^\/+/, "")}`,
-      alt: d.alt_text || "Foto galeri",
-    }));
+    const items: GalleryItem[] = [];
+    for (const d of rows) {
+      const url = await getMediaUrl(d.storage_path);
+      if (url) {
+        items.push({
+          id: d.id,
+          url,
+          alt: d.alt_text || "Foto galeri",
+        });
+      }
+    }
+    return items;
   } catch (err) {
     console.error("Failed to fetch gallery from Neon:", err);
     return [];

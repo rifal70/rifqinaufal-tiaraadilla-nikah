@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/admin";
 import { query } from "@/lib/neon/db";
 import { getSettings } from "@/lib/data";
+import { getMediaUrl } from "@/lib/media";
 import { LOVE_STORY, DIGITAL_GIFT_DEFAULT_TEXT } from "@/lib/content";
 import { ActionForm, InviteCreator } from "@/components/admin/Forms";
 import { ToastProvider, ToastSubmitButton } from "@/components/admin/ToastContext";
@@ -71,9 +72,11 @@ export default async function AdminPage({
   const count = parseInt(countRows[0]?.total ?? "0", 10);
   const activeSessions = parseInt(activeSessionsRows[0]?.total ?? "0", 10);
 
-  const thumbs = photos?.map((p) => ({
-    signedUrl: `/api/media/${p.storage_path.replace(/^\/+/, "")}`,
-  })) ?? [];
+  const thumbs = await Promise.all(
+    (photos ?? []).map(async (p) => ({
+      signedUrl: await getMediaUrl(p.storage_path),
+    }))
+  );
 
   const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
 

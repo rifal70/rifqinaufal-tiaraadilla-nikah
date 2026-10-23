@@ -1,5 +1,7 @@
 import { NextRequest } from "next/server";
 import { query } from "@/lib/neon/db";
+import { isB2Configured, getB2Client } from "@/lib/b2";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
 
 export const dynamic = "force-dynamic";
 
@@ -15,19 +17,47 @@ export async function GET(
   }
 
   try {
-    const rows = await query<{ content_type: string; data: Buffer }>(
-      "SELECT content_type, data FROM media_files WHERE file_path = $1 LIMIT 1",
-      [filePath]
-    );
+    let contentType = "application/octet-stream";
+    let dataBuffer: Buffer | null = null;
 
-    if (!rows.length || !rows[0].data) {
-      return new Response("Not Found", { status: 404 });
+    // 1. Try Backblaze B2 if configured
+    if (isB2Configured()) {
+      try {
+        const client = getB2Client();
+        const bucket = process.env.B2_BUCKET_NAME;
+        if (client && bucket) {
+          const obj = await client.send(
+            new GetObjectCommand({ Bucket: bucket, Key: filePath })
+          );
+          if (obj.Body) {
+            const bytes = await obj.Body.transformToByteArray();
+            dataBuffer = Buffer.from(bytes);
+            contentType = obj.ContentType || contentType;
+          }
+        }
+      } catch (b2Err) {
+        // Fall back to Neon if not in B2
+      }
     }
 
-    const item = rows[0];
-    const dataBuffer = Buffer.isBuffer(item.data)
-      ? item.data
-      : Buffer.from(item.data as any);
+    // 2. Fall back to Neon media_files table
+    if (!dataBuffer) {
+      const rows = await query<{ content_type: string; data: Buffer }>(
+        "SELECT content_type, data FROM media_files WHERE file_path = $1 LIMIT 1",
+        [filePath]
+      );
+
+      if (rows.length && rows[0].data) {
+        contentType = rows[0].content_type || contentType;
+        dataBuffer = Buffer.isBuffer(rows[0].data)
+          ? rows[0].data
+          : Buffer.from(rows[0].data as any);
+      }
+    }
+
+    if (!dataBuffer) {
+      return new Response("Not Found", { status: 404 });
+    }
 
     // Support range header for audio seeking
     const range = request.headers.get("range");
@@ -40,23 +70,23 @@ export async function GET(
 
       if (!isNaN(start) && !isNaN(end) && start <= end && end < totalSize) {
         const chunk = dataBuffer.subarray(start, end + 1);
-        return new Response(chunk, {
+        return new Response(new Uint8Array(chunk), {
           status: 206,
           headers: {
             "Content-Range": `bytes ${start}-${end}/${totalSize}`,
             "Accept-Ranges": "bytes",
             "Content-Length": String(chunk.length),
-            "Content-Type": item.content_type || "application/octet-stream",
+            "Content-Type": contentType,
             "Cache-Control": "public, max-age=31536000, immutable",
           },
         });
       }
     }
 
-    return new Response(dataBuffer, {
+    return new Response(new Uint8Array(dataBuffer), {
       status: 200,
       headers: {
-        "Content-Type": item.content_type || "application/octet-stream",
+        "Content-Type": contentType,
         "Content-Length": String(totalSize),
         "Accept-Ranges": "bytes",
         "Cache-Control": "public, max-age=31536000, immutable",

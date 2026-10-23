@@ -11,15 +11,16 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const response = NextResponse.next();
   const isDev = process.env.NODE_ENV !== "production";
+  const b2PublicUrl = process.env.B2_PUBLIC_URL ?? "";
 
   const csp = [
     "default-src 'self'",
     `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
-    "img-src 'self' data: blob:",
-    "media-src 'self' data: blob:",
-    `connect-src 'self'${isDev ? " ws:" : ""}`,
+    `img-src 'self' data: blob: https://*.backblazeb2.com ${b2PublicUrl}`.trim(),
+    `media-src 'self' data: blob: https://*.backblazeb2.com ${b2PublicUrl}`.trim(),
+    `connect-src 'self' https://*.backblazeb2.com${isDev ? " ws:" : ""}`,
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
