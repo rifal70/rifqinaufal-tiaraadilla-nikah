@@ -23,21 +23,26 @@ const siteUrl = () => (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/$/, ""
 /* ---------------- Auth ---------------- */
 
 export async function loginAction(_: ActionState, form: FormData): Promise<ActionState> {
-  const h = await headers();
-  if (!(await isAllowed("admin-login", clientIp(h), 5, 300))) {
-    return { error: "Terlalu banyak percobaan. Coba lagi nanti." };
-  }
-  const parsed = z
-    .object({ email: z.string().email(), password: z.string().min(1) })
-    .safeParse({ email: form.get("email"), password: form.get("password") });
-  if (!parsed.success) return { error: "Email atau kata sandi salah." };
+  try {
+    const h = await headers();
+    if (!(await isAllowed("admin-login", clientIp(h), 5, 300))) {
+      return { ok: false, error: "Terlalu banyak percobaan. Coba lagi nanti." };
+    }
+    const parsed = z
+      .object({ email: z.string().email(), password: z.string().min(1) })
+      .safeParse({ email: form.get("email"), password: form.get("password") });
+    if (!parsed.success) return { ok: false, error: "Email atau kata sandi salah." };
 
-  const valid = await verifyAdminCredentials(parsed.data.email, parsed.data.password);
-  if (!valid) {
-    return { error: "Email atau kata sandi salah." };
-  }
+    const valid = await verifyAdminCredentials(parsed.data.email, parsed.data.password);
+    if (!valid) {
+      return { ok: false, error: "Email atau kata sandi salah." };
+    }
 
-  await createAdminSession(parsed.data.email);
+    await createAdminSession(parsed.data.email);
+  } catch (err: any) {
+    console.error("loginAction error:", err);
+    return { ok: false, error: err?.message || "Terjadi kesalahan saat masuk." };
+  }
   redirect("/admin");
 }
 
@@ -49,174 +54,229 @@ export async function logoutAction() {
 /* ---------------- Invitations ---------------- */
 
 /** Bulk create: one guest name per line, optional ";count;bankRef". */
-export async function createInvitationsAction(formData: FormData) {
-  await requireAdmin();
+export async function createInvitationsAction(formData: FormData): Promise<ActionState> {
+  try {
+    await requireAdmin();
 
-  const rawGuests = formData.get("guests")?.toString() ?? "";
-  const lines = rawGuests
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(Boolean);
+    const rawGuests = formData.get("guests")?.toString() ?? "";
+    const lines = rawGuests
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean);
 
-  if (!lines.length) return;
+    if (!lines.length) return { ok: false, error: "Daftar tamu tidak boleh kosong." };
 
-  // 1. Ambil data master rekening aktif untuk pemetaan urutan -> ID
-  const activeBankList = await query<{
-    id: string;
-    display_order: number;
-    account_number: string;
-  }>("SELECT id, display_order, account_number FROM bank_accounts WHERE is_enabled = true");
+    // 1. Ambil data master rekening aktif untuk pemetaan urutan -> ID
+    const activeBankList = await query<{
+      id: string;
+      display_order: number;
+      account_number: string;
+    }>("SELECT id, display_order, account_number FROM bank_accounts WHERE is_enabled = true");
 
-  // 2. Parse tiap baris: nama;jumlah;norek_atau_urutan
-  for (const line of lines) {
-    const parts = line.split(";").map((s) => s.trim());
-    const name = parts[0] || "Tamu";
-    const count = Math.max(1, parseInt(parts[1] || "1", 10) || 1);
-    const bankRef = parts[2]?.toLowerCase();
+    // 2. Parse tiap baris: nama;jumlah;norek_atau_urutan
+    for (const line of lines) {
+      const parts = line.split(";").map((s) => s.trim());
+      const name = parts[0] || "Tamu";
+      const count = Math.max(1, parseInt(parts[1] || "1", 10) || 1);
+      const bankRef = parts[2]?.toLowerCase();
 
-    let matchedBankIds: string[] | null = null;
+      let matchedBankIds: string[] | null = null;
 
-    if (!bankRef || bankRef === "all") {
-      matchedBankIds = activeBankList.map((b) => b.id);
-    } else if (bankRef === "none" || bankRef === "0" || bankRef === "-") {
-      matchedBankIds = [];
-    } else {
-      const targets = bankRef.split(",").map((t) => t.trim());
-      matchedBankIds = activeBankList
-        .filter(
-          (b) =>
-            targets.includes(String(b.display_order)) ||
-            targets.includes(b.account_number)
-        )
-        .map((b) => b.id);
+      if (!bankRef || bankRef === "all") {
+        matchedBankIds = activeBankList.map((b) => b.id);
+      } else if (bankRef === "none" || bankRef === "0" || bankRef === "-") {
+        matchedBankIds = [];
+      } else {
+        const targets = bankRef.split(",").map((t) => t.trim());
+        matchedBankIds = activeBankList
+          .filter(
+            (b) =>
+              targets.includes(String(b.display_order)) ||
+              targets.includes(b.account_number)
+          )
+          .map((b) => b.id);
+      }
+
+      const token = generateToken();
+      const tokenHash = hashToken(token);
+
+      await query(
+        `INSERT INTO invitations (guest_name, token_hash, guest_count, visible_bank_ids)
+         VALUES ($1, $2, $3, $4)`,
+        [name, tokenHash, count, matchedBankIds]
+      );
     }
 
-    const token = generateToken();
-    const tokenHash = hashToken(token);
-
-    await query(
-      `INSERT INTO invitations (guest_name, token_hash, guest_count, visible_bank_ids)
-       VALUES ($1, $2, $3, $4)`,
-      [name, tokenHash, count, matchedBankIds]
-    );
+    revalidatePath("/admin");
+    return { ok: true, message: `${lines.length} undangan berhasil dibuat!` };
+  } catch (err: any) {
+    console.error("createInvitationsAction error:", err);
+    return { ok: false, error: err?.message || "Gagal membuat undangan. Silakan coba lagi." };
   }
-
-  revalidatePath("/admin");
 }
 
 /** Regenerate a single invitation's link (old link stops working). */
-export async function regenerateLinkAction(_: ActionState, form: FormData): Promise<ActionState> {
-  await requireAdmin();
-  const id = z.string().uuid().safeParse(form.get("id"));
-  if (!id.success || !siteUrl()) return { error: "Data tidak valid." };
-  const token = generateToken();
-  const tHash = hashToken(token);
+export async function regenerateLinkAction(
+  arg1: ActionState | FormData,
+  arg2?: FormData
+): Promise<ActionState> {
+  try {
+    await requireAdmin();
+    const form = arg1 instanceof FormData ? arg1 : arg2!;
+    const id = z.string().uuid().safeParse(form.get("id"));
+    if (!id.success || !siteUrl()) {
+      return { ok: false, error: "Data undangan tidak valid atau URL situs belum dikonfigurasi." };
+    }
+    const token = generateToken();
+    const tHash = hashToken(token);
 
-  await query(
-    "UPDATE invitations SET token_hash = $1, updated_at = now() WHERE id = $2",
-    [tHash, id.data]
-  );
-  await query("DELETE FROM sessions WHERE invitation_id = $1", [id.data]);
+    await query(
+      "UPDATE invitations SET token_hash = $1, updated_at = now() WHERE id = $2",
+      [tHash, id.data]
+    );
+    await query("DELETE FROM sessions WHERE invitation_id = $1", [id.data]);
 
-  return { ok: true, message: `${siteUrl()}/invite/${token}` };
-}
-
-export async function setRevokedAction(form: FormData) {
-  await requireAdmin();
-  const id = z.string().uuid().parse(form.get("id"));
-  const revoke = form.get("revoke") === "1";
-
-  await query(
-    "UPDATE invitations SET is_revoked = $1, updated_at = now() WHERE id = $2",
-    [revoke, id]
-  );
-  if (revoke) {
-    await query("DELETE FROM sessions WHERE invitation_id = $1", [id]);
+    revalidatePath("/admin");
+    return { ok: true, message: `${siteUrl()}/invite/${token}` };
+  } catch (err: any) {
+    console.error("regenerateLinkAction error:", err);
+    return { ok: false, error: err?.message || "Gagal membuat link baru." };
   }
-  revalidatePath("/admin");
 }
 
-export async function deleteInvitationAction(form: FormData) {
-  await requireAdmin();
-  const id = z.string().uuid().parse(form.get("id"));
-  await query("DELETE FROM invitations WHERE id = $1", [id]);
-  revalidatePath("/admin");
+export async function setRevokedAction(form: FormData): Promise<ActionState> {
+  try {
+    await requireAdmin();
+    const id = z.string().uuid().parse(form.get("id"));
+    const revoke = form.get("revoke") === "1";
+
+    await query(
+      "UPDATE invitations SET is_revoked = $1, updated_at = now() WHERE id = $2",
+      [revoke, id]
+    );
+    if (revoke) {
+      await query("DELETE FROM sessions WHERE invitation_id = $1", [id]);
+    }
+    revalidatePath("/admin");
+    return {
+      ok: true,
+      message: revoke ? "Undangan berhasil dicabut!" : "Undangan diaktifkan kembali!",
+    };
+  } catch (err: any) {
+    console.error("setRevokedAction error:", err);
+    return { ok: false, error: err?.message || "Gagal mengubah status undangan." };
+  }
+}
+
+export async function deleteInvitationAction(form: FormData): Promise<ActionState> {
+  try {
+    await requireAdmin();
+    const id = z.string().uuid().parse(form.get("id"));
+    await query("DELETE FROM invitations WHERE id = $1", [id]);
+    revalidatePath("/admin");
+    return { ok: true, message: "Undangan berhasil dihapus!" };
+  } catch (err: any) {
+    console.error("deleteInvitationAction error:", err);
+    return { ok: false, error: err?.message || "Gagal menghapus undangan." };
+  }
 }
 
 /* ---------------- Bank accounts ---------------- */
 
-export async function updateBankAction(form: FormData) {
-  await requireAdmin();
-  const data = z
-    .object({
-      id: z.string().uuid(),
-      bank_name: z.string().trim().min(1).max(100),
-      account_holder: z.string().trim().min(1).max(200),
-      account_number: z.string().trim().min(1).max(64),
-    })
-    .parse({
-      id: form.get("id"),
-      bank_name: form.get("bank_name"),
-      account_holder: form.get("account_holder"),
-      account_number: form.get("account_number"),
-    });
+export async function updateBankAction(form: FormData): Promise<ActionState> {
+  try {
+    await requireAdmin();
+    const data = z
+      .object({
+        id: z.string().uuid(),
+        bank_name: z.string().trim().min(1, "Nama bank wajib diisi").max(100),
+        account_holder: z.string().trim().min(1, "Nama pemilik wajib diisi").max(200),
+        account_number: z.string().trim().min(1, "Nomor rekening wajib diisi").max(64),
+      })
+      .parse({
+        id: form.get("id"),
+        bank_name: form.get("bank_name"),
+        account_holder: form.get("account_holder"),
+        account_number: form.get("account_number"),
+      });
 
-  const isEnabled = form.get("is_enabled") === "on";
+    const isEnabled = form.get("is_enabled") === "on";
 
-  await query(
-    "UPDATE bank_accounts SET bank_name = $1, account_holder = $2, account_number = $3, is_enabled = $4 WHERE id = $5",
-    [data.bank_name, data.account_holder, data.account_number, isEnabled, data.id]
-  );
+    await query(
+      "UPDATE bank_accounts SET bank_name = $1, account_holder = $2, account_number = $3, is_enabled = $4 WHERE id = $5",
+      [data.bank_name, data.account_holder, data.account_number, isEnabled, data.id]
+    );
 
-  revalidatePath("/admin");
-  revalidatePath("/");
+    revalidatePath("/admin");
+    revalidatePath("/");
+    return { ok: true, message: `Rekening ${data.bank_name} berhasil disimpan!` };
+  } catch (err: any) {
+    console.error("updateBankAction error:", err);
+    const msg = err?.errors?.[0]?.message || err?.message || "Gagal menyimpan rekening bank.";
+    return { ok: false, error: msg };
+  }
 }
 
-export async function updateInvitationBanksAction(formData: FormData) {
-  await requireAdmin();
-  const invitation_id = formData.get("invitation_id")?.toString();
-  const bank_ids = formData.getAll("bank_ids") as string[];
+export async function updateInvitationBanksAction(formData: FormData): Promise<ActionState> {
+  try {
+    await requireAdmin();
+    const invitation_id = formData.get("invitation_id")?.toString();
+    if (!invitation_id) {
+      return { ok: false, error: "ID undangan tidak ditemukan." };
+    }
+    const bank_ids = formData.getAll("bank_ids") as string[];
 
-  await query(
-    "UPDATE invitations SET visible_bank_ids = $1, updated_at = now() WHERE id = $2",
-    [bank_ids, invitation_id]
-  );
+    await query(
+      "UPDATE invitations SET visible_bank_ids = $1, updated_at = now() WHERE id = $2",
+      [bank_ids, invitation_id]
+    );
 
-  revalidatePath("/admin");
-  revalidatePath("/");
+    revalidatePath("/admin");
+    revalidatePath("/");
+    return { ok: true, message: "Pengaturan amplop berhasil disimpan!" };
+  } catch (err: any) {
+    console.error("updateInvitationBanksAction error:", err);
+    return { ok: false, error: err?.message || "Gagal menyimpan pengaturan amplop." };
+  }
 }
 
 /* ---------------- Settings ---------------- */
 
-export async function updateSettingsAction(form: FormData) {
-  await requireAdmin();
+export async function updateSettingsAction(form: FormData): Promise<ActionState> {
+  try {
+    await requireAdmin();
 
-  const settingKeys = [
-    "opening_greeting",
-    "closing_greeting",
-    "love_story",
-    "digital_gift_text",
-    "maps_url",
-    "event_date",
-    "event_expiry_days",
-  ] as const;
+    const settingKeys = [
+      "opening_greeting",
+      "closing_greeting",
+      "love_story",
+      "digital_gift_text",
+      "maps_url",
+      "event_date",
+      "event_expiry_days",
+    ] as const;
 
-  for (const key of settingKeys) {
-    let value = String(form.get(key) ?? "").slice(0, 5000);
-    if (key === "maps_url" && value && !/^https:\/\//.test(value)) {
-      value = "";
+    for (const key of settingKeys) {
+      let value = String(form.get(key) ?? "").slice(0, 5000);
+      if (key === "maps_url" && value && !/^https:\/\//.test(value)) {
+        value = "";
+      }
+
+      await query(
+        `INSERT INTO site_settings (key, value, updated_at)
+         VALUES ($1, $2, now())
+         ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()`,
+        [key, value]
+      );
     }
 
-    await query(
-      `INSERT INTO site_settings (key, value, updated_at)
-       VALUES ($1, $2, now())
-       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()`,
-      [key, value]
-    );
+    revalidatePath("/admin");
+    revalidatePath("/");
+    return { ok: true, message: "Pengaturan teks acara berhasil disimpan!" };
+  } catch (err: any) {
+    console.error("updateSettingsAction error:", err);
+    return { ok: false, error: err?.message || "Gagal menyimpan pengaturan teks acara." };
   }
-
-  revalidatePath("/admin");
-  revalidatePath("/");
 }
 
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
@@ -238,21 +298,25 @@ async function upload(file: File, prefix: string, allowed: string[]) {
   return path;
 }
 
-export async function uploadAssetAction(_: ActionState, form: FormData): Promise<ActionState> {
-  await requireAdmin();
-  const kind = form.get("kind")?.toString();
-
-  const keyMap: Record<string, string> = {
-    music: "music_path",
-    map: "map_image_path",
-    groom_photo: "groom_photo_path",
-    bride_photo: "bride_photo_path",
-  };
-
-  const key = kind ? keyMap[kind] : null;
-  if (!key) return { error: "Jenis aset tidak valid." };
-
+export async function uploadAssetAction(
+  arg1: ActionState | FormData,
+  arg2?: FormData
+): Promise<ActionState> {
   try {
+    await requireAdmin();
+    const form = arg1 instanceof FormData ? arg1 : arg2!;
+    const kind = form.get("kind")?.toString();
+
+    const keyMap: Record<string, string> = {
+      music: "music_path",
+      map: "map_image_path",
+      groom_photo: "groom_photo_path",
+      bride_photo: "bride_photo_path",
+    };
+
+    const key = kind ? keyMap[kind] : null;
+    if (!key) return { ok: false, error: "Jenis aset tidak valid." };
+
     const isAudio = kind === "music";
     const path = await upload(form.get("file") as File, "assets", isAudio ? AUDIO_TYPES : IMAGE_TYPES);
 
@@ -265,63 +329,88 @@ export async function uploadAssetAction(_: ActionState, form: FormData): Promise
 
     revalidatePath("/admin");
     revalidatePath("/");
-    return { ok: true, message: "Berhasil diunggah." };
-  } catch (e) {
-    return { error: (e as Error).message };
+    return { ok: true, message: "Aset berhasil diunggah!" };
+  } catch (e: any) {
+    console.error("uploadAssetAction error:", e);
+    return { ok: false, error: e?.message || "Gagal mengunggah file aset." };
   }
 }
 
 /* ---------------- Gallery ---------------- */
 
-export async function uploadGalleryAction(_: ActionState, form: FormData): Promise<ActionState> {
-  await requireAdmin();
-  const files = form.getAll("files").filter((f): f is File => f instanceof File && f.size > 0);
-  if (!files.length) return { error: "Pilih minimal satu foto." };
+export async function uploadGalleryAction(
+  arg1: ActionState | FormData,
+  arg2?: FormData
+): Promise<ActionState> {
+  try {
+    await requireAdmin();
+    const form = arg1 instanceof FormData ? arg1 : arg2!;
+    const files = form.getAll("files").filter((f): f is File => f instanceof File && f.size > 0);
+    if (!files.length) return { ok: false, error: "Pilih minimal satu foto." };
 
-  const last = await query<{ display_order: number }>(
-    "SELECT display_order FROM gallery_images ORDER BY display_order DESC LIMIT 1"
-  );
-  let order = (last?.[0]?.display_order ?? 0) + 1;
-  let done = 0;
+    const last = await query<{ display_order: number }>(
+      "SELECT display_order FROM gallery_images ORDER BY display_order DESC LIMIT 1"
+    );
+    let order = (last?.[0]?.display_order ?? 0) + 1;
+    let done = 0;
 
-  for (const f of files) {
-    try {
-      const path = await upload(f, "photos", IMAGE_TYPES);
-      await query(
-        "INSERT INTO gallery_images (storage_path, display_order, alt_text) VALUES ($1, $2, 'Foto galeri')",
-        [path, order++]
-      );
-      done++;
-    } catch (e) {
-      return { error: `${done} foto terunggah, lalu gagal: ${(e as Error).message}` };
+    for (const f of files) {
+      try {
+        const path = await upload(f, "photos", IMAGE_TYPES);
+        await query(
+          "INSERT INTO gallery_images (storage_path, display_order, alt_text) VALUES ($1, $2, 'Foto galeri')",
+          [path, order++]
+        );
+        done++;
+      } catch (e) {
+        return { ok: false, error: `${done} foto terunggah, lalu gagal: ${(e as Error).message}` };
+      }
     }
-  }
 
-  revalidatePath("/admin");
-  return { ok: true, message: `${done} foto terunggah.` };
+    revalidatePath("/admin");
+    return { ok: true, message: `${done} foto berhasil diunggah.` };
+  } catch (err: any) {
+    console.error("uploadGalleryAction error:", err);
+    return { ok: false, error: err?.message || "Gagal mengunggah foto galeri." };
+  }
 }
 
-export async function toggleGalleryAction(form: FormData) {
-  await requireAdmin();
-  const id = z.string().uuid().parse(form.get("id"));
-  const isVisible = form.get("visible") === "1";
+export async function toggleGalleryAction(form: FormData): Promise<ActionState> {
+  try {
+    await requireAdmin();
+    const id = z.string().uuid().parse(form.get("id"));
+    const isVisible = form.get("visible") === "1";
 
-  await query("UPDATE gallery_images SET is_visible = $1 WHERE id = $2", [isVisible, id]);
-  revalidatePath("/admin");
+    await query("UPDATE gallery_images SET is_visible = $1 WHERE id = $2", [isVisible, id]);
+    revalidatePath("/admin");
+    return {
+      ok: true,
+      message: isVisible ? "Foto galeri ditampilkan!" : "Foto galeri disembunyikan!",
+    };
+  } catch (err: any) {
+    console.error("toggleGalleryAction error:", err);
+    return { ok: false, error: err?.message || "Gagal mengubah status foto." };
+  }
 }
 
-export async function deleteGalleryAction(form: FormData) {
-  await requireAdmin();
-  const id = z.string().uuid().parse(form.get("id"));
+export async function deleteGalleryAction(form: FormData): Promise<ActionState> {
+  try {
+    await requireAdmin();
+    const id = z.string().uuid().parse(form.get("id"));
 
-  const rows = await query<{ storage_path: string }>(
-    "SELECT storage_path FROM gallery_images WHERE id = $1 LIMIT 1",
-    [id]
-  );
-  if (rows.length && rows[0].storage_path) {
-    await deleteMediaFile(rows[0].storage_path);
+    const rows = await query<{ storage_path: string }>(
+      "SELECT storage_path FROM gallery_images WHERE id = $1 LIMIT 1",
+      [id]
+    );
+    if (rows.length && rows[0].storage_path) {
+      await deleteMediaFile(rows[0].storage_path);
+    }
+
+    await query("DELETE FROM gallery_images WHERE id = $1", [id]);
+    revalidatePath("/admin");
+    return { ok: true, message: "Foto berhasil dihapus!" };
+  } catch (err: any) {
+    console.error("deleteGalleryAction error:", err);
+    return { ok: false, error: err?.message || "Gagal menghapus foto." };
   }
-
-  await query("DELETE FROM gallery_images WHERE id = $1", [id]);
-  revalidatePath("/admin");
 }

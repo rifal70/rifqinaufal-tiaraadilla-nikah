@@ -4,8 +4,13 @@ import { query } from "@/lib/neon/db";
 import { getSettings } from "@/lib/data";
 import { getMediaUrl } from "@/lib/media";
 import { LOVE_STORY, DIGITAL_GIFT_DEFAULT_TEXT } from "@/lib/content";
-import { ActionForm, InviteCreator } from "@/components/admin/Forms";
-import { ToastProvider, ToastSubmitButton } from "@/components/admin/ToastContext";
+import {
+  ActionForm,
+  InviteCreator,
+  AdminForm,
+  AdminSubmitButton,
+} from "@/components/admin/Forms";
+import { ToastProvider } from "@/components/admin/ToastContext";
 import {
   logoutAction,
   createInvitationsAction,
@@ -111,7 +116,14 @@ export default async function AdminPage({
           <h2 className="admin-h2">Master Rekening Bank</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {banks?.map((b) => (
-              <form key={b.id} action={updateBankAction} className="rounded-xl border border-gold-500/20 p-4 space-y-2" id={`bank-form-${b.display_order}`}>
+              <AdminForm
+                key={b.id}
+                action={updateBankAction}
+                className="rounded-xl border border-gold-500/20 p-4 space-y-2"
+                id={`bank-form-${b.display_order}`}
+                successMessage={`Rekening ${b.bank_name || "bank"} berhasil disimpan!`}
+                errorMessage={`Gagal menyimpan rekening ${b.bank_name || "bank"}.`}
+              >
                 <input type="hidden" name="id" value={b.id} />
                 <p className="text-xs text-gold-300">Urutan #{b.display_order}</p>
                 <input name="bank_name" defaultValue={b.bank_name} className="admin-input" aria-label="Nama bank" />
@@ -120,13 +132,10 @@ export default async function AdminPage({
                 <label className="flex items-center gap-2 text-sm">
                   <input type="checkbox" name="is_enabled" defaultChecked={b.is_enabled} /> Aktif
                 </label>
-                <ToastSubmitButton
-                  id={`bank-save-${b.display_order}`}
-                  successMessage={`Rekening ${b.bank_name || "bank"} berhasil disimpan!`}
-                >
+                <AdminSubmitButton id={`bank-save-${b.display_order}`}>
                   Simpan
-                </ToastSubmitButton>
-              </form>
+                </AdminSubmitButton>
+              </AdminForm>
             ))}
           </div>
         </section>
@@ -175,7 +184,12 @@ export default async function AdminPage({
                     <td className="py-3 font-medium text-cream">{inv.guest_name}</td>
                     <td className="py-3">{inv.guest_count}</td>
                     <td className="py-3 text-xs text-cream/80">
-                      <form action={updateInvitationBanksAction} className="flex flex-col gap-1.5 max-w-xs">
+                      <AdminForm
+                        action={updateInvitationBanksAction}
+                        className="flex flex-col gap-1.5 max-w-xs"
+                        successMessage={`Pengaturan amplop untuk ${inv.guest_name} disimpan!`}
+                        errorMessage={`Gagal menyimpan amplop untuk ${inv.guest_name}.`}
+                      >
                         <input type="hidden" name="invitation_id" value={inv.id} />
                         <div className="flex flex-wrap gap-2 text-[11px]">
                           {availableBanks.map((b) => {
@@ -194,13 +208,10 @@ export default async function AdminPage({
                             );
                           })}
                         </div>
-                        <ToastSubmitButton
-                          className="text-[10px] py-0.5 px-2 self-start btn-copy"
-                          successMessage={`Pengaturan amplop untuk ${inv.guest_name} disimpan!`}
-                        >
+                        <AdminSubmitButton className="text-[10px] py-0.5 px-2 self-start btn-copy">
                           Simpan Amplop
-                        </ToastSubmitButton>
-                      </form>
+                        </AdminSubmitButton>
+                      </AdminForm>
                     </td>
                     <td className="py-3">
                       {inv.is_revoked ? (
@@ -218,25 +229,27 @@ export default async function AdminPage({
                         >
                           <input type="hidden" name="id" value={inv.id} />
                         </ActionForm>
-                        <form action={setRevokedAction}>
+                        <AdminForm
+                          action={setRevokedAction}
+                          successMessage={inv.is_revoked ? "Undangan diaktifkan kembali!" : "Undangan berhasil dicabut!"}
+                          errorMessage="Gagal mengubah status undangan."
+                        >
                           <input type="hidden" name="id" value={inv.id} />
                           <input type="hidden" name="revoke" value={inv.is_revoked ? "0" : "1"} />
-                          <ToastSubmitButton
-                            id={`revoke-${inv.id}`}
-                            successMessage={inv.is_revoked ? "Undangan diaktifkan kembali!" : "Undangan berhasil dicabut!"}
-                          >
+                          <AdminSubmitButton id={`revoke-${inv.id}`}>
                             {inv.is_revoked ? "Aktifkan" : "Cabut"}
-                          </ToastSubmitButton>
-                        </form>
-                        <form action={deleteInvitationAction}>
+                          </AdminSubmitButton>
+                        </AdminForm>
+                        <AdminForm
+                          action={deleteInvitationAction}
+                          successMessage="Undangan berhasil dihapus!"
+                          errorMessage="Gagal menghapus undangan."
+                        >
                           <input type="hidden" name="id" value={inv.id} />
-                          <ToastSubmitButton
-                            id={`del-${inv.id}`}
-                            successMessage="Undangan berhasil dihapus!"
-                          >
+                          <AdminSubmitButton id={`del-${inv.id}`}>
                             Hapus
-                          </ToastSubmitButton>
-                        </form>
+                          </AdminSubmitButton>
+                        </AdminForm>
                       </div>
                     </td>
                   </tr>
@@ -268,7 +281,13 @@ export default async function AdminPage({
         <section className="glass-card space-y-6">
           <h2 className="admin-h2">Teks & Aset Acara</h2>
 
-          <form action={updateSettingsAction} className="space-y-4" id="settings-form">
+          <AdminForm
+            action={updateSettingsAction}
+            className="space-y-4"
+            id="settings-form"
+            successMessage="Pengaturan teks acara berhasil disimpan!"
+            errorMessage="Gagal menyimpan pengaturan teks acara."
+          >
             <div>
               <label className="admin-label" htmlFor="event_date">Tanggal Acara Utama (Akad & Resepsi)</label>
               <input
@@ -351,10 +370,10 @@ export default async function AdminPage({
               />
             </div>
 
-            <ToastSubmitButton id="save-settings" successMessage="Pengaturan teks acara berhasil disimpan!">
+            <AdminSubmitButton id="save-settings">
               Simpan Pengaturan
-            </ToastSubmitButton>
-          </form>
+            </AdminSubmitButton>
+          </AdminForm>
 
           <div className="grid gap-4 md:grid-cols-2 pt-4 border-t border-gold-500/20">
             <ActionForm action={uploadAssetAction} submitLabel="Unggah Foto Pria" id="upload-groom">
@@ -400,19 +419,27 @@ export default async function AdminPage({
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={thumbs?.[i]?.signedUrl ?? ""} alt="" className="aspect-square w-full object-cover" loading="lazy" />
                 <div className="flex gap-1 p-2">
-                  <form action={toggleGalleryAction}>
+                  <AdminForm
+                    action={toggleGalleryAction}
+                    successMessage={p.is_visible ? "Foto galeri disembunyikan!" : "Foto galeri ditampilkan!"}
+                    errorMessage="Gagal mengubah status foto."
+                  >
                     <input type="hidden" name="id" value={p.id} />
                     <input type="hidden" name="visible" value={p.is_visible ? "0" : "1"} />
-                    <ToastSubmitButton successMessage="Visibilitas foto diperbarui!">
+                    <AdminSubmitButton>
                       {p.is_visible ? "Sembunyikan" : "Tampilkan"}
-                    </ToastSubmitButton>
-                  </form>
-                  <form action={deleteGalleryAction}>
+                    </AdminSubmitButton>
+                  </AdminForm>
+                  <AdminForm
+                    action={deleteGalleryAction}
+                    successMessage="Foto berhasil dihapus!"
+                    errorMessage="Gagal menghapus foto."
+                  >
                     <input type="hidden" name="id" value={p.id} />
-                    <ToastSubmitButton successMessage="Foto berhasil dihapus!">
+                    <AdminSubmitButton>
                       Hapus
-                    </ToastSubmitButton>
-                  </form>
+                    </AdminSubmitButton>
+                  </AdminForm>
                 </div>
               </div>
             ))}
