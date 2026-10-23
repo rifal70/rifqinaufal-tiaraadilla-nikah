@@ -1,9 +1,8 @@
 import "server-only";
-import { createServiceClient } from "@/lib/supabase/server";
+import { query } from "@/lib/neon/db";
 import { FALLBACK_BANKS, type BankAccount } from "@/lib/content";
 
 export const STORAGE_BUCKET = "gallery";
-const SIGNED_URL_TTL = 60 * 60 * 6; // 6 hours
 
 export interface SiteSettings {
   opening_greeting: string;
@@ -53,13 +52,16 @@ export async function getSettings(): Promise<SiteSettings> {
   };
 
   try {
-    const { data } = await createServiceClient().from("site_settings").select("key, value");
-    for (const row of data ?? []) {
+    const rows = await query<{ key: string; value: string }>(
+      "SELECT key, value FROM site_settings"
+    );
+    for (const row of rows) {
       if ((SETTING_KEYS as readonly string[]).includes(row.key) && !isPlaceholder(row.value)) {
         empty[row.key as keyof SiteSettings] = row.value;
       }
     }
-  } catch {
+  } catch (err) {
+    console.error("Failed to fetch settings from Neon:", err);
     /* use empty → placeholders shown */
   }
   return empty;
@@ -100,25 +102,27 @@ export async function getDynamicWeddingDate(fallbackIso = "2026-12-29T08:00:00+0
 
 export async function getBanks(includeDisabled = true): Promise<BankAccount[]> {
   try {
-    let q = createServiceClient()
-      .from("bank_accounts")
-      .select("id, bank_name, account_holder, account_number, is_enabled")
-      .order("display_order", { ascending: true });
-    if (!includeDisabled) q = q.eq("is_enabled", true);
-    const { data, error } = await q;
-    if (error || !data?.length) return FALLBACK_BANKS;
-    return data.map((b) => ({ ...b, account_number: String(b.account_number) }));
-  } catch {
+    const sqlQuery = includeDisabled
+      ? "SELECT id, bank_name, account_holder, account_number, is_enabled FROM bank_accounts ORDER BY display_order ASC"
+      : "SELECT id, bank_name, account_holder, account_number, is_enabled FROM bank_accounts WHERE is_enabled = true ORDER BY display_order ASC";
+
+    const rows = await query<BankAccount>(sqlQuery);
+    if (!rows?.length) return FALLBACK_BANKS;
+    return rows.map((b) => ({ ...b, account_number: String(b.account_number) }));
+  } catch (err) {
+    console.error("Failed to fetch banks from Neon:", err);
     return FALLBACK_BANKS;
   }
 }
 
-/** Turn a storage path into a short-lived signed URL; external http(s) URLs pass through. */
+/**
+ * Returns public URL for a given media path.
+ * External URLs pass through unchanged.
+ */
 export async function signedUrl(path?: string | null): Promise<string> {
   if (!path) return "";
   if (/^https?:\/\//.test(path) || path.startsWith("/")) return path;
-  const { data } = await createServiceClient().storage.from(STORAGE_BUCKET).createSignedUrl(path, SIGNED_URL_TTL);
-  return data?.signedUrl ?? "";
+  return `/api/media/${path.replace(/^\/+/, "")}`;
 }
 
 export interface GalleryItem {
@@ -129,21 +133,19 @@ export interface GalleryItem {
 
 export async function getGallery(): Promise<GalleryItem[]> {
   try {
-    const supabase = createServiceClient();
-    const { data } = await supabase
-      .from("gallery_images")
-      .select("id, storage_path, alt_text")
-      .eq("is_visible", true)
-      .order("display_order", { ascending: true })
-      .limit(60);
-    if (!data?.length) return [];
-    const { data: signed } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .createSignedUrls(data.map((d) => d.storage_path), SIGNED_URL_TTL);
-    return data
-      .map((d, i) => ({ id: d.id, url: signed?.[i]?.signedUrl ?? "", alt: d.alt_text || "Foto galeri" }))
-      .filter((g) => g.url);
-  } catch {
+    const rows = await query<{ id: string; storage_path: string; alt_text: string | null }>(
+      "SELECT id, storage_path, alt_text FROM gallery_images WHERE is_visible = true ORDER BY display_order ASC LIMIT 60"
+    );
+
+    if (!rows.length) return [];
+
+    return rows.map((d) => ({
+      id: d.id,
+      url: `/api/media/${d.storage_path.replace(/^\/+/, "")}`,
+      alt: d.alt_text || "Foto galeri",
+    }));
+  } catch (err) {
+    console.error("Failed to fetch gallery from Neon:", err);
     return [];
   }
 }

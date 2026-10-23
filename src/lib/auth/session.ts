@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import crypto from "crypto";
-import { createServiceClient } from "@/lib/supabase/server";
+import { query } from "@/lib/neon/db";
 
 const SESSION_COOKIE_NAME = "wedding_session";
 
@@ -11,29 +11,31 @@ const DEFAULT_EXPIRY_DAYS = 30;
  * Mengambil tanggal kedaluwarsa dinamis dari database site_settings
  */
 export async function getDynamicExpiryDate(): Promise<Date> {
-  const supabase = createServiceClient();
-  const { data: settings } = await supabase
-    .from("site_settings")
-    .select("key, value")
-    .in("key", ["event_date", "event_expiry_days"]);
+  try {
+    const rows = await query<{ key: string; value: string }>(
+      "SELECT key, value FROM site_settings WHERE key IN ('event_date', 'event_expiry_days')"
+    );
 
-  const settingsMap = new Map((settings ?? []).map((s) => [s.key, s.value]));
+    const settingsMap = new Map(rows.map((s) => [s.key, s.value]));
 
-  const eventDateStr = settingsMap.get("event_date");
-  const expiryDaysStr = settingsMap.get("event_expiry_days");
+    const eventDateStr = settingsMap.get("event_date");
+    const expiryDaysStr = settingsMap.get("event_expiry_days");
 
-  const expiryDays = expiryDaysStr ? parseInt(expiryDaysStr, 10) || DEFAULT_EXPIRY_DAYS : DEFAULT_EXPIRY_DAYS;
+    const expiryDays = expiryDaysStr ? parseInt(expiryDaysStr, 10) || DEFAULT_EXPIRY_DAYS : DEFAULT_EXPIRY_DAYS;
 
-  if (eventDateStr) {
-    const baseEventDate = new Date(eventDateStr);
-    if (!isNaN(baseEventDate.getTime())) {
-      // Tanggal acara + X hari (pukul 23:59:59)
-      return new Date(baseEventDate.getTime() + expiryDays * 24 * 60 * 60 * 1000);
+    if (eventDateStr) {
+      const baseEventDate = new Date(eventDateStr);
+      if (!isNaN(baseEventDate.getTime())) {
+        // Tanggal acara + X hari (pukul 23:59:59)
+        return new Date(baseEventDate.getTime() + expiryDays * 24 * 60 * 60 * 1000);
+      }
     }
-  }
 
-  // Fallback jika event_date kosong: sekarang + X hari
-  return new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000);
+    // Fallback jika event_date kosong: sekarang + X hari
+    return new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000);
+  } catch {
+    return new Date(Date.now() + DEFAULT_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+  }
 }
 
 export function hashToken(rawToken: string): string {
@@ -62,16 +64,21 @@ export interface SessionData {
 export async function validateTokenAndCreateSession(
   rawToken: string
 ): Promise<SessionData | null> {
-  const supabase = createServiceClient();
   const tokenHash = hashToken(rawToken);
 
-  const { data: invitation, error } = await supabase
-    .from("invitations")
-    .select("id, guest_name, visible_bank_ids, is_revoked, expires_at")
-    .eq("token_hash", tokenHash)
-    .single();
+  const invitations = await query<{
+    id: string;
+    guest_name: string;
+    visible_bank_ids: string[] | null;
+    is_revoked: boolean;
+    expires_at: string | null;
+  }>(
+    "SELECT id, guest_name, visible_bank_ids, is_revoked, expires_at FROM invitations WHERE token_hash = $1 LIMIT 1",
+    [tokenHash]
+  );
 
-  if (error || !invitation || invitation.is_revoked) {
+  const invitation = invitations[0];
+  if (!invitation || invitation.is_revoked) {
     return null;
   }
 
@@ -98,12 +105,16 @@ export async function validateTokenAndCreateSession(
 
   // Re-use session jika sudah ada di browser ini & masih valid
   if (existingSessionId) {
-    const { data: existingSession } = await supabase
-      .from("sessions")
-      .select("id, invitation_id, expires_at")
-      .eq("id", existingSessionId)
-      .single();
+    const existingSessions = await query<{
+      id: string;
+      invitation_id: string;
+      expires_at: string;
+    }>(
+      "SELECT id, invitation_id, expires_at FROM sessions WHERE id = $1 LIMIT 1",
+      [existingSessionId]
+    );
 
+    const existingSession = existingSessions[0];
     if (
       existingSession &&
       existingSession.invitation_id === invitation.id &&
@@ -129,14 +140,13 @@ export async function validateTokenAndCreateSession(
 
   const sessionId = generateSessionId();
 
-  const { error: sessionError } = await supabase.from("sessions").insert({
-    id: sessionId,
-    invitation_id: invitation.id,
-    expires_at: expiresAtIso,
-  });
-
-  if (sessionError) {
-    console.error("Failed to create session:", sessionError.message);
+  try {
+    await query(
+      "INSERT INTO sessions (id, invitation_id, expires_at) VALUES ($1, $2, $3)",
+      [sessionId, invitation.id, expiresAtIso]
+    );
+  } catch (sessionError) {
+    console.error("Failed to create session in Neon:", sessionError);
     return null;
   }
 
@@ -170,31 +180,38 @@ export async function getSession(): Promise<{
     return null;
   }
 
-  const supabase = createServiceClient();
+  const sessions = await query<{
+    id: string;
+    invitation_id: string;
+    expires_at: string;
+  }>(
+    "SELECT id, invitation_id, expires_at FROM sessions WHERE id = $1 LIMIT 1",
+    [sessionCookie.value]
+  );
 
-  const { data: session, error } = await supabase
-    .from("sessions")
-    .select("id, invitation_id, expires_at")
-    .eq("id", sessionCookie.value)
-    .single();
-
-  if (error || !session) {
+  const session = sessions[0];
+  if (!session) {
     return null;
   }
 
   if (new Date(session.expires_at) < new Date()) {
-    await supabase.from("sessions").delete().eq("id", session.id);
+    await query("DELETE FROM sessions WHERE id = $1", [session.id]);
     return null;
   }
 
-  const { data: invitation } = await supabase
-    .from("invitations")
-    .select("id, guest_name, visible_bank_ids, is_revoked")
-    .eq("id", session.invitation_id)
-    .single();
+  const invitations = await query<{
+    id: string;
+    guest_name: string;
+    visible_bank_ids: string[] | null;
+    is_revoked: boolean;
+  }>(
+    "SELECT id, guest_name, visible_bank_ids, is_revoked FROM invitations WHERE id = $1 LIMIT 1",
+    [session.invitation_id]
+  );
 
+  const invitation = invitations[0];
   if (!invitation || invitation.is_revoked) {
-    await supabase.from("sessions").delete().eq("id", session.id);
+    await query("DELETE FROM sessions WHERE id = $1", [session.id]);
     return null;
   }
 
@@ -211,8 +228,7 @@ export async function destroySession(): Promise<void> {
   const sessionCookie = cookieStore.get(SESSION_COOKIE_NAME);
 
   if (sessionCookie?.value) {
-    const supabase = createServiceClient();
-    await supabase.from("sessions").delete().eq("id", sessionCookie.value);
+    await query("DELETE FROM sessions WHERE id = $1", [sessionCookie.value]);
   }
 
   cookieStore.delete(SESSION_COOKIE_NAME);

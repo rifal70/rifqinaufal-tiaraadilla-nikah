@@ -1,13 +1,34 @@
-// Read-only check of which tables / functions exist in the Supabase project.
-import { createClient } from "@supabase/supabase-js";
-const s = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
-for (const t of ["invitations", "sessions", "bank_accounts", "gallery_images", "site_settings", "rate_limits"]) {
-  const { data, error } = await s.from(t).select("*").limit(1);
-  console.log(t.padEnd(16), error ? `MISSING/ERR: ${error.message}` : `OK (${data.length ? "has rows" : "empty"})`);
+// Read-only check of which tables / functions exist in the Neon database.
+import { neon } from "@neondatabase/serverless";
+
+const dbUrl = process.env.DATABASE_URL;
+if (!dbUrl) {
+  console.error("Missing DATABASE_URL in environment.");
+  process.exit(1);
 }
-const { data: rl, error: rlErr } = await s.rpc("check_rate_limit", { p_bucket: "selftest", p_max: 100, p_window_seconds: 1 });
-console.log("check_rate_limit", rlErr ? `ERR: ${rlErr.message}` : `OK (${rl})`);
-const { data: b, error: bErr } = await s.storage.getBucket("gallery");
-console.log("bucket gallery  ", bErr ? `ERR: ${bErr.message}` : `OK public=${b.public}`);
-const { data: banks } = await s.from("bank_accounts").select("display_order,bank_name,account_holder,account_number,is_enabled").order("display_order");
-console.log(JSON.stringify(banks));
+
+const sql = neon(dbUrl);
+
+console.log("Checking Neon database tables...");
+for (const t of ["invitations", "sessions", "admin_users", "bank_accounts", "gallery_images", "site_settings", "rate_limits", "media_files"]) {
+  try {
+    const rows = await sql.query(`SELECT * FROM ${t} LIMIT 1`);
+    console.log(t.padEnd(16), `OK (${rows.length ? "has rows" : "empty"})`);
+  } catch (err) {
+    console.log(t.padEnd(16), `MISSING/ERR: ${err.message}`);
+  }
+}
+
+try {
+  const rl = await sql.query("SELECT check_rate_limit($1, $2, $3) AS allowed", ["selftest", 100, 1]);
+  console.log("check_rate_limit".padEnd(16), `OK (${rl[0]?.allowed})`);
+} catch (err) {
+  console.log("check_rate_limit".padEnd(16), `ERR: ${err.message}`);
+}
+
+try {
+  const banks = await sql.query("SELECT display_order, bank_name, account_holder, account_number, is_enabled FROM bank_accounts ORDER BY display_order");
+  console.log("Bank Accounts:", JSON.stringify(banks));
+} catch (err) {
+  console.log("Bank Accounts: ERR:", err.message);
+}

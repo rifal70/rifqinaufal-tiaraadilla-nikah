@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 
 vi.mock("next/headers", () => ({ cookies: vi.fn(), headers: vi.fn() }));
-vi.mock("@/lib/supabase/server", () => ({ createServiceClient: vi.fn() }));
+vi.mock("@/lib/neon/db", () => ({ query: vi.fn(), getDb: vi.fn() }));
 
 import { hashToken, generateToken } from "@/lib/auth/session";
 import { FALLBACK_BANKS, WEDDING } from "@/lib/content";

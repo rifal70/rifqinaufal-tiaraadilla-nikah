@@ -15,18 +15,18 @@ const clientFiles = files.filter((f) => /^\s*["']use client["']/.test(f.src));
 describe("security: client bundle hygiene", () => {
   it("has client components to check", () => expect(clientFiles.length).toBeGreaterThan(0));
 
-  it("no client component imports server-only modules or the service role key", () => {
+  it("no client component imports server-only modules or database connection secrets", () => {
     for (const f of clientFiles) {
-      expect(f.src, f.p).not.toMatch(/SUPABASE_SERVICE_ROLE_KEY/);
-      expect(f.src, f.p).not.toMatch(/@\/lib\/supabase\/server/);
+      expect(f.src, f.p).not.toMatch(/DATABASE_URL/);
+      expect(f.src, f.p).not.toMatch(/@\/lib\/neon\/db/);
       expect(f.src, f.p).not.toMatch(/@\/lib\/auth\/session/);
       expect(f.src, f.p).not.toMatch(/from ["']@\/lib\/data["']/); // type-only imports allowed
     }
   });
 
-  it("service role key is only referenced in the server Supabase client", () => {
-    const refs = files.filter((f) => f.src.includes("SUPABASE_SERVICE_ROLE_KEY")).map((f) => path.relative(SRC, f.p));
-    expect(refs).toEqual([path.join("lib", "supabase", "server.ts")]);
+  it("DATABASE_URL is only referenced in server-side neon db client", () => {
+    const refs = files.filter((f) => f.src.includes("DATABASE_URL")).map((f) => path.relative(SRC, f.p));
+    expect(refs).toEqual([path.join("lib", "neon", "db.ts")]);
   });
 
   it("raw tokens are never logged", () => {

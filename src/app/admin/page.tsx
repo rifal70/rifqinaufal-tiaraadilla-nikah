@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/admin";
-import { createServiceClient } from "@/lib/supabase/server";
-import { STORAGE_BUCKET, getSettings } from "@/lib/data";
+import { query } from "@/lib/neon/db";
+import { getSettings } from "@/lib/data";
 import { LOVE_STORY, DIGITAL_GIFT_DEFAULT_TEXT } from "@/lib/content";
 import { ActionForm, InviteCreator } from "@/components/admin/Forms";
 import { ToastProvider, ToastSubmitButton } from "@/components/admin/ToastContext";
@@ -33,25 +33,48 @@ export default async function AdminPage({
   const q = typeof sp.q === "string" ? sp.q.slice(0, 100) : "";
   const page = Math.max(1, parseInt(typeof sp.page === "string" ? sp.page : "1", 10) || 1);
 
-  const supabase = createServiceClient();
-  let invQuery = supabase
-    .from("invitations")
-    .select("id, guest_name, guest_count, is_revoked, visible_bank_ids, created_at", { count: "exact" })
-    .order("created_at", { ascending: false })
-    .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
-  if (q) invQuery = invQuery.ilike("guest_name", `%${q.replace(/[%_]/g, "\\$&")}%`);
+  const offset = (page - 1) * PAGE_SIZE;
+  const countParams: any[] = [];
+  const invParams: any[] = [];
 
-  const [{ data: invites, count }, { data: banks }, { data: photos }, settings, { count: activeSessions }] = await Promise.all([
-    invQuery,
-    supabase.from("bank_accounts").select("*").order("display_order"),
-    supabase.from("gallery_images").select("id, storage_path, is_visible, display_order").order("display_order"),
+  let countSql = "SELECT COUNT(*) AS total FROM invitations";
+  let invSql = `
+    SELECT id, guest_name, guest_count, is_revoked, visible_bank_ids, created_at
+    FROM invitations
+  `;
+
+  if (q) {
+    countSql += " WHERE guest_name ILIKE $1";
+    countParams.push(`%${q}%`);
+    invSql += " WHERE guest_name ILIKE $1";
+    invParams.push(`%${q}%`);
+  }
+
+  invSql += ` ORDER BY created_at DESC LIMIT ${PAGE_SIZE} OFFSET ${offset}`;
+
+  const [
+    invites,
+    countRows,
+    banks,
+    photos,
+    settings,
+    activeSessionsRows,
+  ] = await Promise.all([
+    query<any>(invSql, invParams),
+    query<{ total: string }>(countSql, countParams),
+    query<any>("SELECT * FROM bank_accounts ORDER BY display_order ASC"),
+    query<any>("SELECT id, storage_path, is_visible, display_order FROM gallery_images ORDER BY display_order ASC"),
     getSettings(),
-    supabase.from("sessions").select("id", { count: "exact", head: true }).gt("expires_at", new Date().toISOString()),
+    query<{ total: string }>("SELECT COUNT(*) AS total FROM sessions WHERE expires_at > now()"),
   ]);
 
-  const { data: thumbs } = photos?.length
-    ? await supabase.storage.from(STORAGE_BUCKET).createSignedUrls(photos.map((p) => p.storage_path), 600)
-    : { data: [] };
+  const count = parseInt(countRows[0]?.total ?? "0", 10);
+  const activeSessions = parseInt(activeSessionsRows[0]?.total ?? "0", 10);
+
+  const thumbs = photos?.map((p) => ({
+    signedUrl: `/api/media/${p.storage_path.replace(/^\/+/, "")}`,
+  })) ?? [];
+
   const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
 
   const availableBanks =
@@ -108,73 +131,96 @@ export default async function AdminPage({
         {/* Invitations */}
         <section className="glass-card space-y-6">
           <h2 className="admin-h2">Undangan</h2>
-          <InviteCreator action={createInvitationsAction} />
 
-          <form className="flex gap-2" method="get" id="search-invites">
-            <input name="q" defaultValue={q} placeholder="Cari nama tamu…" className="admin-input" id="search-q" />
-            <button type="submit" className="btn-copy" id="search-submit">Cari</button>
+          <div className="rounded-xl border border-gold-500/20 p-4 space-y-4">
+            <h3 className="text-lg font-medium text-gold-200">Buat Undangan Baru</h3>
+            <InviteCreator
+              action={createInvitationsAction}
+            />
+          </div>
+
+          <form method="get" className="flex gap-2">
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="Cari nama tamu…"
+              className="admin-input"
+              aria-label="Cari nama tamu"
+            />
+            <button type="submit" className="btn-copy">Cari</button>
+            {q && (
+              <Link href="/admin" className="btn-copy self-center text-xs">
+                Reset
+              </Link>
+            )}
           </form>
 
           <div className="overflow-x-auto">
-            <table className="admin-table">
-              <thead>
+            <table className="w-full text-left text-sm" id="invitations-table">
+              <thead className="border-b border-gold-500/20 text-xs uppercase tracking-wider text-gold-300">
                 <tr>
-                  <th>Nama</th>
-                  <th>Jml</th>
-                  <th>Status</th>
-                  {availableBanks.map((b) => (
-                    <th key={b.id} className="text-center whitespace-nowrap">
-                      <div>{b.bank_name}</div>
-                      <div className="text-[10px] text-green-200/60 font-normal">({b.account_holder})</div>
-                    </th>
-                  ))}
-                  <th>Pilihan Rekening</th>
-                  <th>Aksi</th>
+                  <th className="py-2">Nama</th>
+                  <th className="py-2">Pax</th>
+                  <th className="py-2">Rekening Terlihat</th>
+                  <th className="py-2">Status</th>
+                  <th className="py-2 text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gold-500/10">
                 {invites?.map((inv) => (
                   <tr key={inv.id}>
-                    <td className="font-medium text-cream">{inv.guest_name}</td>
-                    <td>{inv.guest_count}</td>
-                    <td>{inv.is_revoked ? <span className="text-red-300">Dicabut</span> : <span className="text-green-200">Aktif</span>}</td>
-
-                    {availableBanks.map((b) => {
-                      const isChecked = inv.visible_bank_ids ? inv.visible_bank_ids.includes(b.id) : false;
-                      return (
-                        <td key={b.id} className="text-center align-middle">
-                          <input
-                            form={`bank-select-${inv.id}`}
-                            type="checkbox"
-                            name="bank_ids"
-                            value={b.id}
-                            defaultChecked={isChecked}
-                            className="h-4 w-4 accent-gold-500 cursor-pointer"
-                          />
-                        </td>
-                      );
-                    })}
-
-                    <td className="align-middle whitespace-nowrap">
-                      <form id={`bank-select-${inv.id}`} action={updateInvitationBanksAction}>
+                    <td className="py-3 font-medium text-cream">{inv.guest_name}</td>
+                    <td className="py-3">{inv.guest_count}</td>
+                    <td className="py-3 text-xs text-cream/80">
+                      <form action={updateInvitationBanksAction} className="flex flex-col gap-1.5 max-w-xs">
                         <input type="hidden" name="invitation_id" value={inv.id} />
+                        <div className="flex flex-wrap gap-2 text-[11px]">
+                          {availableBanks.map((b) => {
+                            const isChecked = !inv.visible_bank_ids || inv.visible_bank_ids.includes(b.id);
+                            return (
+                              <label key={b.id} className="flex items-center gap-1 bg-forest-900/40 px-1.5 py-0.5 rounded border border-gold-500/20 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  name="bank_ids"
+                                  value={b.id}
+                                  defaultChecked={isChecked}
+                                  className="rounded border-gold-500/30 text-gold-500 focus:ring-0"
+                                />
+                                <span>{b.bank_name}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
                         <ToastSubmitButton
-                          className="btn-copy text-[11px] py-1 px-2.5"
-                          successMessage={`Pilihan rekening untuk ${inv.guest_name} disimpan!`}
+                          className="text-[10px] py-0.5 px-2 self-start btn-copy"
+                          successMessage={`Pengaturan amplop untuk ${inv.guest_name} disimpan!`}
                         >
-                          Simpan
+                          Simpan Amplop
                         </ToastSubmitButton>
                       </form>
                     </td>
-
-                    <td className="space-y-2">
-                      <div className="flex flex-wrap gap-2">
+                    <td className="py-3">
+                      {inv.is_revoked ? (
+                        <span className="text-red-300">Dicabut</span>
+                      ) : (
+                        <span className="text-green-300">Aktif</span>
+                      )}
+                    </td>
+                    <td className="py-3 text-right">
+                      <div className="inline-flex items-center gap-2">
+                        <ActionForm
+                          action={regenerateLinkAction}
+                          submitLabel="Link baru"
+                          id={`regen-${inv.id}`}
+                        >
+                          <input type="hidden" name="id" value={inv.id} />
+                        </ActionForm>
                         <form action={setRevokedAction}>
                           <input type="hidden" name="id" value={inv.id} />
                           <input type="hidden" name="revoke" value={inv.is_revoked ? "0" : "1"} />
                           <ToastSubmitButton
                             id={`revoke-${inv.id}`}
-                            successMessage={`Status undangan ${inv.guest_name} diperbarui!`}
+                            successMessage={inv.is_revoked ? "Undangan diaktifkan kembali!" : "Undangan berhasil dicabut!"}
                           >
                             {inv.is_revoked ? "Aktifkan" : "Cabut"}
                           </ToastSubmitButton>
@@ -182,58 +228,132 @@ export default async function AdminPage({
                         <form action={deleteInvitationAction}>
                           <input type="hidden" name="id" value={inv.id} />
                           <ToastSubmitButton
-                            id={`delete-${inv.id}`}
-                            successMessage={`Undangan ${inv.guest_name} dihapus!`}
+                            id={`del-${inv.id}`}
+                            successMessage="Undangan berhasil dihapus!"
                           >
                             Hapus
                           </ToastSubmitButton>
                         </form>
                       </div>
-                      <ActionForm action={regenerateLinkAction} submitLabel="Link baru" id={`regen-${inv.id}`}>
-                        <input type="hidden" name="id" value={inv.id} />
-                      </ActionForm>
                     </td>
                   </tr>
                 ))}
-                {!invites?.length && (
-                  <tr>
-                    <td colSpan={5 + availableBanks.length} className="text-center text-green-100">
-                      Belum ada undangan.
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </table>
           </div>
-          <nav className="flex items-center gap-3 text-sm">
-            {page > 1 && <Link className="btn-copy" href={`/admin?q=${encodeURIComponent(q)}&page=${page - 1}`}>← Sebelumnya</Link>}
-            <span>Halaman {page} / {totalPages}</span>
-            {page < totalPages && <Link className="btn-copy" href={`/admin?q=${encodeURIComponent(q)}&page=${page + 1}`}>Berikutnya →</Link>}
-          </nav>
+
+          {totalPages > 1 && (
+            <nav className="flex justify-between items-center text-sm pt-4" aria-label="Pagination">
+              <span>Halaman {page} dari {totalPages}</span>
+              <div className="flex gap-2">
+                {page > 1 && (
+                  <Link href={`/admin?${new URLSearchParams({ ...(q && { q }), page: String(page - 1) })}`} className="btn-copy">
+                    Sebelumnya
+                  </Link>
+                )}
+                {page < totalPages && (
+                  <Link href={`/admin?${new URLSearchParams({ ...(q && { q }), page: String(page + 1) })}`} className="btn-copy">
+                    Selanjutnya
+                  </Link>
+                )}
+              </div>
+            </nav>
+          )}
         </section>
 
-        {/* Content settings */}
-        <section className="glass-card space-y-4">
-          <h2 className="admin-h2">Konten dari Pemilik</h2>
-          <p className="text-sm text-green-100">Tempel teks persis seperti di undangan. Kosongkan untuk menampilkan placeholder.</p>
-          <form action={updateSettingsAction} id="settings-form" className="space-y-3">
-            <label className="admin-label" htmlFor="opening_greeting">Salam pembuka</label>
-            <textarea id="opening_greeting" name="opening_greeting" rows={5} className="admin-input" defaultValue={settings.opening_greeting} />
-            <label className="admin-label" htmlFor="closing_greeting">Salam penutup</label>
-            <textarea id="closing_greeting" name="closing_greeting" rows={5} className="admin-input" defaultValue={settings.closing_greeting} />
-            <label className="admin-label" htmlFor="love_story">Cerita cinta kami</label>
-            <textarea id="love_story" name="love_story" rows={6} className="admin-input" defaultValue={settings.love_story || LOVE_STORY.story} />
-            <label className="admin-label" htmlFor="digital_gift_text">Teks kado digital</label>
-            <textarea id="digital_gift_text" name="digital_gift_text" rows={4} className="admin-input" defaultValue={settings.digital_gift_text || DIGITAL_GIFT_DEFAULT_TEXT} />
-            <label className="admin-label" htmlFor="maps_url">Link Google Maps (https://…)</label>
-            <input id="maps_url" name="maps_url" type="url" className="admin-input" defaultValue={settings.maps_url} />
-            <ToastSubmitButton className="btn-gold" id="settings-submit" successMessage="Pengaturan konten berhasil disimpan!">
-              Simpan
+        {/* Content & Assets */}
+        <section className="glass-card space-y-6">
+          <h2 className="admin-h2">Teks & Aset Acara</h2>
+
+          <form action={updateSettingsAction} className="space-y-4" id="settings-form">
+            <div>
+              <label className="admin-label" htmlFor="event_date">Tanggal Acara Utama (Akad & Resepsi)</label>
+              <input
+                id="event_date"
+                name="event_date"
+                type="date"
+                defaultValue={settings.event_date || "2026-12-29"}
+                className="admin-input"
+              />
+              <p className="text-xs text-green-100 mt-1">Mengubah tanggal yang tertera di seluruh kartu, countdown timer, dan kalender.</p>
+            </div>
+
+            <div>
+              <label className="admin-label" htmlFor="event_expiry_days">Masa Berlaku Link Undangan Setelah Hari Acara (Hari)</label>
+              <input
+                id="event_expiry_days"
+                name="event_expiry_days"
+                type="number"
+                min="0"
+                max="365"
+                defaultValue={settings.event_expiry_days || "30"}
+                className="admin-input"
+              />
+              <p className="text-xs text-green-100 mt-1">Link undangan akan otomatis kedaluwarsa X hari setelah tanggal acara utama.</p>
+            </div>
+
+            <div>
+              <label className="admin-label" htmlFor="opening_greeting">Salam Pembuka</label>
+              <textarea
+                id="opening_greeting"
+                name="opening_greeting"
+                rows={3}
+                defaultValue={settings.opening_greeting}
+                className="admin-input"
+              />
+            </div>
+
+            <div>
+              <label className="admin-label" htmlFor="closing_greeting">Salam Penutup</label>
+              <textarea
+                id="closing_greeting"
+                name="closing_greeting"
+                rows={3}
+                defaultValue={settings.closing_greeting}
+                className="admin-input"
+              />
+            </div>
+
+            <div>
+              <label className="admin-label" htmlFor="love_story">Cerita Cinta</label>
+              <textarea
+                id="love_story"
+                name="love_story"
+                rows={5}
+                defaultValue={settings.love_story || LOVE_STORY.story}
+                className="admin-input"
+              />
+            </div>
+
+            <div>
+              <label className="admin-label" htmlFor="digital_gift_text">Teks Kado Digital / Amplop</label>
+              <textarea
+                id="digital_gift_text"
+                name="digital_gift_text"
+                rows={3}
+                defaultValue={settings.digital_gift_text || DIGITAL_GIFT_DEFAULT_TEXT}
+                className="admin-input"
+              />
+            </div>
+
+            <div>
+              <label className="admin-label" htmlFor="maps_url">URL Google Maps (harus https://)</label>
+              <input
+                id="maps_url"
+                name="maps_url"
+                type="url"
+                defaultValue={settings.maps_url}
+                placeholder="https://maps.google.com/..."
+                className="admin-input"
+              />
+            </div>
+
+            <ToastSubmitButton id="save-settings" successMessage="Pengaturan teks acara berhasil disimpan!">
+              Simpan Pengaturan
             </ToastSubmitButton>
           </form>
 
-          {/* Asset Uploads: Foto Mempelai, Denah, dan Musik */}
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2 pt-4 border-t border-gold-500/20">
             <ActionForm action={uploadAssetAction} submitLabel="Unggah Foto Pria" id="upload-groom">
               <input type="hidden" name="kind" value="groom_photo" />
               <label className="admin-label" htmlFor="groom-file">
@@ -258,7 +378,7 @@ export default async function AdminPage({
 
             <ActionForm action={uploadAssetAction} submitLabel="Unggah Musik" id="upload-music">
               <input type="hidden" name="kind" value="music" />
-              <label className="admin-label" htmlFor="music-file">Musik latar (MP3/M4A/OGG, ≤155 KB) {settings.music_path ? "✓ sudah ada" : ""}</label>
+              <label className="admin-label" htmlFor="music-file">Musik latar (MP3/M4A/OGG, ≤1.2 MB) {settings.music_path ? "✓ sudah ada" : ""}</label>
               <input id="music-file" name="file" type="file" accept="audio/*" required className="admin-input" />
             </ActionForm>
           </div>

@@ -11,16 +11,15 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const response = NextResponse.next();
   const isDev = process.env.NODE_ENV !== "production";
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 
   const csp = [
     "default-src 'self'",
     `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
-    `img-src 'self' data: blob: ${supabaseUrl}`,
-    `media-src 'self' ${supabaseUrl}`,
-    `connect-src 'self' ${supabaseUrl}${isDev ? " ws:" : ""}`,
+    "img-src 'self' data: blob:",
+    "media-src 'self' data: blob:",
+    `connect-src 'self'${isDev ? " ws:" : ""}`,
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
