@@ -75,7 +75,7 @@ export default function InvitationShell({
 
   return (
     <>
-      {musicUrl && <audio ref={audioRef} src={musicUrl} loop preload="none" />}
+      {musicUrl && <audio ref={audioRef} src={musicUrl} loop preload="auto" />}
 
       {/* Container Cover */}
       <div

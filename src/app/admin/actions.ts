@@ -3,7 +3,7 @@
 import crypto from "crypto";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import {
   requireAdmin,
@@ -15,6 +15,7 @@ import { query } from "@/lib/neon/db";
 import { generateToken, hashToken } from "@/lib/auth/session";
 import { isAllowed, clientIp } from "@/lib/rate-limit";
 import { saveMediaFile, deleteMediaFile } from "@/lib/media";
+import { CACHE_TAG_SETTINGS, CACHE_TAG_BANKS, CACHE_TAG_GALLERY } from "@/lib/data";
 
 export type CreatedInvite = {
   name: string;
@@ -280,6 +281,7 @@ export async function updateBankAction(form: FormData): Promise<ActionState> {
       [data.bank_name, data.account_holder, data.account_number, isEnabled, data.id]
     );
 
+    revalidateTag(CACHE_TAG_BANKS, { expire: 0 });
     revalidatePath("/admin");
     revalidatePath("/");
     return { ok: true, message: `Rekening ${data.bank_name} berhasil disimpan!` };
@@ -343,6 +345,7 @@ export async function updateSettingsAction(form: FormData): Promise<ActionState>
       );
     }
 
+    revalidateTag(CACHE_TAG_SETTINGS, { expire: 0 });
     revalidatePath("/admin");
     revalidatePath("/");
     return { ok: true, message: "Pengaturan teks acara berhasil disimpan!" };
@@ -400,6 +403,7 @@ export async function uploadAssetAction(
       [key, path]
     );
 
+    revalidateTag(CACHE_TAG_SETTINGS, { expire: 0 });
     revalidatePath("/admin");
     revalidatePath("/");
     return { ok: true, message: "Aset berhasil diunggah!" };
@@ -431,6 +435,7 @@ export async function deleteAssetAction(form: FormData): Promise<ActionState> {
       [key]
     );
 
+    revalidateTag(CACHE_TAG_SETTINGS, { expire: 0 });
     revalidatePath("/admin");
     revalidatePath("/");
     return { ok: true, message: "Aset berhasil dihapus!" };
@@ -471,7 +476,9 @@ export async function uploadGalleryAction(
       }
     }
 
+    revalidateTag(CACHE_TAG_GALLERY, { expire: 0 });
     revalidatePath("/admin");
+    revalidatePath("/");
     return { ok: true, message: `${done} foto berhasil diunggah.` };
   } catch (err: any) {
     console.error("uploadGalleryAction error:", err);
@@ -486,7 +493,9 @@ export async function toggleGalleryAction(form: FormData): Promise<ActionState> 
     const isVisible = form.get("visible") === "1";
 
     await query("UPDATE gallery_images SET is_visible = $1 WHERE id = $2", [isVisible, id]);
+    revalidateTag(CACHE_TAG_GALLERY, { expire: 0 });
     revalidatePath("/admin");
+    revalidatePath("/");
     return {
       ok: true,
       message: isVisible ? "Foto galeri ditampilkan!" : "Foto galeri disembunyikan!",
@@ -511,7 +520,9 @@ export async function deleteGalleryAction(form: FormData): Promise<ActionState> 
     }
 
     await query("DELETE FROM gallery_images WHERE id = $1", [id]);
+    revalidateTag(CACHE_TAG_GALLERY, { expire: 0 });
     revalidatePath("/admin");
+    revalidatePath("/");
     return { ok: true, message: "Foto berhasil dihapus!" };
   } catch (err: any) {
     console.error("deleteGalleryAction error:", err);

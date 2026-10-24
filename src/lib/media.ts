@@ -41,6 +41,7 @@ export async function deleteMediaFile(filePath: string): Promise<void> {
 
 /**
  * Resolve accessible URL for media.
+ * Always returns deterministic URLs so browser disk cache can cache them permanently.
  */
 export async function getMediaUrl(filePath?: string | null): Promise<string> {
   if (!filePath || !filePath.trim() || filePath.trim() === "null" || filePath.trim() === "undefined") return "";
@@ -49,10 +50,14 @@ export async function getMediaUrl(filePath?: string | null): Promise<string> {
   }
 
   const cleanPath = filePath.replace(/^\/+/, "");
-  if (isB2Configured()) {
-    const b2Url = await getB2Url(cleanPath);
-    if (b2Url) return b2Url;
+
+  // If a public CDN base URL is configured (e.g. Cloudflare or public B2 bucket), use direct CDN URL
+  const publicBaseUrl = process.env.B2_PUBLIC_URL?.replace(/\/$/, "");
+  if (publicBaseUrl) {
+    return `${publicBaseUrl}/${cleanPath}`;
   }
 
+  // Otherwise, route through /api/media/ which serves with HTTP Cache-Control: immutable,
+  // avoiding presigned query tokens that break browser disk caching.
   return `/api/media/${cleanPath}`;
 }

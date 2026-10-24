@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import crypto from "crypto";
 import { query } from "@/lib/neon/db";
 import { isB2Configured, getB2Client } from "@/lib/b2";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
@@ -59,10 +60,27 @@ export async function GET(
       return new Response("Not Found", { status: 404 });
     }
 
-    // Support range header for audio seeking
-    const range = request.headers.get("range");
     const totalSize = dataBuffer.length;
+    const etag = `W/"${totalSize}-${crypto
+      .createHash("md5")
+      .update(dataBuffer.subarray(0, Math.min(4096, totalSize)))
+      .digest("hex")}"`;
 
+    const ifNoneMatch = request.headers.get("if-none-match");
+    const range = request.headers.get("range");
+
+    // Fast 304 Not Modified if browser already has it cached
+    if (ifNoneMatch && ifNoneMatch === etag && !range) {
+      return new Response(null, {
+        status: 304,
+        headers: {
+          "ETag": etag,
+          "Cache-Control": "public, max-age=31536000, immutable",
+        },
+      });
+    }
+
+    // Support range header for audio seeking
     if (range && range.startsWith("bytes=")) {
       const parts = range.replace(/bytes=/, "").split("-");
       const start = parseInt(parts[0], 10);
@@ -77,6 +95,7 @@ export async function GET(
             "Accept-Ranges": "bytes",
             "Content-Length": String(chunk.length),
             "Content-Type": contentType,
+            "ETag": etag,
             "Cache-Control": "public, max-age=31536000, immutable",
           },
         });
@@ -89,6 +108,7 @@ export async function GET(
         "Content-Type": contentType,
         "Content-Length": String(totalSize),
         "Accept-Ranges": "bytes",
+        "ETag": etag,
         "Cache-Control": "public, max-age=31536000, immutable",
       },
     });

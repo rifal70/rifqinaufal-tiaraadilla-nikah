@@ -1,9 +1,14 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { query } from "@/lib/neon/db";
 import { FALLBACK_BANKS, type BankAccount } from "@/lib/content";
 import { getMediaUrl } from "@/lib/media";
 
 export const STORAGE_BUCKET = "gallery";
+
+export const CACHE_TAG_SETTINGS = "site_settings";
+export const CACHE_TAG_BANKS = "bank_accounts";
+export const CACHE_TAG_GALLERY = "gallery_images";
 
 export interface SiteSettings {
   opening_greeting: string;
@@ -50,36 +55,43 @@ const isPlaceholder = (v?: string | null) => {
   );
 };
 
-export async function getSettings(): Promise<SiteSettings> {
-  const empty: SiteSettings = {
-    opening_greeting: "",
-    closing_greeting: "",
-    music_path: "",
-    maps_url: "",
-    map_image_path: "",
-    groom_photo_path: "",
-    bride_photo_path: "",
-    event_date: "",
-    event_expiry_days: "",
-    love_story: "",
-    digital_gift_text: "",
-  };
+export const getSettings = unstable_cache(
+  async (): Promise<SiteSettings> => {
+    const empty: SiteSettings = {
+      opening_greeting: "",
+      closing_greeting: "",
+      music_path: "",
+      maps_url: "",
+      map_image_path: "",
+      groom_photo_path: "",
+      bride_photo_path: "",
+      event_date: "",
+      event_expiry_days: "",
+      love_story: "",
+      digital_gift_text: "",
+    };
 
-  try {
-    const rows = await query<{ key: string; value: string }>(
-      "SELECT key, value FROM site_settings"
-    );
-    for (const row of rows) {
-      if ((SETTING_KEYS as readonly string[]).includes(row.key) && !isPlaceholder(row.value)) {
-        empty[row.key as keyof SiteSettings] = row.value;
+    try {
+      const rows = await query<{ key: string; value: string }>(
+        "SELECT key, value FROM site_settings"
+      );
+      for (const row of rows) {
+        if ((SETTING_KEYS as readonly string[]).includes(row.key) && !isPlaceholder(row.value)) {
+          empty[row.key as keyof SiteSettings] = row.value;
+        }
       }
+    } catch (err) {
+      console.error("Failed to fetch settings from Neon:", err);
+      /* use empty → placeholders shown */
     }
-  } catch (err) {
-    console.error("Failed to fetch settings from Neon:", err);
-    /* use empty → placeholders shown */
+    return empty;
+  },
+  ["site_settings_cache"],
+  {
+    revalidate: 3600, // 1 jam di memori server
+    tags: [CACHE_TAG_SETTINGS],
   }
-  return empty;
-}
+);
 
 /** Format objek Date ke teks representasi Indonesia (contoh: "Selasa, 29 Desember 2026") */
 export function formatWeddingDate(date: Date): string {
@@ -114,21 +126,27 @@ export async function getDynamicWeddingDate(fallbackIso = "2026-12-29T08:00:00+0
   };
 }
 
-export async function getBanks(includeDisabled = true): Promise<BankAccount[]> {
-  try {
-    const sqlQuery = includeDisabled
-      ? "SELECT id, bank_name, account_holder, account_number, is_enabled FROM bank_accounts ORDER BY display_order ASC"
-      : "SELECT id, bank_name, account_holder, account_number, is_enabled FROM bank_accounts WHERE is_enabled = true ORDER BY display_order ASC";
+export const getBanks = unstable_cache(
+  async (includeDisabled = true): Promise<BankAccount[]> => {
+    try {
+      const sqlQuery = includeDisabled
+        ? "SELECT id, bank_name, account_holder, account_number, is_enabled FROM bank_accounts ORDER BY display_order ASC"
+        : "SELECT id, bank_name, account_holder, account_number, is_enabled FROM bank_accounts WHERE is_enabled = true ORDER BY display_order ASC";
 
-    const rows = await query<BankAccount>(sqlQuery);
-    if (!rows?.length) return FALLBACK_BANKS;
-    return rows.map((b) => ({ ...b, account_number: String(b.account_number) }));
-  } catch (err) {
-    console.error("Failed to fetch banks from Neon:", err);
-    return FALLBACK_BANKS;
+      const rows = await query<BankAccount>(sqlQuery);
+      if (!rows?.length) return FALLBACK_BANKS;
+      return rows.map((b) => ({ ...b, account_number: String(b.account_number) }));
+    } catch (err) {
+      console.error("Failed to fetch banks from Neon:", err);
+      return FALLBACK_BANKS;
+    }
+  },
+  ["bank_accounts_cache"],
+  {
+    revalidate: 3600, // 1 jam di memori server
+    tags: [CACHE_TAG_BANKS],
   }
-}
-
+);
 
 /**
  * Returns public URL for a given media path.
@@ -144,28 +162,35 @@ export interface GalleryItem {
   alt: string;
 }
 
-export async function getGallery(): Promise<GalleryItem[]> {
-  try {
-    const rows = await query<{ id: string; storage_path: string; alt_text: string | null }>(
-      "SELECT id, storage_path, alt_text FROM gallery_images WHERE is_visible = true ORDER BY display_order ASC LIMIT 60"
-    );
+export const getGallery = unstable_cache(
+  async (): Promise<GalleryItem[]> => {
+    try {
+      const rows = await query<{ id: string; storage_path: string; alt_text: string | null }>(
+        "SELECT id, storage_path, alt_text FROM gallery_images WHERE is_visible = true ORDER BY display_order ASC LIMIT 60"
+      );
 
-    if (!rows.length) return [];
+      if (!rows.length) return [];
 
-    const items: GalleryItem[] = [];
-    for (const d of rows) {
-      const url = await getMediaUrl(d.storage_path);
-      if (url) {
-        items.push({
-          id: d.id,
-          url,
-          alt: d.alt_text || "Foto galeri",
-        });
+      const items: GalleryItem[] = [];
+      for (const d of rows) {
+        const url = await getMediaUrl(d.storage_path);
+        if (url) {
+          items.push({
+            id: d.id,
+            url,
+            alt: d.alt_text || "Foto galeri",
+          });
+        }
       }
+      return items;
+    } catch (err) {
+      console.error("Failed to fetch gallery from Neon:", err);
+      return [];
     }
-    return items;
-  } catch (err) {
-    console.error("Failed to fetch gallery from Neon:", err);
-    return [];
+  },
+  ["gallery_images_cache"],
+  {
+    revalidate: 3600, // 1 jam di memori server
+    tags: [CACHE_TAG_GALLERY],
   }
-}
+);
