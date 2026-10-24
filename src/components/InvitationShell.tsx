@@ -138,9 +138,8 @@ export default function InvitationShell({
       {/* Loading Screen Anggun saat gambar di InvitationShell masih dimuat */}
       {showLoadingOverlay && (
         <div
-          className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-forest-950 transition-opacity duration-700 ease-out select-none ${
-            imagesLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
-          }`}
+          className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-forest-950 transition-opacity duration-700 ease-out select-none ${imagesLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
+            }`}
           aria-hidden={imagesLoaded}
         >
           {/* Cincin Emas Berputar & Kilau Berlian */}
@@ -212,7 +211,7 @@ export default function InvitationShell({
         {/* Area Amplop & Tombol */}
         <div className="relative z-30 flex flex-col items-center justify-center max-w-full mb-1 sm:mb-2 landscape:absolute landscape:top-[42%] landscape:left-1/2 landscape:bottom-auto landscape:-translate-x-1/2 landscape:-translate-y-1/2 landscape:mb-0">
           {/* Dimensi Amplop: Naik bertahap sampai desktop/layar lebar */}
-          <div className="relative aspect-[4/3] w-[min(78vw,270px)] sm:w-[320px] md:w-[380px] lg:w-[430px] landscape:w-auto landscape:h-[28dvh] landscape:max-h-[125px] md:landscape:h-[38dvh] md:landscape:max-h-[220px] lg:landscape:h-[44dvh] lg:landscape:max-h-[260px] transition-all">
+          <div className="relative aspect-[4/3] w-[min(78vw,270px)] sm:w-[320px] md:w-[380px] lg:w-[430px] landscape:w-auto landscape:h-[34dvh] landscape:max-h-[145px] sm:landscape:h-[38dvh] sm:landscape:max-h-[165px] md:landscape:h-[42dvh] md:landscape:max-h-[235px] lg:landscape:h-[46dvh] lg:landscape:max-h-[265px] transition-all">
 
             {/* Layer 1: Amplop Dasar */}
             <img
@@ -224,7 +223,7 @@ export default function InvitationShell({
             {/* Layer 2: Kertas Surat */}
             <div
               className={`absolute left-[11%] top-[3%] z-20 flex h-[88%] w-[78%] @container flex-col items-center justify-between p-2 sm:p-3 md:p-4 landscape:p-1 md:landscape:p-2 text-center transition-all duration-700 ease-out ${isLetterOpen
-                ? "-translate-y-[45%] sm:-translate-y-[52%] md:-translate-y-[58%] landscape:-translate-y-[26%] md:landscape:-translate-y-[45%] scale-[1.01] shadow-2xl"
+                ? "-translate-y-[48%] sm:-translate-y-[52%] md:-translate-y-[56%] landscape:-translate-y-[45%] sm:landscape:-translate-y-[48%] md:landscape:-translate-y-[52%] scale-[1.01] shadow-2xl"
                 : "translate-y-0"
                 }`}
             >
@@ -234,22 +233,22 @@ export default function InvitationShell({
                 className="absolute inset-0 h-full w-full rounded-sm object-cover shadow-md"
               />
 
-              <div className="relative z-10 flex h-full w-full flex-col items-center justify-center px-[12%] pt-[2%] pb-[7%] text-center">
-                {/* Label Yth - Ukuran Sedang */}
-                <p className="animate-fade-in-up font-normal text-[#8c656d] leading-none text-[clamp(9.5px,2.5vw,13px)] landscape:text-[clamp(7px,1.9dvh,8.5px)] md:landscape:text-[clamp(10px,1.8vw,12.5px)]">
+              <div className="relative z-10 flex h-full w-full flex-col items-center justify-center px-[12%] pt-[3%] pb-[7%] text-center">
+                {/* Label Yth - Ukuran proporsional di semua layar */}
+                <p className="animate-fade-in-up font-normal text-[#8c656d] leading-none text-[10px] xs:text-[11px] sm:text-xs md:text-[13px] landscape:text-[8px] sm:landscape:text-[8.5px] md:landscape:text-[11px]">
                   Kepada Yth.
                 </p>
 
-                {/* Nama Tamu - Ukuran Sedang Besar */}
-                <p className="animate-fade-in-up animate-delay-200 mt-1 sm:mt-1.5 font-display font-bold tracking-wide text-[#3e2b2f] line-clamp-1 leading-snug text-[clamp(12px,3.3vw,17px)] landscape:text-[clamp(8.5px,2.3dvh,11px)] md:landscape:text-[clamp(12px,2.1vw,16px)]">
+                {/* Nama Tamu - Tegas & elegan */}
+                <p className="animate-fade-in-up animate-delay-200 mt-1 sm:mt-1.5 landscape:mt-0.5 md:landscape:mt-1 font-display font-bold tracking-wide text-[#3e2b2f] line-clamp-1 leading-snug text-[13px] xs:text-[14px] sm:text-[16px] md:text-[18px] landscape:text-[10px] sm:landscape:text-[11px] md:landscape:text-[15px]">
                   {guestName}
                 </p>
 
                 {/* Garis Pemisah Tipis */}
-                <div className="my-1 sm:my-1.5 landscape:my-0.5 h-[1px] w-[24%] max-w-[42px] min-w-[18px] bg-[#7d535b]/25" />
+                <div className="my-1 sm:my-1.5 landscape:my-0.5 md:landscape:my-1 h-[1px] w-[22%] max-w-[38px] min-w-[16px] bg-[#7d535b]/25" />
 
-                {/* Pesan Kehadiran - Ukuran Sedang Kecil (Aman di dalam batas bingkai & tidak menyentuh tangkai bunga) */}
-                <p className="animate-fade-in-up animate-delay-400 font-normal text-[#7d535b] leading-snug text-[clamp(8px,2vw,10.5px)] landscape:text-[clamp(6px,1.5dvh,7.5px)] md:landscape:text-[clamp(8px,1.4vw,10px)] max-w-[82%]">
+                {/* Pesan Kehadiran - Tanpa line-clamp (teks utuh bebas terpotong) dengan skala teks optimal */}
+                <p className="animate-fade-in-up animate-delay-400 font-display italic text-[#6d454d] leading-snug tracking-normal text-[10px] xs:text-[10.5px] sm:text-[11.5px] md:text-[12.5px] landscape:text-[8px] sm:landscape:text-[8.5px] md:landscape:text-[10.5px] lg:landscape:text-[11.5px] max-w-[92%]">
                   {envelopeMessage?.trim() || "Hi, kami tunggu kedatangan dan doa restunya ya. Jangan lupa datang dan ramaikan acara kami."}
                 </p>
               </div>
@@ -281,11 +280,10 @@ export default function InvitationShell({
             type="button"
             onClick={handleButtonClick}
             disabled={!imagesLoaded}
-            className={`btn-gold relative z-40 mt-1.5 sm:mt-2.5 landscape:mt-1 md:landscape:mt-2.5 px-5 py-1.5 sm:px-6 sm:py-2 md:px-7 md:py-2.5 landscape:px-3 landscape:py-0.5 md:landscape:px-6 md:landscape:py-2 text-xs sm:text-sm md:text-base landscape:text-[9px] md:landscape:text-xs transition-all duration-300 shadow-md ${
-              !imagesLoaded
-                ? "opacity-70 cursor-not-allowed scale-100"
-                : "hover:scale-105 active:scale-95"
-            }`}
+            className={`btn-gold relative z-40 mt-1.5 sm:mt-2.5 landscape:mt-1 md:landscape:mt-2.5 px-5 py-1.5 sm:px-6 sm:py-2 md:px-7 md:py-2.5 landscape:px-3 landscape:py-0.5 md:landscape:px-6 md:landscape:py-2 text-xs sm:text-sm md:text-base landscape:text-[9px] md:landscape:text-xs transition-all duration-300 shadow-md ${!imagesLoaded
+              ? "opacity-70 cursor-not-allowed scale-100"
+              : "hover:scale-105 active:scale-95"
+              }`}
           >
             {!imagesLoaded ? (
               <span className="inline-flex items-center gap-2">
