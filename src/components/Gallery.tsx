@@ -10,6 +10,81 @@ type GalleryItem = {
   signedUrl?: string;
 };
 
+function GallerySlide({
+  item,
+  idx,
+  isPriority,
+}: {
+  item: GalleryItem;
+  idx: number;
+  isPriority: boolean;
+}) {
+  const [loaded, setLoaded] = useState(false);
+  const imgUrl = item.signedUrl || item.url || item.storage_path || "";
+
+  return (
+    <div className="relative flex h-full w-full flex-shrink-0 items-center justify-center p-2">
+      {/* Shimmer skeleton saat foto slide belum selesai dimuat */}
+      <div
+        aria-hidden="true"
+        className={`absolute inset-0 skeleton-shimmer z-0 transition-opacity duration-500 ${
+          loaded ? "opacity-0 pointer-events-none" : "opacity-100"
+        }`}
+      />
+
+      {/* Background Blur Halus */}
+      {loaded && (
+        <div
+          className="absolute inset-0 bg-cover bg-center blur-md opacity-25 transition-opacity duration-500"
+          style={{ backgroundImage: `url(${imgUrl})` }}
+        />
+      )}
+
+      {/* Foto Utama */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={imgUrl}
+        alt={`Foto galeri ${idx + 1}`}
+        className={`relative max-h-full max-w-full rounded-md object-contain shadow-md transition-opacity duration-500 ${
+          loaded ? "opacity-100" : "opacity-0"
+        }`}
+        loading={isPriority ? "eager" : "lazy"}
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+      />
+    </div>
+  );
+}
+
+function ModalGalleryImage({ src, alt }: { src: string; alt: string }) {
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setLoaded(false);
+  }, [src]);
+
+  return (
+    <>
+      {!loaded && (
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 skeleton-shimmer rounded-xl"
+        />
+      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={alt}
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+        className={`max-h-[82vh] max-w-full rounded-xl border border-gold-400/40 object-contain shadow-2xl transition-opacity duration-300 ${
+          loaded ? "opacity-100" : "opacity-0"
+        }`}
+      />
+    </>
+  );
+}
+
 export default function Gallery({ items }: { items: GalleryItem[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -79,31 +154,14 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
               className="flex h-full w-full transition-transform duration-700 ease-in-out"
               style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >
-              {items.map((item, idx) => {
-                const imgUrl = item.signedUrl || item.url || item.storage_path || "";
-                return (
-                  <div
-                    key={item.id || idx}
-                    className="relative flex h-full w-full flex-shrink-0 items-center justify-center p-2"
-                  >
-                    {/* Background Blur Halus */}
-                    <div
-                      className="absolute inset-0 bg-cover bg-center blur-md opacity-25"
-                      style={{ backgroundImage: `url(${imgUrl})` }}
-                    />
-
-                    {/* Foto Utama */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={imgUrl}
-                      alt={`Foto galeri ${idx + 1}`}
-                      className="relative max-h-full max-w-full rounded-md object-contain shadow-md"
-                      loading={idx === 0 ? "eager" : "lazy"}
-                      decoding="async"
-                    />
-                  </div>
-                );
-              })}
+              {items.map((item, idx) => (
+                <GallerySlide
+                  key={item.id || idx}
+                  item={item}
+                  idx={idx}
+                  isPriority={idx === 0}
+                />
+              ))}
             </div>
           </div>
 
@@ -185,15 +243,12 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
           )}
 
           <div
-            className="relative flex max-h-[85vh] max-w-full items-center justify-center"
+            className="relative flex max-h-[85vh] max-w-full min-w-[280px] min-h-[300px] items-center justify-center overflow-hidden rounded-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <ModalGalleryImage
               src={items[currentIndex].signedUrl || items[currentIndex].url || items[currentIndex].storage_path || ""}
               alt={`Foto galeri ${currentIndex + 1}`}
-              decoding="async"
-              className="max-h-[82vh] max-w-full rounded-xl border border-gold-400/40 object-contain shadow-2xl"
             />
           </div>
 

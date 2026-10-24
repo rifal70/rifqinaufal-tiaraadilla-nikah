@@ -12,6 +12,8 @@ export default function CouplePhoto({
 }) {
     const [isOpen, setIsOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [isModalLoaded, setIsModalLoaded] = useState(false);
 
     useEffect(() => {
         setMounted(true);
@@ -47,14 +49,24 @@ export default function CouplePhoto({
                 title={`Lihat foto ${alt}`}
             >
                 {/* 1. Foto Pengantin (Ditinggiin dengan h-full dan inset yang pas) */}
-                <div className="absolute inset-[12%] overflow-hidden rounded-[0.5rem]">
+                <div className="absolute inset-[12%] overflow-hidden rounded-[0.5rem] bg-black/40">
+                    {/* Shimmer placeholder selagi foto belum selesai dimuat */}
+                    <div
+                        aria-hidden="true"
+                        className={`absolute inset-0 skeleton-shimmer z-0 transition-opacity duration-500 ${
+                            isLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
+                        }`}
+                    />
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                         src={src}
                         alt={alt}
-                        className="h-full w-full object-cover object-[center_85%] transition-transform duration-500 group-hover:scale-105"
+                        className={`h-full w-full object-cover object-[center_85%] transition-all duration-500 group-hover:scale-105 ${
+                            isLoaded ? "opacity-100" : "opacity-0"
+                        }`}
                         loading="lazy"
                         decoding="async"
+                        onLoad={() => setIsLoaded(true)}
                     />
                 </div>
 
@@ -86,15 +98,24 @@ export default function CouplePhoto({
                     </button>
 
                     <div
-                        className="relative flex max-h-[85vh] max-w-[90vw] items-center justify-center"
+                        className="relative flex max-h-[85vh] max-w-[90vw] min-w-[280px] min-h-[350px] items-center justify-center overflow-hidden rounded-2xl"
                         onClick={(e) => e.stopPropagation()}
                     >
+                        {!isModalLoaded && (
+                            <div
+                                aria-hidden="true"
+                                className="absolute inset-0 skeleton-shimmer rounded-2xl"
+                            />
+                        )}
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src={src}
                             alt={alt}
                             decoding="async"
-                            className="max-h-[82vh] max-w-full rounded-2xl border-2 border-gold-400/50 object-contain shadow-[0_0_50px_rgba(0,0,0,0.9)]"
+                            onLoad={() => setIsModalLoaded(true)}
+                            className={`max-h-[82vh] max-w-full rounded-2xl border-2 border-gold-400/50 object-contain shadow-[0_0_50px_rgba(0,0,0,0.9)] transition-opacity duration-300 ${
+                                isModalLoaded ? "opacity-100" : "opacity-0"
+                            }`}
                         />
                     </div>
                 </div>,

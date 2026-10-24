@@ -159,6 +159,29 @@ body {
   animation: shimmer 3.5s linear infinite;
 }
 
+/* === Skeleton Shimmer Placeholder Effect === */
+@keyframes skeletonWave {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(212, 175, 55, 0.16) 35%,
+    rgba(255, 244, 196, 0.28) 50%,
+    rgba(212, 175, 55, 0.16) 65%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonWave 1.8s ease-in-out infinite;
+}
+
 /* === Fade In Animation === */
 @keyframes fadeInUp {
   from {

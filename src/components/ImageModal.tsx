@@ -12,6 +12,8 @@ export default function ImageModal({
 }) {
     const [isOpen, setIsOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [isModalLoaded, setIsModalLoaded] = useState(false);
 
     useEffect(() => {
         setMounted(true);
@@ -44,15 +46,24 @@ export default function ImageModal({
             <button
                 type="button"
                 onClick={() => setIsOpen(true)}
-                className="w-full h-full flex items-center justify-center cursor-pointer overflow-hidden rounded-xl border border-gold-500/20 bg-black/20 p-1 sm:p-1.5 transition-all hover:scale-[1.01] hover:border-gold-500/50"
+                className="relative w-full h-full min-h-[220px] flex items-center justify-center cursor-pointer overflow-hidden rounded-xl border border-gold-500/20 bg-black/20 p-1 sm:p-1.5 transition-all hover:scale-[1.01] hover:border-gold-500/50"
             >
+                {!isLoaded && (
+                    <div
+                        aria-hidden="true"
+                        className="absolute inset-0 skeleton-shimmer z-0 rounded-xl"
+                    />
+                )}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                     src={src}
                     alt={alt}
-                    className="max-h-[560px] md:max-h-[640px] w-full h-full object-contain rounded-lg"
+                    className={`max-h-[560px] md:max-h-[640px] w-full h-full object-contain rounded-lg transition-opacity duration-500 ${
+                        isLoaded ? "opacity-100" : "opacity-0"
+                    }`}
                     loading="lazy"
                     decoding="async"
+                    onLoad={() => setIsLoaded(true)}
                 />
             </button>
 
@@ -75,15 +86,24 @@ export default function ImageModal({
 
                     {/* Kontainer Gambar Lebar */}
                     <div
-                        className="flex h-full w-full max-w-7xl items-center justify-center"
+                        className="relative flex h-full w-full max-w-7xl min-h-[300px] items-center justify-center overflow-hidden rounded-xl"
                         onClick={(e) => e.stopPropagation()}
                     >
+                        {!isModalLoaded && (
+                            <div
+                                aria-hidden="true"
+                                className="absolute inset-0 skeleton-shimmer rounded-xl"
+                            />
+                        )}
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src={src}
                             alt={alt}
                             decoding="async"
-                            className="max-h-[92vh] w-auto max-w-full rounded-xl border border-gold-500/30 object-contain shadow-2xl"
+                            onLoad={() => setIsModalLoaded(true)}
+                            className={`max-h-[92vh] w-auto max-w-full rounded-xl border border-gold-500/30 object-contain shadow-2xl transition-opacity duration-300 ${
+                                isModalLoaded ? "opacity-100" : "opacity-0"
+                            }`}
                         />
                     </div>
                 </div>,

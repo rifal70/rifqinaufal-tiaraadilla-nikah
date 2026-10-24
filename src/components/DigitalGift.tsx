@@ -11,6 +11,8 @@ interface DigitalGiftProps {
 
 export default function DigitalGift({ accounts, greeting }: DigitalGiftProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isTopLoaded, setIsTopLoaded] = useState(false);
+  const [isBottomLoaded, setIsBottomLoaded] = useState(false);
 
   const toggleOpen = () => {
     setIsOpen((prev) => !prev);
@@ -67,12 +69,24 @@ export default function DigitalGift({ accounts, greeting }: DigitalGiftProps) {
             </div>
           )}
 
+          {/* Shimmer skeleton saat tutup kado belum termuat */}
+          {!isTopLoaded && (
+            <div
+              aria-hidden="true"
+              className="w-[80%] aspect-[16/7] skeleton-shimmer rounded-2xl mb-2"
+            />
+          )}
+
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/kado_top.png"
             alt="Tutup Kado"
             loading="lazy"
             decoding="async"
-            className={`w-[80%] h-auto object-contain transition-all duration-700 ${isOpen
+            onLoad={() => setIsTopLoaded(true)}
+            className={`w-[80%] h-auto object-contain transition-all duration-700 ${
+              isTopLoaded ? "opacity-100" : "opacity-0 absolute"
+            } ${isOpen
               ? "drop-shadow-[0_20px_30px_rgba(0,0,0,0.6)]"
               : "-translate-y-10 rotate-0 scale-100 drop-shadow-[0_10px_16px_rgba(0,0,0,0.4)]"
               }`}
@@ -128,12 +142,24 @@ export default function DigitalGift({ accounts, greeting }: DigitalGiftProps) {
               }`}
           />
 
+          {/* Shimmer skeleton saat kotak kado belum termuat */}
+          {!isBottomLoaded && (
+            <div
+              aria-hidden="true"
+              className="w-full aspect-[4/3] skeleton-shimmer rounded-3xl"
+            />
+          )}
+
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/kado_bottom.png"
             alt="Kotak Kado"
             loading="lazy"
             decoding="async"
-            className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-[0_16px_30px_rgba(0,0,0,0.5)] transition-all duration-500"
+            onLoad={() => setIsBottomLoaded(true)}
+            className={`w-full h-auto object-contain select-none pointer-events-none drop-shadow-[0_16px_30px_rgba(0,0,0,0.5)] transition-all duration-500 ${
+              isBottomLoaded ? "opacity-100" : "opacity-0 absolute"
+            }`}
           />
         </div>
 

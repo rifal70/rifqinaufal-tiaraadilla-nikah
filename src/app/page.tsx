@@ -11,6 +11,7 @@ import CouplePhoto from "@/components/CouplePhoto";
 import ImageModal from "@/components/ImageModal";
 import LoveStory from "@/components/LoveStory";
 import WaitingScreen from "@/components/WaitingScreen";
+import ShimmerImage from "@/components/ShimmerImage";
 
 export const dynamic = "force-dynamic";
 
@@ -516,12 +517,12 @@ export default async function Home({
 
           {/* Save The Date */}
           <div className="flex flex-col items-center mb-8 w-full max-w-md mx-auto" data-reveal>
-            <div className="relative overflow-hidden rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.35)] border border-gold-500/30 max-w-[260px] sm:max-w-[280px] transition-transform duration-300 hover:scale-[1.02]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+            <div className="relative overflow-hidden rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.35)] border border-gold-500/30 max-w-[260px] sm:max-w-[280px] w-full transition-transform duration-300 hover:scale-[1.02]">
+              <ShimmerImage
                 src="/save_the_date.jpg"
                 alt="Save The Date"
                 className="w-full h-auto object-contain rounded-2xl"
+                containerClassName="w-full aspect-[4/5] min-h-[280px]"
                 loading="lazy"
               />
             </div>
@@ -613,12 +614,13 @@ export default async function Home({
                 <p className="text-xs uppercase tracking-widest text-gold-300 mb-6 font-semibold">
                   Scan QR Google Maps
                 </p>
-                <div className="relative p-3 bg-white rounded-2xl shadow-lg border border-gold-500/20 max-w-[200px] md:max-w-[220px]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                <div className="relative p-3 bg-white rounded-2xl shadow-lg border border-gold-500/20 max-w-[200px] md:max-w-[220px] w-full">
+                  <ShimmerImage
                     src="/qr-maps.png"
                     alt="Scan QR Google Maps"
                     className="w-full h-auto aspect-square object-contain rounded-lg"
+                    containerClassName="w-full aspect-square"
+                    shimmerClassName="rounded-lg"
                     loading="lazy"
                   />
                 </div>
