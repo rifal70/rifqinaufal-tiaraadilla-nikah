@@ -793,11 +793,11 @@ export default async function Home({
       {/* Gifts / Amplop Digital */}
       {visibleBanks.length > 0 && (
         <section className="section-wedding text-center relative overflow-x-clip" id="amplop">
-          {/* Motive 1 - Pojok Kanan Atas */}
+          {/* Motive 1 - Pojok Kanan Atas (Digeser ke sudut luar agar tidak menabrak teks doa restu) */}
           <div
             aria-hidden="true"
             data-reveal
-            className="pointer-events-none select-none absolute top-2 -right-8 sm:top-6 sm:-right-14 z-0 rotate-15"
+            className="pointer-events-none select-none absolute -top-8 -right-10 sm:-top-12 sm:-right-16 md:-top-14 md:-right-20 z-0 rotate-15 opacity-60 sm:opacity-75 md:opacity-90"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -809,11 +809,11 @@ export default async function Home({
             />
           </div>
 
-          {/* Motive 4 - Pojok Kiri Bawah */}
+          {/* Motive 4 - Pojok Kiri Bawah (Digeser ke sudut luar agar tidak menabrak elemen kado) */}
           <div
             aria-hidden="true"
             data-reveal
-            className="pointer-events-none select-none absolute -bottom-6 -left-8 sm:-bottom-10 sm:-left-12 z-0 -rotate-12"
+            className="pointer-events-none select-none absolute -bottom-10 -left-10 sm:-bottom-14 sm:-left-16 md:-bottom-16 md:-left-20 z-0 -rotate-12 opacity-60 sm:opacity-75 md:opacity-90"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
