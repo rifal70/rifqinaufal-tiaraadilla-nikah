@@ -42,7 +42,7 @@ function GallerySlide({
       return;
     }
 
-    if ("decode" in img) {
+    if (isPriority && "decode" in img) {
       img
         .decode()
         .then(() => setLoaded(true))

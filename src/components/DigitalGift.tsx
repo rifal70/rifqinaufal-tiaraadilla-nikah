@@ -36,9 +36,6 @@ export default function DigitalGift({ accounts, greeting }: DigitalGiftProps) {
       if (top.complete) {
         setIsTopLoaded(true);
       } else {
-        if ("decode" in top) {
-          top.decode().then(() => setIsTopLoaded(true)).catch(() => setIsTopLoaded(true));
-        }
         const done = () => setIsTopLoaded(true);
         top.addEventListener("load", done, { once: true });
         top.addEventListener("error", done, { once: true });
@@ -49,9 +46,6 @@ export default function DigitalGift({ accounts, greeting }: DigitalGiftProps) {
       if (bottom.complete) {
         setIsBottomLoaded(true);
       } else {
-        if ("decode" in bottom) {
-          bottom.decode().then(() => setIsBottomLoaded(true)).catch(() => setIsBottomLoaded(true));
-        }
         const done = () => setIsBottomLoaded(true);
         bottom.addEventListener("load", done, { once: true });
         bottom.addEventListener("error", done, { once: true });

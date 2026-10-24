@@ -106,17 +106,27 @@ export default function MediaMonitor() {
       const target = event.target;
       if (target instanceof HTMLImageElement) {
         console.warn("Media failed to load:", target.src);
-        setFailedCount((prev) => prev + 1);
-        setHasError(true);
+        // Hanya tampilkan pop-up koneksi bermasalah jika koneksi user benar-benar terputus / offline
+        // Jangan pernah memblokir layar tamu jika user sedang online normal
+        if (typeof navigator !== "undefined" && !navigator.onLine) {
+          setFailedCount((prev) => prev + 1);
+          setHasError(true);
+        }
       }
+    };
+
+    const handleOffline = () => {
+      setHasError(true);
     };
 
     // Gunakan capture phase (true) karena error pada elemen <img> tidak melakukan bubble
     window.addEventListener("error", handleCaptureError, true);
+    window.addEventListener("offline", handleOffline);
 
     return () => {
       observer.disconnect();
       window.removeEventListener("error", handleCaptureError, true);
+      window.removeEventListener("offline", handleOffline);
     };
   }, []);
 
