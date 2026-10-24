@@ -4,6 +4,7 @@ import { query } from "@/lib/neon/db";
 import { getSettings } from "@/lib/data";
 import { getMediaUrl } from "@/lib/media";
 import { LOVE_STORY, DIGITAL_GIFT_DEFAULT_TEXT, DEFAULT_ENVELOPE_MESSAGE } from "@/lib/content";
+import { sanitizeSiteUrl, sanitizeInviteUrl } from "@/lib/url";
 import {
   ActionForm,
   InviteCreator,
@@ -59,7 +60,7 @@ export default async function AdminPage({
     hasTokenColumn = false;
   }
 
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/$/, "");
+  const siteUrl = sanitizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL);
   const offset = (page - 1) * PAGE_SIZE;
   const countParams: any[] = [];
   const invParams: any[] = [];
@@ -217,7 +218,7 @@ export default async function AdminPage({
               </thead>
               <tbody className="divide-y divide-gold-500/10">
                 {invites?.map((inv) => {
-                  const inviteUrl = inv.token ? `${siteUrl}/invite/${inv.token}` : null;
+                  const inviteUrl = inv.token ? sanitizeInviteUrl(`${siteUrl}/invite/${inv.token}`) : null;
                   return (
                     <tr key={inv.id} className="hover:bg-gold-500/5 transition-colors">
                       <td className="py-3 px-2 font-medium text-cream whitespace-nowrap">{inv.guest_name}</td>

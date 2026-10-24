@@ -16,6 +16,7 @@ import { generateToken, hashToken } from "@/lib/auth/session";
 import { isAllowed, clientIp } from "@/lib/rate-limit";
 import { saveMediaFile, deleteMediaFile } from "@/lib/media";
 import { CACHE_TAG_SETTINGS, CACHE_TAG_BANKS, CACHE_TAG_GALLERY } from "@/lib/data";
+import { sanitizeSiteUrl, sanitizeInviteUrl } from "@/lib/url";
 
 export type CreatedInvite = {
   name: string;
@@ -32,7 +33,7 @@ export type ActionState = {
   createdInvites?: CreatedInvite[];
 };
 
-const siteUrl = () => (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/$/, "");
+const siteUrl = () => sanitizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL);
 
 /* ---------------- Auth ---------------- */
 
@@ -150,7 +151,7 @@ export async function createInvitationsAction(formData: FormData): Promise<Actio
         name,
         count,
         token,
-        url: `${base}/invite/${token}`,
+        url: sanitizeInviteUrl(`${base}/invite/${token}`),
       });
     }
 
@@ -211,7 +212,7 @@ export async function regenerateLinkAction(
     await query("DELETE FROM sessions WHERE invitation_id = $1", [id.data]);
 
     revalidatePath("/admin");
-    return { ok: true, message: `${siteUrl()}/invite/${token}` };
+    return { ok: true, message: sanitizeInviteUrl(`${siteUrl()}/invite/${token}`) };
   } catch (err: any) {
     console.error("regenerateLinkAction error:", err);
     return { ok: false, error: err?.message || "Gagal membuat link baru." };

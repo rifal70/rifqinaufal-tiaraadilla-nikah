@@ -36,7 +36,8 @@ const guests = readFileSync(input, "utf8")
   .filter((g) => g.name);
 
 const sql = neon(dbUrl);
-const base = site.replace(/\/$/, "");
+const baseMatch = site.match(/https?:\/\/[^\s\[\]\(\)"']+/);
+const base = (baseMatch ? baseMatch[0] : site).replace(/\/$/, "");
 const lines = ["nama,jumlah,link"];
 const rows = guests.map((g) => {
   const token = randomBytes(32).toString("base64url");

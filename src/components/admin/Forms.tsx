@@ -5,6 +5,7 @@ import { useFormStatus } from "react-dom";
 import { useToast } from "./ToastContext";
 import type { ActionState, CreatedInvite } from "@/app/admin/actions";
 import { regenerateLinkAction } from "@/app/admin/actions";
+import { sanitizeInviteUrl } from "@/lib/url";
 
 interface FormPendingContextType {
   pending: boolean;
@@ -33,12 +34,13 @@ export function CopyButton({
   const handleCopy = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    const cleanText = sanitizeInviteUrl(text);
     try {
       if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(cleanText);
       } else {
         const textArea = document.createElement("textarea");
-        textArea.value = text;
+        textArea.value = cleanText;
         textArea.style.position = "fixed";
         textArea.style.left = "-999999px";
         document.body.appendChild(textArea);
@@ -82,7 +84,7 @@ export function CopyableLinkInput({
   invitationId?: string;
   className?: string;
 }) {
-  const [currentUrl, setCurrentUrl] = useState<string | null>(initialUrl);
+  const [currentUrl, setCurrentUrl] = useState<string | null>(initialUrl ? sanitizeInviteUrl(initialUrl) : null);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const { showToast, showErrorModal } = useToast();
 
@@ -127,19 +129,21 @@ export function CopyableLinkInput({
     }
   };
 
+  const cleanUrl = sanitizeInviteUrl(currentUrl);
+
   return (
     <div className="flex items-center gap-1.5 min-w-[280px]">
-      {currentUrl ? (
+      {cleanUrl ? (
         <>
           <input
             type="text"
             readOnly
-            value={currentUrl}
+            value={cleanUrl}
             className={`${className} truncate bg-forest-900/60 border border-gold-500/20 rounded px-2 py-1 text-gold-200 font-mono text-[11px] select-all cursor-pointer focus:border-gold-400 focus:outline-none`}
             onClick={(e) => (e.target as HTMLInputElement).select()}
-            title={currentUrl}
+            title={cleanUrl}
           />
-          <CopyButton text={currentUrl} label="Salin" />
+          <CopyButton text={cleanUrl} label="Salin" />
           {invitationId && (
             <button
               type="button"
@@ -373,17 +377,19 @@ export function RegenerateAndCopyButton({
     }
   };
 
-  if (link) {
+  const cleanLink = link ? sanitizeInviteUrl(link) : null;
+
+  if (cleanLink) {
     return (
       <div className="flex items-center gap-1.5 max-w-xs">
         <input
           type="text"
           readOnly
-          value={link}
+          value={cleanLink}
           className="w-44 truncate bg-forest-900/60 border border-gold-500/20 rounded px-2 py-1 text-gold-200 font-mono text-[11px] select-all cursor-pointer"
           onClick={(e) => (e.target as HTMLInputElement).select()}
         />
-        <CopyButton text={link} label="Salin" />
+        <CopyButton text={cleanLink} label="Salin" />
       </div>
     );
   }
@@ -412,7 +418,7 @@ export function InviteCreator({
   const handleCopyAll = async () => {
     if (!createdList || createdList.length === 0) return;
     const allText = createdList
-      .map((item) => `${item.name} (${item.count} pax): ${item.url}`)
+      .map((item) => `${item.name} (${item.count} pax): ${sanitizeInviteUrl(item.url)}`)
       .join("\n");
     try {
       await navigator.clipboard.writeText(allText);
@@ -509,26 +515,29 @@ export function InviteCreator({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gold-500/10">
-                {createdList.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-gold-500/5 transition-colors">
-                    <td className="py-2.5 px-3 font-medium text-cream">{item.name}</td>
-                    <td className="py-2.5 px-3 text-cream/80">{item.count} pax</td>
-                    <td className="py-2.5 px-3">
-                      <div className="flex items-center gap-1">
-                        <input
-                          type="text"
-                          readOnly
-                          value={item.url}
-                          className="w-full min-w-[240px] bg-forest-900/80 border border-gold-500/25 rounded px-2.5 py-1.5 text-gold-200 font-mono text-[11px] select-all cursor-pointer focus:border-gold-400 focus:outline-none"
-                          onClick={(e) => (e.target as HTMLInputElement).select()}
-                        />
-                      </div>
-                    </td>
-                    <td className="py-2.5 px-3 text-right whitespace-nowrap">
-                      <CopyButton text={item.url} label="Salin Link" />
-                    </td>
-                  </tr>
-                ))}
+                {createdList.map((item, idx) => {
+                  const cleanUrl = sanitizeInviteUrl(item.url);
+                  return (
+                    <tr key={idx} className="hover:bg-gold-500/5 transition-colors">
+                      <td className="py-2.5 px-3 font-medium text-cream">{item.name}</td>
+                      <td className="py-2.5 px-3 text-cream/80">{item.count} pax</td>
+                      <td className="py-2.5 px-3">
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="text"
+                            readOnly
+                            value={cleanUrl}
+                            className="w-full min-w-[240px] bg-forest-900/80 border border-gold-500/25 rounded px-2.5 py-1.5 text-gold-200 font-mono text-[11px] select-all cursor-pointer focus:border-gold-400 focus:outline-none"
+                            onClick={(e) => (e.target as HTMLInputElement).select()}
+                          />
+                        </div>
+                      </td>
+                      <td className="py-2.5 px-3 text-right whitespace-nowrap">
+                        <CopyButton text={cleanUrl} label="Salin Link" />
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
