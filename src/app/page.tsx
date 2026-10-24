@@ -809,6 +809,18 @@ export default async function Home({
             {W.groom.shortName} &amp; {W.bride.shortName}
           </p>
         </div>
+
+        {/* Footer / Copyright Elegan */}
+        <footer
+          className="relative z-10 mt-auto pt-6 sm:pt-8 landscape:pt-3 pb-2 sm:pb-4 landscape:pb-1 flex flex-col items-center gap-1 select-none"
+          data-reveal
+        >
+          <div className="h-[1px] w-16 bg-gradient-to-r from-transparent via-gold-400/30 to-transparent mb-1" aria-hidden="true" />
+          <p className="text-[9px] landscape:text-[8px] tracking-[0.2em] uppercase text-cream/35 font-light">
+            <span className="text-gold-400/60">&copy;</span>
+            Copyright 2026 | {W.groom.shortName} - {W.bride.shortName}
+          </p>
+        </footer>
       </section>
     </InvitationShell>
   );
