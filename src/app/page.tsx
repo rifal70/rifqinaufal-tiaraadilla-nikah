@@ -12,6 +12,7 @@ import ImageModal from "@/components/ImageModal";
 import LoveStory from "@/components/LoveStory";
 import WaitingScreen from "@/components/WaitingScreen";
 import ShimmerImage from "@/components/ShimmerImage";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export const dynamic = "force-dynamic";
 
@@ -892,6 +893,9 @@ export default async function Home({
           </p>
         </footer>
       </section>
+
+      {/* Floating Scroll To Top Button saat sampai di section penutup */}
+      <ScrollToTop targetId="penutup" />
     </InvitationShell>
   );
 }
