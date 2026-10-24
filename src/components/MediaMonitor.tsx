@@ -11,17 +11,32 @@ export default function MediaMonitor() {
   useEffect(() => {
     setMounted(true);
 
-    // Cek query parameter opsional untuk kemudahan testing: ?error=media
+    // Cek query parameter opsional untuk kemudahan testing di browser: ?error=media atau ?test=media-error atau ?test=broken-image
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      if (params.get("error") === "media") {
+      if (
+        params.get("error") === "media" ||
+        params.get("test") === "media-error" ||
+        params.get("test") === "broken-image"
+      ) {
         setHasError(true);
         setFailedCount(1);
       }
     }
 
-    // 1. Tangani transisi halus untuk seluruh gambar yang ada di halaman
+    // 1. Tangani transisi halus untuk foto media (lewati ornamen motif/awan/pelaminan agar warna filter tidak tertimpa)
     const processImage = (img: HTMLImageElement) => {
+      if (
+        img.classList.contains("motive-ornament") ||
+        img.classList.contains("cloud-float-top") ||
+        img.classList.contains("cloud-float-bottom") ||
+        img.src.includes("/motive/") ||
+        img.src.includes("/pelaminan/") ||
+        img.getAttribute("aria-hidden") === "true"
+      ) {
+        return;
+      }
+
       // Jika gambar sudah selesai di-load (misal dari cache browser)
       if (img.complete && img.naturalWidth > 0) {
         img.classList.add("media-loaded");

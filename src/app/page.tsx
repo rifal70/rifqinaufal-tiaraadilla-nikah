@@ -29,11 +29,68 @@ function Placeholder({ label }: { label: string }) {
 export default async function Home({
   searchParams,
 }: {
-  searchParams?: Promise<{ status?: string }>;
+  searchParams?: Promise<{ status?: string; error?: string; test?: string }>;
 }) {
   const params = searchParams ? await searchParams : undefined;
   if (params?.status === "busy") {
     return <WaitingScreen />;
+  }
+
+  // Tampilkan simulasi pop-up koneksi bermasalah langsung di layar jika ada parameter ?error=media atau ?test=media-error
+  if (params?.error === "media" || params?.test === "media-error") {
+    return (
+      <main className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/85 p-4 backdrop-blur-md select-none">
+        <div className="relative mx-auto flex w-full max-w-sm flex-col items-center rounded-2xl border border-gold-400/40 bg-gradient-to-b from-green-950/95 to-green-900/95 p-6 sm:p-7 text-center text-cream shadow-2xl backdrop-blur-md">
+          <div className="mb-4 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full border border-gold-400/50 bg-gold-400/10 shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+            <svg
+              className="h-7 w-7 sm:h-8 sm:w-8 text-gold-300"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M1 1l22 22" />
+              <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55" />
+              <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39" />
+              <path d="M10.71 5.05A16 16 0 0 1 22.58 9" />
+              <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88" />
+              <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+              <line x1="12" y1="20" x2="12.01" y2="20" />
+            </svg>
+          </div>
+          <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-gold-300">
+            Koneksi Bermasalah
+          </p>
+          <h2 className="mt-1.5 font-display text-xl sm:text-2xl font-bold text-gold-shimmer leading-tight">
+            Gagal Memuat Media
+          </h2>
+          <div className="ornament-divider my-2.5 sm:my-3" aria-hidden="true">
+            <span className="ornament-diamond" />
+          </div>
+          <p className="text-xs sm:text-sm text-green-100/85 leading-relaxed">
+            Beberapa foto atau media undangan tidak dapat dimuat karena gangguan koneksi internet.
+            Silakan muat ulang halaman untuk mencoba kembali.
+          </p>
+          <div className="mt-6 flex w-full flex-col gap-2">
+            <a
+              href="/"
+              className="btn-gold w-full py-2.5 text-xs sm:text-sm font-semibold tracking-wide transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-md text-center"
+            >
+              Muat Ulang Halaman
+            </a>
+            <a
+              href="/"
+              className="w-full py-1.5 text-xs text-gold-300/70 hover:text-gold-200 transition-colors text-center"
+            >
+              Tutup &amp; Lanjutkan Membaca
+            </a>
+          </div>
+        </div>
+      </main>
+    );
   }
 
   const h = await headers();
