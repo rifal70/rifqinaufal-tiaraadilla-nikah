@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Great+Vibes&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -50,6 +50,7 @@
 
   /* Typography */
   --font-display: "Cormorant Garamond", "Georgia", serif;
+  --font-script: "Great Vibes", "Brush Script MT", "Segoe Script", "Lucida Handwriting", cursive;
   --font-body: "Inter", system-ui, sans-serif;
 }
 
@@ -83,7 +84,21 @@
   --color-cream-dark: var(--cream-dark);
   --color-ivory: var(--ivory);
   --font-display: var(--font-display);
+  --font-script: var(--font-script);
   --font-body: var(--font-body);
+}
+
+@font-face {
+  font-family: 'Great Vibes';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/greatvibes/v21/RWmMoKWR9v4ksMfaWd_JN-XC.woff2') format('woff2'),
+       url('https://fonts.gstatic.com/s/greatvibes/v21/RWmMoKWR9v4ksMfaWd_JN-XC.ttf') format('truetype');
+}
+
+.font-script {
+  font-family: var(--font-script) !important;
 }
 
 /* === Base Styles === */

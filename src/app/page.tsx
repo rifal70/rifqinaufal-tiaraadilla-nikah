@@ -233,7 +233,10 @@ export default async function Home({
             The Wedding of
           </p>
 
-          <h1 className="mt-4 sm:mt-6 landscape:mt-1.5 sm:landscape:mt-2 md:landscape:mt-4 lg:landscape:mt-6 font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-gold-shimmer leading-tight md:whitespace-nowrap">
+          <h1
+            style={{ fontFamily: "var(--font-script)" }}
+            className="mt-2 sm:mt-3 landscape:mt-1 sm:landscape:mt-1.5 md:landscape:mt-3 font-script text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl landscape:text-4xl sm:landscape:text-4xl md:landscape:text-5xl lg:landscape:text-6xl text-gold-shimmer leading-normal py-1 px-2 whitespace-nowrap"
+          >
             {W.groom.shortName} &amp; {W.bride.shortName}
           </h1>
         </div>

@@ -240,8 +240,11 @@ export default function InvitationShell({
                 </p>
 
                 {/* Nama Tamu - Tegas & elegan */}
-                <p className="animate-fade-in-up animate-delay-200 mt-1 sm:mt-1.5 landscape:mt-0.5 md:landscape:mt-1 font-display font-bold tracking-wide text-[#3e2b2f] line-clamp-1 leading-snug text-[13px] xs:text-[14px] sm:text-[16px] md:text-[18px] landscape:text-[10px] sm:landscape:text-[11px] md:landscape:text-[15px]">
-                  {guestName}
+                <p
+                  style={{ textTransform: "uppercase" }}
+                  className="animate-fade-in-up animate-delay-200 mt-1 sm:mt-1.5 landscape:mt-0.5 md:landscape:mt-1 font-display font-bold tracking-wide uppercase text-[#3e2b2f] line-clamp-1 leading-snug text-[13px] xs:text-[14px] sm:text-[16px] md:text-[18px] landscape:text-[10px] sm:landscape:text-[11px] md:landscape:text-[15px]"
+                >
+                  {guestName?.toUpperCase()}
                 </p>
 
                 {/* Garis Pemisah Tipis */}
