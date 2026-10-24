@@ -4,7 +4,7 @@
 
 [build.environment]
   NODE_VERSION = "22"
-  SECRETS_SCAN_OMIT_KEYS = "B2_ENDPOINT,B2_REGION"
+  SECRETS_SCAN_OMIT_KEYS = "B2_ENDPOINT,B2_REGION,ADMIN_EMAILS"
 
 # Netlify auto-installs @netlify/plugin-nextjs (OpenNext adapter) for Next.js sites.
 
