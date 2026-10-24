@@ -35,7 +35,20 @@ export const SETTING_KEYS = [
 
 export type SettingKey = (typeof SETTING_KEYS)[number];
 
-const isPlaceholder = (v?: string | null) => !v || v.trim() === "" || v.startsWith("[PLACEHOLDER");
+const isPlaceholder = (v?: string | null) => {
+  if (!v) return true;
+  const t = v.trim().toLowerCase();
+  return (
+    t === "" ||
+    t === "null" ||
+    t === "undefined" ||
+    t === "-" ||
+    t === "none" ||
+    t === "empty" ||
+    t.startsWith("[placeholder") ||
+    t.startsWith("placeholder")
+  );
+};
 
 export async function getSettings(): Promise<SiteSettings> {
   const empty: SiteSettings = {

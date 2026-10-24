@@ -9,6 +9,9 @@ import {
   InviteCreator,
   AdminForm,
   AdminSubmitButton,
+  CopyableLinkInput,
+  FileUploadWithPreview,
+  GalleryUploadWithPreview,
 } from "@/components/admin/Forms";
 import { ToastProvider } from "@/components/admin/ToastContext";
 import {
@@ -20,6 +23,7 @@ import {
   updateBankAction,
   updateSettingsAction,
   uploadAssetAction,
+  deleteAssetAction,
   uploadGalleryAction,
   toggleGalleryAction,
   deleteGalleryAction,
@@ -39,13 +43,33 @@ export default async function AdminPage({
   const q = typeof sp.q === "string" ? sp.q.slice(0, 100) : "";
   const page = Math.max(1, parseInt(typeof sp.page === "string" ? sp.page : "1", 10) || 1);
 
+  // Periksa ketersediaan kolom token di database secara aman
+  let hasTokenColumn = false;
+  try {
+    const colRows = await query<{ column_name: string }>(
+      "SELECT column_name FROM information_schema.columns WHERE table_name = 'invitations' AND column_name = 'token'"
+    );
+    hasTokenColumn = colRows && colRows.length > 0;
+    if (!hasTokenColumn) {
+      await query("ALTER TABLE invitations ADD COLUMN IF NOT EXISTS token TEXT");
+      hasTokenColumn = true;
+    }
+  } catch (err) {
+    console.warn("Notice: token column check or creation:", err);
+    hasTokenColumn = false;
+  }
+
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/$/, "");
   const offset = (page - 1) * PAGE_SIZE;
   const countParams: any[] = [];
   const invParams: any[] = [];
 
   let countSql = "SELECT COUNT(*) AS total FROM invitations";
+  // Gunakan NULL AS token jika kolom token belum ada di database, agar SQL tidak pernah gagal
   let invSql = `
-    SELECT id, guest_name, guest_count, is_revoked, visible_bank_ids, created_at
+    SELECT id, guest_name, guest_count, is_revoked, visible_bank_ids,
+           ${hasTokenColumn ? "token" : "NULL AS token"},
+           created_at
     FROM invitations
   `;
 
@@ -77,11 +101,23 @@ export default async function AdminPage({
   const count = parseInt(countRows[0]?.total ?? "0", 10);
   const activeSessions = parseInt(activeSessionsRows[0]?.total ?? "0", 10);
 
-  const thumbs = await Promise.all(
-    (photos ?? []).map(async (p) => ({
-      signedUrl: await getMediaUrl(p.storage_path),
-    }))
-  );
+  const [
+    thumbs,
+    groomPhotoUrl,
+    bridePhotoUrl,
+    mapImageUrl,
+    musicUrl,
+  ] = await Promise.all([
+    Promise.all(
+      (photos ?? []).map(async (p) => ({
+        signedUrl: await getMediaUrl(p.storage_path),
+      }))
+    ),
+    settings.groom_photo_path?.trim() ? getMediaUrl(settings.groom_photo_path) : Promise.resolve(""),
+    settings.bride_photo_path?.trim() ? getMediaUrl(settings.bride_photo_path) : Promise.resolve(""),
+    settings.map_image_path?.trim() ? getMediaUrl(settings.map_image_path) : Promise.resolve(""),
+    settings.music_path?.trim() ? getMediaUrl(settings.music_path) : Promise.resolve(""),
+  ]);
 
   const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
 
@@ -118,7 +154,7 @@ export default async function AdminPage({
             {banks?.map((b) => (
               <AdminForm
                 key={b.id}
-                action={updateBankAction}
+                actionFn={updateBankAction}
                 className="rounded-xl border border-gold-500/20 p-4 space-y-2"
                 id={`bank-form-${b.display_order}`}
                 successMessage={`Rekening ${b.bank_name || "bank"} berhasil disimpan!`}
@@ -147,7 +183,7 @@ export default async function AdminPage({
           <div className="rounded-xl border border-gold-500/20 p-4 space-y-4">
             <h3 className="text-lg font-medium text-gold-200">Buat Undangan Baru</h3>
             <InviteCreator
-              action={createInvitationsAction}
+              actionFn={createInvitationsAction}
             />
           </div>
 
@@ -171,89 +207,92 @@ export default async function AdminPage({
             <table className="w-full text-left text-sm" id="invitations-table">
               <thead className="border-b border-gold-500/20 text-xs uppercase tracking-wider text-gold-300">
                 <tr>
-                  <th className="py-2">Nama</th>
-                  <th className="py-2">Pax</th>
-                  <th className="py-2">Rekening Terlihat</th>
-                  <th className="py-2">Status</th>
-                  <th className="py-2 text-right">Aksi</th>
+                  <th className="py-2.5 px-2">Nama</th>
+                  <th className="py-2.5 px-2">Pax</th>
+                  <th className="py-2.5 px-2">Link Undangan</th>
+                  <th className="py-2.5 px-2">Rekening Terlihat</th>
+                  <th className="py-2.5 px-2">Status</th>
+                  <th className="py-2.5 px-2 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gold-500/10">
-                {invites?.map((inv) => (
-                  <tr key={inv.id}>
-                    <td className="py-3 font-medium text-cream">{inv.guest_name}</td>
-                    <td className="py-3">{inv.guest_count}</td>
-                    <td className="py-3 text-xs text-cream/80">
-                      <AdminForm
-                        action={updateInvitationBanksAction}
-                        className="flex flex-col gap-1.5 max-w-xs"
-                        successMessage={`Pengaturan amplop untuk ${inv.guest_name} disimpan!`}
-                        errorMessage={`Gagal menyimpan amplop untuk ${inv.guest_name}.`}
-                      >
-                        <input type="hidden" name="invitation_id" value={inv.id} />
-                        <div className="flex flex-wrap gap-2 text-[11px]">
-                          {availableBanks.map((b) => {
-                            const isChecked = !inv.visible_bank_ids || inv.visible_bank_ids.includes(b.id);
-                            return (
-                              <label key={b.id} className="flex items-center gap-1 bg-forest-900/40 px-1.5 py-0.5 rounded border border-gold-500/20 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  name="bank_ids"
-                                  value={b.id}
-                                  defaultChecked={isChecked}
-                                  className="rounded border-gold-500/30 text-gold-500 focus:ring-0"
-                                />
-                                <span>{b.bank_name}</span>
-                              </label>
-                            );
-                          })}
+                {invites?.map((inv) => {
+                  const inviteUrl = inv.token ? `${siteUrl}/invite/${inv.token}` : null;
+                  return (
+                    <tr key={inv.id} className="hover:bg-gold-500/5 transition-colors">
+                      <td className="py-3 px-2 font-medium text-cream whitespace-nowrap">{inv.guest_name}</td>
+                      <td className="py-3 px-2">{inv.guest_count}</td>
+                      <td className="py-3 px-2">
+                        <CopyableLinkInput
+                          initialUrl={inviteUrl}
+                          invitationId={inv.id}
+                        />
+                      </td>
+                      <td className="py-3 px-2 text-xs text-cream/80">
+                        <AdminForm
+                          actionFn={updateInvitationBanksAction}
+                          className="flex flex-col gap-1.5 max-w-xs"
+                          successMessage={`Pengaturan amplop untuk ${inv.guest_name} disimpan!`}
+                          errorMessage={`Gagal menyimpan amplop untuk ${inv.guest_name}.`}
+                        >
+                          <input type="hidden" name="invitation_id" value={inv.id} />
+                          <div className="flex flex-wrap gap-2 text-[11px]">
+                            {availableBanks.map((b) => {
+                              const isChecked = !inv.visible_bank_ids || inv.visible_bank_ids.includes(b.id);
+                              return (
+                                <label key={b.id} className="flex items-center gap-1 bg-forest-900/40 px-1.5 py-0.5 rounded border border-gold-500/20 cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    name="bank_ids"
+                                    value={b.id}
+                                    defaultChecked={isChecked}
+                                    className="rounded border-gold-500/30 text-gold-500 focus:ring-0"
+                                  />
+                                  <span>{b.bank_name}</span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                          <AdminSubmitButton className="text-[10px] py-0.5 px-2 self-start btn-copy">
+                            Simpan Amplop
+                          </AdminSubmitButton>
+                        </AdminForm>
+                      </td>
+                      <td className="py-3 px-2">
+                        {inv.is_revoked ? (
+                          <span className="text-red-300">Dicabut</span>
+                        ) : (
+                          <span className="text-green-300">Aktif</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-2 text-right">
+                        <div className="inline-flex items-center gap-2">
+                          <AdminForm
+                            actionFn={setRevokedAction}
+                            successMessage={inv.is_revoked ? "Undangan diaktifkan kembali!" : "Undangan berhasil dicabut!"}
+                            errorMessage="Gagal mengubah status undangan."
+                          >
+                            <input type="hidden" name="id" value={inv.id} />
+                            <input type="hidden" name="revoke" value={inv.is_revoked ? "0" : "1"} />
+                            <AdminSubmitButton id={`revoke-${inv.id}`}>
+                              {inv.is_revoked ? "Aktifkan" : "Cabut"}
+                            </AdminSubmitButton>
+                          </AdminForm>
+                          <AdminForm
+                            actionFn={deleteInvitationAction}
+                            successMessage="Undangan berhasil dihapus!"
+                            errorMessage="Gagal menghapus undangan."
+                          >
+                            <input type="hidden" name="id" value={inv.id} />
+                            <AdminSubmitButton id={`del-${inv.id}`}>
+                              Hapus
+                            </AdminSubmitButton>
+                          </AdminForm>
                         </div>
-                        <AdminSubmitButton className="text-[10px] py-0.5 px-2 self-start btn-copy">
-                          Simpan Amplop
-                        </AdminSubmitButton>
-                      </AdminForm>
-                    </td>
-                    <td className="py-3">
-                      {inv.is_revoked ? (
-                        <span className="text-red-300">Dicabut</span>
-                      ) : (
-                        <span className="text-green-300">Aktif</span>
-                      )}
-                    </td>
-                    <td className="py-3 text-right">
-                      <div className="inline-flex items-center gap-2">
-                        <ActionForm
-                          action={regenerateLinkAction}
-                          submitLabel="Link baru"
-                          id={`regen-${inv.id}`}
-                        >
-                          <input type="hidden" name="id" value={inv.id} />
-                        </ActionForm>
-                        <AdminForm
-                          action={setRevokedAction}
-                          successMessage={inv.is_revoked ? "Undangan diaktifkan kembali!" : "Undangan berhasil dicabut!"}
-                          errorMessage="Gagal mengubah status undangan."
-                        >
-                          <input type="hidden" name="id" value={inv.id} />
-                          <input type="hidden" name="revoke" value={inv.is_revoked ? "0" : "1"} />
-                          <AdminSubmitButton id={`revoke-${inv.id}`}>
-                            {inv.is_revoked ? "Aktifkan" : "Cabut"}
-                          </AdminSubmitButton>
-                        </AdminForm>
-                        <AdminForm
-                          action={deleteInvitationAction}
-                          successMessage="Undangan berhasil dihapus!"
-                          errorMessage="Gagal menghapus undangan."
-                        >
-                          <input type="hidden" name="id" value={inv.id} />
-                          <AdminSubmitButton id={`del-${inv.id}`}>
-                            Hapus
-                          </AdminSubmitButton>
-                        </AdminForm>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -282,7 +321,7 @@ export default async function AdminPage({
           <h2 className="admin-h2">Teks & Aset Acara</h2>
 
           <AdminForm
-            action={updateSettingsAction}
+            actionFn={updateSettingsAction}
             className="space-y-4"
             id="settings-form"
             successMessage="Pengaturan teks acara berhasil disimpan!"
@@ -376,43 +415,61 @@ export default async function AdminPage({
           </AdminForm>
 
           <div className="grid gap-4 md:grid-cols-2 pt-4 border-t border-gold-500/20">
-            <ActionForm action={uploadAssetAction} submitLabel="Unggah Foto Pria" id="upload-groom">
-              <input type="hidden" name="kind" value="groom_photo" />
-              <label className="admin-label" htmlFor="groom-file">
-                Foto Mempelai Pria (JPG/PNG/WebP, ≤255 KB) {settings.groom_photo_path ? "✓ sudah ada" : ""}
-              </label>
-              <input id="groom-file" name="file" type="file" accept="image/jpeg,image/png,image/webp,image/avif" required className="admin-input" />
-            </ActionForm>
+            <FileUploadWithPreview
+              actionFn={uploadAssetAction}
+              deleteActionFn={deleteAssetAction}
+              kind="groom_photo"
+              label="Foto Mempelai Pria"
+              accept="image/jpeg,image/png,image/webp,image/avif"
+              submitLabel="Unggah Foto Pria"
+              currentUrl={groomPhotoUrl}
+              id="upload-groom"
+              hint="Format JPG/PNG/WebP, maksimal 255 KB"
+            />
 
-            <ActionForm action={uploadAssetAction} submitLabel="Unggah Foto Wanita" id="upload-bride">
-              <input type="hidden" name="kind" value="bride_photo" />
-              <label className="admin-label" htmlFor="bride-file">
-                Foto Mempelai Wanita (JPG/PNG/WebP, ≤255 KB) {settings.bride_photo_path ? "✓ sudah ada" : ""}
-              </label>
-              <input id="bride-file" name="file" type="file" accept="image/jpeg,image/png,image/webp,image/avif" required className="admin-input" />
-            </ActionForm>
+            <FileUploadWithPreview
+              actionFn={uploadAssetAction}
+              deleteActionFn={deleteAssetAction}
+              kind="bride_photo"
+              label="Foto Mempelai Wanita"
+              accept="image/jpeg,image/png,image/webp,image/avif"
+              submitLabel="Unggah Foto Wanita"
+              currentUrl={bridePhotoUrl}
+              id="upload-bride"
+              hint="Format JPG/PNG/WebP, maksimal 255 KB"
+            />
 
-            <ActionForm action={uploadAssetAction} submitLabel="Unggah Denah Lokasi" id="upload-map">
-              <input type="hidden" name="kind" value="map" />
-              <label className="admin-label" htmlFor="map-file">Gambar Denah Lokasi (JPG/PNG/WebP, ≤255 KB) {settings.map_image_path ? "✓ sudah ada" : ""}</label>
-              <input id="map-file" name="file" type="file" accept="image/jpeg,image/png,image/webp,image/avif" required className="admin-input" />
-            </ActionForm>
+            <FileUploadWithPreview
+              actionFn={uploadAssetAction}
+              deleteActionFn={deleteAssetAction}
+              kind="map"
+              label="Gambar Denah Lokasi"
+              accept="image/jpeg,image/png,image/webp,image/avif"
+              submitLabel="Unggah Denah Lokasi"
+              currentUrl={mapImageUrl}
+              id="upload-map"
+              hint="Format JPG/PNG/WebP, maksimal 255 KB"
+            />
 
-            <ActionForm action={uploadAssetAction} submitLabel="Unggah Musik" id="upload-music">
-              <input type="hidden" name="kind" value="music" />
-              <label className="admin-label" htmlFor="music-file">Musik latar (MP3/M4A/OGG, ≤1.2 MB) {settings.music_path ? "✓ sudah ada" : ""}</label>
-              <input id="music-file" name="file" type="file" accept="audio/*" required className="admin-input" />
-            </ActionForm>
+            <FileUploadWithPreview
+              actionFn={uploadAssetAction}
+              deleteActionFn={deleteAssetAction}
+              kind="music"
+              label="Musik Latar Acara"
+              accept="audio/*"
+              submitLabel="Unggah Musik"
+              currentUrl={musicUrl}
+              id="upload-music"
+              isAudio={true}
+              hint="Format MP3/M4A/OGG, maksimal 1.2 MB"
+            />
           </div>
         </section>
 
         {/* Gallery */}
         <section className="glass-card space-y-4">
           <h2 className="admin-h2">Galeri</h2>
-          <ActionForm action={uploadGalleryAction} submitLabel="Unggah Foto" id="upload-gallery">
-            <label className="admin-label" htmlFor="gallery-files">Foto (JPG/PNG/WebP, maks 255 KB per unggahan — pilih beberapa sekaligus bila kecil)</label>
-            <input id="gallery-files" name="files" type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif" required className="admin-input" />
-          </ActionForm>
+          <GalleryUploadWithPreview actionFn={uploadGalleryAction} />
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {photos?.map((p, i) => (
               <div key={p.id} className={`rounded-lg overflow-hidden border border-gold-500/20 ${p.is_visible ? "" : "opacity-40"}`}>
@@ -420,7 +477,7 @@ export default async function AdminPage({
                 <img src={thumbs?.[i]?.signedUrl ?? ""} alt="" className="aspect-square w-full object-cover" loading="lazy" />
                 <div className="flex gap-1 p-2">
                   <AdminForm
-                    action={toggleGalleryAction}
+                    actionFn={toggleGalleryAction}
                     successMessage={p.is_visible ? "Foto galeri disembunyikan!" : "Foto galeri ditampilkan!"}
                     errorMessage="Gagal mengubah status foto."
                   >
@@ -431,7 +488,7 @@ export default async function AdminPage({
                     </AdminSubmitButton>
                   </AdminForm>
                   <AdminForm
-                    action={deleteGalleryAction}
+                    actionFn={deleteGalleryAction}
                     successMessage="Foto berhasil dihapus!"
                     errorMessage="Gagal menghapus foto."
                   >

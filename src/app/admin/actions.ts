@@ -16,7 +16,20 @@ import { generateToken, hashToken } from "@/lib/auth/session";
 import { isAllowed, clientIp } from "@/lib/rate-limit";
 import { saveMediaFile, deleteMediaFile } from "@/lib/media";
 
-export type ActionState = { ok?: boolean; error?: string; message?: string; csv?: string };
+export type CreatedInvite = {
+  name: string;
+  count: number;
+  token: string;
+  url: string;
+};
+
+export type ActionState = {
+  ok?: boolean;
+  error?: string;
+  message?: string;
+  csv?: string;
+  createdInvites?: CreatedInvite[];
+};
 
 const siteUrl = () => (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/$/, "");
 
@@ -66,12 +79,30 @@ export async function createInvitationsAction(formData: FormData): Promise<Actio
 
     if (!lines.length) return { ok: false, error: "Daftar tamu tidak boleh kosong." };
 
+    // Check if token column exists in database
+    let hasTokenCol = false;
+    try {
+      const colRows = await query<{ column_name: string }>(
+        "SELECT column_name FROM information_schema.columns WHERE table_name = 'invitations' AND column_name = 'token'"
+      );
+      hasTokenCol = colRows && colRows.length > 0;
+      if (!hasTokenCol) {
+        await query("ALTER TABLE invitations ADD COLUMN IF NOT EXISTS token TEXT");
+        hasTokenCol = true;
+      }
+    } catch {
+      hasTokenCol = false;
+    }
+
     // 1. Ambil data master rekening aktif untuk pemetaan urutan -> ID
     const activeBankList = await query<{
       id: string;
       display_order: number;
       account_number: string;
     }>("SELECT id, display_order, account_number FROM bank_accounts WHERE is_enabled = true");
+
+    const base = siteUrl();
+    const createdInvites: CreatedInvite[] = [];
 
     // 2. Parse tiap baris: nama;jumlah;norek_atau_urutan
     for (const line of lines) {
@@ -100,15 +131,34 @@ export async function createInvitationsAction(formData: FormData): Promise<Actio
       const token = generateToken();
       const tokenHash = hashToken(token);
 
-      await query(
-        `INSERT INTO invitations (guest_name, token_hash, guest_count, visible_bank_ids)
-         VALUES ($1, $2, $3, $4)`,
-        [name, tokenHash, count, matchedBankIds]
-      );
+      if (hasTokenCol) {
+        await query(
+          `INSERT INTO invitations (guest_name, token_hash, guest_count, visible_bank_ids, token)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [name, tokenHash, count, matchedBankIds, token]
+        );
+      } else {
+        await query(
+          `INSERT INTO invitations (guest_name, token_hash, guest_count, visible_bank_ids)
+           VALUES ($1, $2, $3, $4)`,
+          [name, tokenHash, count, matchedBankIds]
+        );
+      }
+
+      createdInvites.push({
+        name,
+        count,
+        token,
+        url: `${base}/invite/${token}`,
+      });
     }
 
     revalidatePath("/admin");
-    return { ok: true, message: `${lines.length} undangan berhasil dibuat!` };
+    return {
+      ok: true,
+      message: `${lines.length} undangan berhasil dibuat!`,
+      createdInvites,
+    };
   } catch (err: any) {
     console.error("createInvitationsAction error:", err);
     return { ok: false, error: err?.message || "Gagal membuat undangan. Silakan coba lagi." };
@@ -127,13 +177,36 @@ export async function regenerateLinkAction(
     if (!id.success || !siteUrl()) {
       return { ok: false, error: "Data undangan tidak valid atau URL situs belum dikonfigurasi." };
     }
+
+    // Check if token column exists
+    let hasTokenCol = false;
+    try {
+      const colRows = await query<{ column_name: string }>(
+        "SELECT column_name FROM information_schema.columns WHERE table_name = 'invitations' AND column_name = 'token'"
+      );
+      hasTokenCol = colRows && colRows.length > 0;
+      if (!hasTokenCol) {
+        await query("ALTER TABLE invitations ADD COLUMN IF NOT EXISTS token TEXT");
+        hasTokenCol = true;
+      }
+    } catch {
+      hasTokenCol = false;
+    }
+
     const token = generateToken();
     const tHash = hashToken(token);
 
-    await query(
-      "UPDATE invitations SET token_hash = $1, updated_at = now() WHERE id = $2",
-      [tHash, id.data]
-    );
+    if (hasTokenCol) {
+      await query(
+        "UPDATE invitations SET token_hash = $1, token = $2, updated_at = now() WHERE id = $3",
+        [tHash, token, id.data]
+      );
+    } else {
+      await query(
+        "UPDATE invitations SET token_hash = $1, updated_at = now() WHERE id = $2",
+        [tHash, id.data]
+      );
+    }
     await query("DELETE FROM sessions WHERE invitation_id = $1", [id.data]);
 
     revalidatePath("/admin");
@@ -333,6 +406,37 @@ export async function uploadAssetAction(
   } catch (e: any) {
     console.error("uploadAssetAction error:", e);
     return { ok: false, error: e?.message || "Gagal mengunggah file aset." };
+  }
+}
+
+export async function deleteAssetAction(form: FormData): Promise<ActionState> {
+  try {
+    await requireAdmin();
+    const kind = form.get("kind")?.toString();
+
+    const keyMap: Record<string, string> = {
+      music: "music_path",
+      map: "map_image_path",
+      groom_photo: "groom_photo_path",
+      bride_photo: "bride_photo_path",
+    };
+
+    const key = kind ? keyMap[kind] : null;
+    if (!key) return { ok: false, error: "Jenis aset tidak valid." };
+
+    await query(
+      `INSERT INTO site_settings (key, value, updated_at)
+       VALUES ($1, '', now())
+       ON CONFLICT (key) DO UPDATE SET value = '', updated_at = now()`,
+      [key]
+    );
+
+    revalidatePath("/admin");
+    revalidatePath("/");
+    return { ok: true, message: "Aset berhasil dihapus!" };
+  } catch (err: any) {
+    console.error("deleteAssetAction error:", err);
+    return { ok: false, error: err?.message || "Gagal menghapus aset." };
   }
 }
 

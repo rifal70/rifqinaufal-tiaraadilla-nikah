@@ -43,7 +43,7 @@ export async function deleteMediaFile(filePath: string): Promise<void> {
  * Resolve accessible URL for media.
  */
 export async function getMediaUrl(filePath?: string | null): Promise<string> {
-  if (!filePath) return "";
+  if (!filePath || !filePath.trim() || filePath.trim() === "null" || filePath.trim() === "undefined") return "";
   if (/^https?:\/\//.test(filePath) || filePath.startsWith("/")) {
     return filePath;
   }
