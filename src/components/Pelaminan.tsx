@@ -131,7 +131,7 @@ export default function PelaminanScene() {
             <img
                 src="/pelaminan/semak_bunga.png"
                 alt=""
-                className={`absolute -right-[1%] bottom-0 w-[22%] h-auto z-45 object-contain -scale-x-100 transition-all duration-1000 delay-500 ease-out ${assembled
+                className={`absolute right-[0%] bottom-0 w-[22%] h-auto z-45 object-contain -scale-x-100 transition-all duration-1000 delay-500 ease-out ${assembled
                     ? "translate-x-0 translate-y-0 opacity-100"
                     : "translate-x-10 translate-y-6 opacity-0"
                     }`}
