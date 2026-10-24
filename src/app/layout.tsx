@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getDynamicWeddingDate } from "@/lib/data";
+import MediaMonitor from "@/components/MediaMonitor";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -33,7 +34,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <MediaMonitor />
+      </body>
     </html>
   );
 }

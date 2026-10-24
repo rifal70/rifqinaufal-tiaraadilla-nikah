@@ -768,3 +768,19 @@ body {
     filter: brightness(0) saturate(100%) invert(39%) sepia(26%) saturate(550%) hue-rotate(39deg) brightness(105%) contrast(92%);
   }
 }
+
+/* === Image Loading & Transition Effects === */
+img.media-loading {
+  opacity: 0;
+  filter: blur(4px);
+  transform: scale(0.98);
+}
+
+img.media-loaded {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
