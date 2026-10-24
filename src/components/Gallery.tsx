@@ -99,6 +99,7 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
                       alt={`Foto galeri ${idx + 1}`}
                       className="relative max-h-full max-w-full rounded-md object-contain shadow-md"
                       loading={idx === 0 ? "eager" : "lazy"}
+                      decoding="async"
                     />
                   </div>
                 );
@@ -111,6 +112,8 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
           <img
             src="/frame-java.png"
             alt="Bingkai Jawa"
+            loading="lazy"
+            decoding="async"
             className="pointer-events-none absolute inset-0 z-20 h-full w-full object-fill drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]"
           />
         </div>
@@ -189,6 +192,7 @@ export default function Gallery({ items }: { items: GalleryItem[] }) {
             <img
               src={items[currentIndex].signedUrl || items[currentIndex].url || items[currentIndex].storage_path || ""}
               alt={`Foto galeri ${currentIndex + 1}`}
+              decoding="async"
               className="max-h-[82vh] max-w-full rounded-xl border border-gold-400/40 object-contain shadow-2xl"
             />
           </div>

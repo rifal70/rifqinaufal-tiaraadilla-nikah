@@ -51,6 +51,8 @@ export default function ImageModal({
                     src={src}
                     alt={alt}
                     className="max-h-[560px] md:max-h-[640px] w-full h-full object-contain rounded-lg"
+                    loading="lazy"
+                    decoding="async"
                 />
             </button>
 
@@ -80,6 +82,7 @@ export default function ImageModal({
                         <img
                             src={src}
                             alt={alt}
+                            decoding="async"
                             className="max-h-[92vh] w-auto max-w-full rounded-xl border border-gold-500/30 object-contain shadow-2xl"
                         />
                     </div>

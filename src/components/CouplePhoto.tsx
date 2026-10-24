@@ -54,6 +54,7 @@ export default function CouplePhoto({
                         alt={alt}
                         className="h-full w-full object-cover object-[center_85%] transition-transform duration-500 group-hover:scale-105"
                         loading="lazy"
+                        decoding="async"
                     />
                 </div>
 
@@ -63,6 +64,8 @@ export default function CouplePhoto({
                     src="/frame-couple.png"
                     alt="Bingkai Mempelai"
                     className="pointer-events-none absolute inset-0 z-10 h-full w-full object-fill scale-105 drop-shadow-[0_1px_2px_rgba(0,0,0,0)]"
+                    loading="lazy"
+                    decoding="async"
                 />
             </div>
 
@@ -90,6 +93,7 @@ export default function CouplePhoto({
                         <img
                             src={src}
                             alt={alt}
+                            decoding="async"
                             className="max-h-[82vh] max-w-full rounded-2xl border-2 border-gold-400/50 object-contain shadow-[0_0_50px_rgba(0,0,0,0.9)]"
                         />
                     </div>

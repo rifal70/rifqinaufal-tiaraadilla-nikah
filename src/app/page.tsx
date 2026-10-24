@@ -281,6 +281,8 @@ export default async function Home({
           <img
             src="/mega_mendung.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="cloud-float-top w-28 sm:w-48 md:w-64 lg:w-80 h-auto object-contain will-change-transform"
           />
         </div>
@@ -295,6 +297,8 @@ export default async function Home({
           <img
             src="/motive/motive_4.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="motive-ornament w-32 sm:w-48 md:w-64 lg:w-72 h-auto object-contain will-change-transform"
           />
         </div>
@@ -318,6 +322,8 @@ export default async function Home({
           <img
             src="/motive/motive_1.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="motive-ornament w-32 sm:w-48 md:w-60 lg:w-72 h-auto object-contain will-change-transform"
           />
         </div>
@@ -332,6 +338,8 @@ export default async function Home({
           <img
             src="/mega_mendung.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="cloud-float-bottom w-28 sm:w-48 md:w-64 lg:w-80 h-auto object-contain will-change-transform"
           />
         </div>
@@ -349,6 +357,8 @@ export default async function Home({
           <img
             src="/motive/motive_1.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="motive-ornament w-32 sm:w-48 md:w-64 lg:w-72 h-auto object-contain will-change-transform"
           />
         </div>
@@ -363,6 +373,8 @@ export default async function Home({
           <img
             src="/motive/motive_3.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="motive-ornament w-32 sm:w-48 md:w-64 lg:w-76 h-auto object-contain will-change-transform"
           />
         </div>
@@ -400,6 +412,8 @@ export default async function Home({
           <img
             src="/motive/motive_2.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
           />
         </div>
@@ -414,6 +428,8 @@ export default async function Home({
           <img
             src="/motive/motive_5.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
           />
         </div>
@@ -472,6 +488,8 @@ export default async function Home({
           <img
             src="/motive/motive_3.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="motive-ornament w-32 sm:w-48 md:w-64 lg:w-76 h-auto object-contain will-change-transform"
           />
         </div>
@@ -486,6 +504,8 @@ export default async function Home({
           <img
             src="/motive/motive_1.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
           />
         </div>
@@ -549,6 +569,8 @@ export default async function Home({
           <img
             src="/motive/motive_4.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
           />
         </div>
@@ -563,6 +585,8 @@ export default async function Home({
           <img
             src="/motive/motive_2.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="motive-ornament w-32 sm:w-48 md:w-64 lg:w-76 h-auto object-contain will-change-transform"
           />
         </div>
@@ -635,6 +659,8 @@ export default async function Home({
           <img
             src="/motive/motive_2.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="motive-ornament w-32 sm:w-48 md:w-64 lg:w-76 h-auto object-contain will-change-transform"
           />
         </div>
@@ -649,6 +675,8 @@ export default async function Home({
           <img
             src="/motive/motive_5.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
           />
         </div>
@@ -680,6 +708,8 @@ export default async function Home({
           <img
             src="/motive/motive_5.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
           />
         </div>
@@ -694,6 +724,8 @@ export default async function Home({
           <img
             src="/motive/motive_3.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="motive-ornament w-32 sm:w-48 md:w-64 lg:w-76 h-auto object-contain will-change-transform"
           />
         </div>
@@ -708,6 +740,8 @@ export default async function Home({
           <img
             src="/motive/motive_1.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="motive-ornament w-32 sm:w-44 md:w-56 h-auto object-contain will-change-transform"
           />
         </div>
@@ -734,6 +768,8 @@ export default async function Home({
             <img
               src="/motive/motive_1.png"
               alt=""
+              loading="lazy"
+              decoding="async"
               className="motive-ornament w-32 sm:w-48 md:w-64 lg:w-76 h-auto object-contain will-change-transform"
             />
           </div>
@@ -748,6 +784,8 @@ export default async function Home({
             <img
               src="/motive/motive_4.png"
               alt=""
+              loading="lazy"
+              decoding="async"
               className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
             />
           </div>
@@ -777,6 +815,8 @@ export default async function Home({
           <img
             src="/motive/motive_6.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
           />
         </div>
@@ -791,6 +831,8 @@ export default async function Home({
           <img
             src="/motive/motive_7.png"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="motive-ornament w-36 sm:w-52 md:w-68 lg:w-80 h-auto object-contain will-change-transform"
           />
         </div>

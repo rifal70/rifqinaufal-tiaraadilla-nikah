@@ -70,6 +70,8 @@ export default function DigitalGift({ accounts, greeting }: DigitalGiftProps) {
           <img
             src="/kado_top.png"
             alt="Tutup Kado"
+            loading="lazy"
+            decoding="async"
             className={`w-[80%] h-auto object-contain transition-all duration-700 ${isOpen
               ? "drop-shadow-[0_20px_30px_rgba(0,0,0,0.6)]"
               : "-translate-y-10 rotate-0 scale-100 drop-shadow-[0_10px_16px_rgba(0,0,0,0.4)]"
@@ -129,6 +131,8 @@ export default function DigitalGift({ accounts, greeting }: DigitalGiftProps) {
           <img
             src="/kado_bottom.png"
             alt="Kotak Kado"
+            loading="lazy"
+            decoding="async"
             className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-[0_16px_30px_rgba(0,0,0,0.5)] transition-all duration-500"
           />
         </div>
