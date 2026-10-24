@@ -24,37 +24,58 @@ export default function MediaMonitor() {
       }
     }
 
-    // 1. Tangani transisi halus untuk foto media (lewati ornamen motif/awan/pelaminan agar warna filter tidak tertimpa)
+    // 1. Cek setiap objek gambar: jika belum punya transisi atau animasi, berikan transisi pemuatan halus
     const processImage = (img: HTMLImageElement) => {
-      if (
+      if (img.classList.contains("media-fade-in")) return;
+
+      // Cek class bawaan yang sudah beranimasi/transisi (misal pelaminan, motif ornamen, awan, wayang, dsb.)
+      const hasPredefinedAnimation =
         img.classList.contains("motive-ornament") ||
         img.classList.contains("cloud-float-top") ||
         img.classList.contains("cloud-float-bottom") ||
-        img.src.includes("/motive/") ||
-        img.src.includes("/pelaminan/") ||
-        img.getAttribute("aria-hidden") === "true"
-      ) {
+        img.classList.contains("animate-gunungan-fast") ||
+        img.classList.contains("animate-gunungan-fast-left") ||
+        img.classList.contains("animate-fade-in") ||
+        img.src.includes("/pelaminan/");
+
+      if (hasPredefinedAnimation) {
         return;
       }
 
-      // Jika gambar sudah selesai di-load (misal dari cache browser)
-      if (img.complete && img.naturalWidth > 0) {
-        img.classList.add("media-loaded");
-        img.classList.remove("media-loading");
+      // Periksa style komputasi elemen di browser
+      const computed = window.getComputedStyle(img);
+
+      // Cek apakah elemen ini SUDAH memiliki transition (durasi > 0)
+      const hasTransition =
+        computed.transitionDuration &&
+        computed.transitionDuration
+          .split(",")
+          .some((d) => parseFloat(d.trim()) > 0);
+
+      // Cek apakah elemen ini SUDAH memiliki animasi CSS (@keyframes)
+      const hasAnimation =
+        computed.animationName &&
+        computed.animationName !== "none" &&
+        computed.animationDuration &&
+        parseFloat(computed.animationDuration) > 0;
+
+      // JIKA SUDAH PUNYA TRANSISI / ANIMASI -> TIDAK PERLU DIUBAH (LEWATKAN)
+      if (hasTransition || hasAnimation) {
         return;
       }
 
-      // Jika masih dalam proses unduh, tambahkan class loading
-      if (!img.classList.contains("media-loaded")) {
-        img.classList.add("media-loading");
+      // JIKA BELUM PUNYA TRANSISI -> BERIKAN TRANSISI HALUS (FADE-IN)
+      img.classList.add("media-fade-in");
 
+      if (!img.complete) {
+        img.style.opacity = "0";
         const handleLoad = () => {
-          img.classList.remove("media-loading");
-          img.classList.add("media-loaded");
+          img.style.opacity = "1";
           img.removeEventListener("load", handleLoad);
         };
-
         img.addEventListener("load", handleLoad, { once: true });
+      } else {
+        img.style.opacity = "1";
       }
     };
 

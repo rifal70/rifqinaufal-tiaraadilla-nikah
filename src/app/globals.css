@@ -224,6 +224,12 @@ body {
   border: 1px solid rgba(212, 175, 55, 0.15);
   border-radius: 1rem;
   padding: 2rem;
+  transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(212, 175, 55, 0.35);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .glass-card-gold {
@@ -233,6 +239,12 @@ body {
   border: 1px solid rgba(212, 175, 55, 0.25);
   border-radius: 1rem;
   padding: 2rem;
+  transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.glass-card-gold:hover {
+  border-color: rgba(212, 175, 55, 0.5);
+  background: rgba(212, 175, 55, 0.09);
 }
 
 /* === Bank Account Card === */
@@ -769,18 +781,7 @@ body {
   }
 }
 
-/* === Image Loading & Transition Effects (Hanya untuk foto konten, tidak merusak warna ornamen motif/awan) === */
-img.media-loading:not(.motive-ornament):not(.cloud-float-top):not(.cloud-float-bottom) {
-  opacity: 0;
-  filter: blur(4px);
-  transform: scale(0.98);
-}
-
-img.media-loaded:not(.motive-ornament):not(.cloud-float-top):not(.cloud-float-bottom) {
-  opacity: 1;
-  filter: blur(0);
-  transform: scale(1);
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+/* === Image Transition (Hanya untuk object gambar yang belum memiliki transisi) === */
+img.media-fade-in {
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
