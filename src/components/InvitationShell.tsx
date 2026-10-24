@@ -23,7 +23,63 @@ export default function InvitationShell({
   const [opened, setOpened] = useState(false);
   const [isLetterOpen, setIsLetterOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [showLoadingOverlay, setShowLoadingOverlay] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Monitor loading status of critical cover images in InvitationShell
+  useEffect(() => {
+    let isMounted = true;
+    const criticalImages = [
+      "/ornament_top.png",
+      "/ornament_bottom.png",
+      "/janur_left.png",
+      "/janur_right.png",
+      "/envelope.png",
+      "/letter.png",
+      "/seal-love.png",
+      "/pelaminan/rumah_joglo.png",
+    ];
+
+    let completedCount = 0;
+    const total = criticalImages.length;
+
+    const onFinish = () => {
+      completedCount++;
+      if (completedCount >= total && isMounted) {
+        setImagesLoaded(true);
+        setTimeout(() => {
+          if (isMounted) setShowLoadingOverlay(false);
+        }, 700);
+      }
+    };
+
+    criticalImages.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+      if (img.complete) {
+        onFinish();
+      } else {
+        img.onload = onFinish;
+        img.onerror = onFinish;
+      }
+    });
+
+    // Fallback timer maksimal 3 detik agar tidak menghambat user bila jaringan lambat
+    const timer = setTimeout(() => {
+      if (isMounted) {
+        setImagesLoaded(true);
+        setTimeout(() => {
+          if (isMounted) setShowLoadingOverlay(false);
+        }, 700);
+      }
+    }, 3000);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = opened ? "" : "hidden";
@@ -78,6 +134,40 @@ export default function InvitationShell({
   return (
     <>
       {musicUrl && <audio ref={audioRef} src={musicUrl} loop preload="none" />}
+
+      {/* Loading Screen Anggun saat gambar di InvitationShell masih dimuat */}
+      {showLoadingOverlay && (
+        <div
+          className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-forest-950 transition-opacity duration-700 ease-out select-none ${
+            imagesLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
+          }`}
+          aria-hidden={imagesLoaded}
+        >
+          {/* Cincin Emas Berputar & Kilau Berlian */}
+          <div className="relative flex items-center justify-center">
+            {/* Cincin luar berdenyut halus */}
+            <div className="absolute h-20 w-20 sm:h-24 sm:w-24 rounded-full border border-gold-400/25 animate-ping opacity-30" />
+
+            {/* Cincin spinner gradasi emas */}
+            <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-full border-[2.5px] border-gold-500/20 border-t-gold-400 border-r-amber-200 animate-spin" />
+
+            {/* Diamond emas di tengah */}
+            <div className="absolute h-3.5 w-3.5 sm:h-4 sm:w-4 bg-gradient-to-tr from-gold-500 via-amber-200 to-yellow-100 rotate-45 shadow-[0_0_15px_rgba(212,175,55,0.9)] animate-pulse" />
+          </div>
+
+          {/* Label Tipografi Anggun */}
+          <div className="mt-6 flex flex-col items-center gap-1.5">
+            <p className="font-display text-xs sm:text-sm tracking-[0.35em] uppercase text-gold-shimmer">
+              Memuat Undangan
+            </p>
+            <div className="flex gap-1.5 mt-0.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-gold-400/70 animate-bounce [animation-delay:-0.3s]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-gold-400/70 animate-bounce [animation-delay:-0.15s]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-gold-400/70 animate-bounce" />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Container Cover */}
       <div
@@ -190,9 +280,41 @@ export default function InvitationShell({
             id="open-invitation"
             type="button"
             onClick={handleButtonClick}
-            className="btn-gold relative z-40 mt-1.5 sm:mt-2.5 landscape:mt-1 md:landscape:mt-2.5 px-5 py-1.5 sm:px-6 sm:py-2 md:px-7 md:py-2.5 landscape:px-3 landscape:py-0.5 md:landscape:px-6 md:landscape:py-2 text-xs sm:text-sm md:text-base landscape:text-[9px] md:landscape:text-xs transition-transform duration-300 hover:scale-105 active:scale-95 shadow-md"
+            disabled={!imagesLoaded}
+            className={`btn-gold relative z-40 mt-1.5 sm:mt-2.5 landscape:mt-1 md:landscape:mt-2.5 px-5 py-1.5 sm:px-6 sm:py-2 md:px-7 md:py-2.5 landscape:px-3 landscape:py-0.5 md:landscape:px-6 md:landscape:py-2 text-xs sm:text-sm md:text-base landscape:text-[9px] md:landscape:text-xs transition-all duration-300 shadow-md ${
+              !imagesLoaded
+                ? "opacity-70 cursor-not-allowed scale-100"
+                : "hover:scale-105 active:scale-95"
+            }`}
           >
-            {isLetterOpen ? "Masuk" : "Buka Undangan"}
+            {!imagesLoaded ? (
+              <span className="inline-flex items-center gap-2">
+                <svg
+                  className="animate-spin h-3.5 w-3.5 text-forest-950"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  />
+                </svg>
+                <span>Memuat...</span>
+              </span>
+            ) : isLetterOpen ? (
+              "Masuk"
+            ) : (
+              "Buka Undangan"
+            )}
           </button>
         </div>
 
