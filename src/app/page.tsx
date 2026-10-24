@@ -879,8 +879,30 @@ export default async function Home({
           />
         </div>
 
-        {/* Kotak Salam Penutup (Tetap Presisi di Tengah tanpa tergeser) */}
-        <div className="glass-card max-w-xl md:max-w-2xl w-full mx-auto relative z-10 p-6 sm:p-8 md:p-10 space-y-4 sm:space-y-6 landscape:py-4 landscape:space-y-3 text-center my-auto bg-black/35 backdrop-blur-md shadow-2xl" data-reveal>
+        {/* Kotak Salam Penutup dengan Ornamen Bunga Pernikahan */}
+        <div className="glass-card max-w-xl md:max-w-2xl w-full mx-auto relative z-10 pt-9 sm:pt-13 md:pt-15 pb-7 sm:pb-9 px-6 sm:px-8 md:px-10 space-y-4 sm:space-y-6 landscape:pt-7 landscape:pb-5 landscape:space-y-3 text-center my-auto bg-black/35 backdrop-blur-md shadow-2xl" data-reveal>
+          {/* 1. Rangkaian Bunga Sudut Kiri Bawah */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/red_flower.png"
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            decoding="async"
+            className="pointer-events-none select-none absolute -bottom-5 -left-5 sm:-bottom-7 sm:-left-7 md:-bottom-8 md:-left-8 w-28 sm:w-36 md:w-44 lg:w-48 h-auto object-contain z-20 drop-shadow-[0_6px_14px_rgba(0,0,0,0.45)] rotate-180"
+          />
+
+          {/* 2. Rangkaian Bunga Sudut Kanan Bawah */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/red_flower.png"
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            decoding="async"
+            className="pointer-events-none select-none absolute -bottom-5 -right-5 sm:-bottom-7 sm:-right-7 md:-bottom-8 md:-right-8 w-28 sm:w-36 md:w-44 lg:w-48 h-auto object-contain z-20 drop-shadow-[0_6px_14px_rgba(0,0,0,0.45)] rotate-90"
+          />
+
           {settings.closing_greeting ? (
             <p className="font-display text-xl leading-relaxed text-cream whitespace-pre-line">{settings.closing_greeting}</p>
           ) : (
