@@ -769,14 +769,14 @@ body {
   }
 }
 
-/* === Image Loading & Transition Effects === */
-img.media-loading {
+/* === Image Loading & Transition Effects (Hanya untuk foto konten, tidak merusak warna ornamen motif/awan) === */
+img.media-loading:not(.motive-ornament):not(.cloud-float-top):not(.cloud-float-bottom) {
   opacity: 0;
   filter: blur(4px);
   transform: scale(0.98);
 }
 
-img.media-loaded {
+img.media-loaded:not(.motive-ornament):not(.cloud-float-top):not(.cloud-float-bottom) {
   opacity: 1;
   filter: blur(0);
   transform: scale(1);
