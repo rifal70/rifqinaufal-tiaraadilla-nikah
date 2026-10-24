@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
 type GalleryItem = {
@@ -21,6 +21,43 @@ function GallerySlide({
 }) {
   const [loaded, setLoaded] = useState(false);
   const imgUrl = item.signedUrl || item.url || item.storage_path || "";
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
+  const checkLoaded = (node: HTMLImageElement | null) => {
+    imgRef.current = node;
+    if (node && node.complete) {
+      setLoaded(true);
+    }
+  };
+
+  useEffect(() => {
+    const img = imgRef.current;
+    if (!img || !imgUrl) {
+      if (!imgUrl) setLoaded(true);
+      return;
+    }
+
+    if (img.complete) {
+      setLoaded(true);
+      return;
+    }
+
+    if ("decode" in img) {
+      img
+        .decode()
+        .then(() => setLoaded(true))
+        .catch(() => setLoaded(true));
+    }
+
+    const handleDone = () => setLoaded(true);
+    img.addEventListener("load", handleDone, { once: true });
+    img.addEventListener("error", handleDone, { once: true });
+
+    return () => {
+      img.removeEventListener("load", handleDone);
+      img.removeEventListener("error", handleDone);
+    };
+  }, [imgUrl]);
 
   return (
     <div className="relative flex h-full w-full flex-shrink-0 items-center justify-center p-2">
@@ -43,6 +80,7 @@ function GallerySlide({
       {/* Foto Utama */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
+        ref={checkLoaded}
         src={imgUrl}
         alt={`Foto galeri ${idx + 1}`}
         className={`relative max-h-full max-w-full rounded-md object-contain shadow-md transition-opacity duration-500 ${
@@ -51,6 +89,7 @@ function GallerySlide({
         loading={isPriority ? "eager" : "lazy"}
         decoding="async"
         onLoad={() => setLoaded(true)}
+        onError={() => setLoaded(true)}
       />
     </div>
   );
@@ -58,25 +97,60 @@ function GallerySlide({
 
 function ModalGalleryImage({ src, alt }: { src: string; alt: string }) {
   const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
+  const checkLoaded = (node: HTMLImageElement | null) => {
+    imgRef.current = node;
+    if (node && node.complete) {
+      setLoaded(true);
+    }
+  };
 
   useEffect(() => {
-    setLoaded(false);
+    const img = imgRef.current;
+    if (!img || !src) {
+      if (!src) setLoaded(true);
+      return;
+    }
+
+    if (img.complete) {
+      setLoaded(true);
+      return;
+    }
+
+    if ("decode" in img) {
+      img
+        .decode()
+        .then(() => setLoaded(true))
+        .catch(() => setLoaded(true));
+    }
+
+    const handleDone = () => setLoaded(true);
+    img.addEventListener("load", handleDone, { once: true });
+    img.addEventListener("error", handleDone, { once: true });
+
+    return () => {
+      img.removeEventListener("load", handleDone);
+      img.removeEventListener("error", handleDone);
+    };
   }, [src]);
 
   return (
     <>
-      {!loaded && (
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 skeleton-shimmer rounded-xl"
-        />
-      )}
+      <div
+        aria-hidden="true"
+        className={`absolute inset-0 skeleton-shimmer rounded-xl transition-opacity duration-300 ${
+          loaded ? "opacity-0 pointer-events-none" : "opacity-100"
+        }`}
+      />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
+        ref={checkLoaded}
         src={src}
         alt={alt}
         decoding="async"
         onLoad={() => setLoaded(true)}
+        onError={() => setLoaded(true)}
         className={`max-h-[82vh] max-w-full rounded-xl border border-gold-400/40 object-contain shadow-2xl transition-opacity duration-300 ${
           loaded ? "opacity-100" : "opacity-0"
         }`}

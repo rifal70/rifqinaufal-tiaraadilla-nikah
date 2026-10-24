@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
 export default function CouplePhoto({
@@ -14,6 +14,51 @@ export default function CouplePhoto({
     const [mounted, setMounted] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
     const [isModalLoaded, setIsModalLoaded] = useState(false);
+    const imgRef = useRef<HTMLImageElement | null>(null);
+    const modalImgRef = useRef<HTMLImageElement | null>(null);
+
+    const checkLoaded = (node: HTMLImageElement | null) => {
+        imgRef.current = node;
+        if (node && node.complete) {
+            setIsLoaded(true);
+        }
+    };
+
+    const checkModalLoaded = (node: HTMLImageElement | null) => {
+        modalImgRef.current = node;
+        if (node && node.complete) {
+            setIsModalLoaded(true);
+        }
+    };
+
+    useEffect(() => {
+        const img = imgRef.current;
+        if (!img || !src) {
+            if (!src) setIsLoaded(true);
+            return;
+        }
+
+        if (img.complete) {
+            setIsLoaded(true);
+            return;
+        }
+
+        if ("decode" in img) {
+            img
+                .decode()
+                .then(() => setIsLoaded(true))
+                .catch(() => setIsLoaded(true));
+        }
+
+        const handleDone = () => setIsLoaded(true);
+        img.addEventListener("load", handleDone, { once: true });
+        img.addEventListener("error", handleDone, { once: true });
+
+        return () => {
+            img.removeEventListener("load", handleDone);
+            img.removeEventListener("error", handleDone);
+        };
+    }, [src]);
 
     useEffect(() => {
         setMounted(true);
@@ -59,6 +104,7 @@ export default function CouplePhoto({
                     />
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
+                        ref={checkLoaded}
                         src={src}
                         alt={alt}
                         className={`h-full w-full object-cover object-[center_85%] transition-all duration-500 group-hover:scale-105 ${
@@ -67,6 +113,7 @@ export default function CouplePhoto({
                         loading="lazy"
                         decoding="async"
                         onLoad={() => setIsLoaded(true)}
+                        onError={() => setIsLoaded(true)}
                     />
                 </div>
 
@@ -109,10 +156,12 @@ export default function CouplePhoto({
                         )}
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
+                            ref={checkModalLoaded}
                             src={src}
                             alt={alt}
                             decoding="async"
                             onLoad={() => setIsModalLoaded(true)}
+                            onError={() => setIsModalLoaded(true)}
                             className={`max-h-[82vh] max-w-full rounded-2xl border-2 border-gold-400/50 object-contain shadow-[0_0_50px_rgba(0,0,0,0.9)] transition-opacity duration-300 ${
                                 isModalLoaded ? "opacity-100" : "opacity-0"
                             }`}

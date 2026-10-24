@@ -878,12 +878,6 @@ export default async function Home({
           ) : (
             <Placeholder label="teks salam penutup dari pemilik" />
           )}
-
-          <Divider />
-
-          <p className="font-display text-3xl sm:text-4xl text-gold-shimmer">
-            {W.groom.shortName} &amp; {W.bride.shortName}
-          </p>
         </div>
 
         {/* Footer / Copyright Elegan */}
