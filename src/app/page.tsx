@@ -113,6 +113,7 @@ export default async function Home({
 
   // --- LOGIKA TANGGAL DINAMIS ---
   let weddingDate = WEDDING.date;
+  let eventDateObj = new Date("2026-12-29T08:00:00+07:00");
   if (settings.event_date) {
     let cleanDate = settings.event_date.trim().replace(/^["']|["']$/g, "");
     if (cleanDate.includes(" ") && !cleanDate.includes("+")) {
@@ -120,9 +121,23 @@ export default async function Home({
     }
     const parsed = new Date(cleanDate);
     if (!isNaN(parsed.getTime())) {
+      eventDateObj = parsed;
       weddingDate = formatWeddingDate(parsed);
     }
   }
+
+  const weddingDateParts = {
+    dayName: new Intl.DateTimeFormat("id-ID", { weekday: "long", timeZone: "Asia/Jakarta" })
+      .format(eventDateObj)
+      .toUpperCase(),
+    dayNumber: new Intl.DateTimeFormat("id-ID", { day: "numeric", timeZone: "Asia/Jakarta" })
+      .format(eventDateObj),
+    monthName: new Intl.DateTimeFormat("id-ID", { month: "long", timeZone: "Asia/Jakarta" })
+      .format(eventDateObj)
+      .toUpperCase(),
+    yearNumber: new Intl.DateTimeFormat("id-ID", { year: "numeric", timeZone: "Asia/Jakarta" })
+      .format(eventDateObj),
+  };
 
   // Gabungkan objek WEDDING dengan tanggal dinamis
   const W = {
@@ -469,19 +484,20 @@ export default async function Home({
                 loading="lazy"
               />
             </div>
-            {/* Bingkai Tanggal Pernikahan (frame_date) */}
-            <div className="relative mt-4 w-full max-w-[340px] xs:max-w-[380px] sm:max-w-[420px] md:max-w-[450px] flex items-center justify-center transition-transform duration-300 hover:scale-[1.02]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/frame_date.png"
-                alt="Bingkai Tanggal"
-                className="w-full h-auto object-contain pointer-events-none select-none drop-shadow-[0_6px_20px_rgba(212,175,55,0.3)]"
-              />
-              <div className="absolute inset-0 flex items-center justify-center px-10 sm:px-12 py-3 text-center">
-                <p className="font-display italic text-m xs:text-base sm:text-lg md:text-xl font-bold text-gold-shimmer tracking-wide leading-snug drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-                  {W.date}
-                </p>
-              </div>
+            {/* Tampilan Tanggal Tipografi Minimalis Tanpa Frame (Warna Putih Solid) */}
+            <div className="mt-8 flex flex-col items-center justify-center text-center select-none text-white" data-reveal>
+              <p className="font-sans text-xs sm:text-sm font-semibold tracking-[0.45em] uppercase text-white/90 pl-[0.45em]">
+                {weddingDateParts.dayName}
+              </p>
+              <span className="font-display text-7xl xs:text-8xl sm:text-9xl font-light text-white leading-none my-1 sm:my-2 drop-shadow-[0_4px_16px_rgba(0,0,0,0.35)]">
+                {weddingDateParts.dayNumber}
+              </span>
+              <p className="font-sans text-xs sm:text-sm font-semibold tracking-[0.4em] uppercase text-white/90 pl-[0.4em] mt-0.5">
+                {weddingDateParts.monthName}
+              </p>
+              <p className="font-sans text-xs sm:text-sm font-semibold tracking-[0.45em] uppercase text-white/80 pl-[0.45em] mt-1.5">
+                {weddingDateParts.yearNumber}
+              </p>
             </div>
           </div>
           <div className="grid gap-6 md:grid-cols-2 max-w-4xl w-full">
@@ -532,7 +548,7 @@ export default async function Home({
 
         <div className="relative z-10 flex flex-col items-center w-full">
           <h2 className="font-display text-4xl md:text-5xl text-gold-shimmer" data-reveal>
-            Denah &amp; Lokasi
+            Denah Lokasi
           </h2>
           <Divider />
 
