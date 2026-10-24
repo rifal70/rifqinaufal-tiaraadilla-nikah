@@ -29,8 +29,9 @@ export default function DigitalGift({ accounts, greeting }: DigitalGiftProps) {
           {greeting}
         </p>
       ) : (
-        <div className="mb-6 max-w-xl mx-auto px-4 w-full" data-reveal>
-          <p className="placeholder-box text-center">[PLACEHOLDER — teks kado digital dari pemilik]</p>
+        <div className="mb-6 max-w-xl mx-auto px-4 w-full space-y-2.5 py-2 animate-pulse" data-reveal>
+          <div className="h-3.5 sm:h-4 skeleton-shimmer rounded-full w-[85%] mx-auto" />
+          <div className="h-3.5 sm:h-4 skeleton-shimmer rounded-full w-[60%] mx-auto" />
         </div>
       )}
 

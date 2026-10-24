@@ -23,8 +23,40 @@ function Divider() {
   );
 }
 
-function Placeholder({ label }: { label: string }) {
-  return <p className="placeholder-box">[PLACEHOLDER — {label}]</p>;
+function Placeholder({
+  label = "tulisan",
+  lines = 3,
+  card = false,
+}: {
+  label?: string;
+  lines?: number;
+  card?: boolean;
+}) {
+  const content = (
+    <div className="w-full max-w-xl mx-auto space-y-3 py-2 animate-pulse" title={label}>
+      {Array.from({ length: lines }).map((_, i) => (
+        <div
+          key={i}
+          className="h-3.5 sm:h-4 skeleton-shimmer rounded-full"
+          style={{
+            width: i === lines - 1 ? "55%" : i === 0 ? "88%" : "98%",
+            margin: "0 auto",
+          }}
+        />
+      ))}
+      <span className="sr-only">Memuat {label}...</span>
+    </div>
+  );
+
+  if (card) {
+    return (
+      <div className="glass-card max-w-3xl mx-auto p-6 sm:p-10 text-center">
+        {content}
+      </div>
+    );
+  }
+
+  return content;
 }
 
 export default async function Home({
@@ -605,7 +637,7 @@ export default async function Home({
                 {mapImageUrl ? (
                   <ImageModal src={mapImageUrl} alt="Denah lokasi acara" />
                 ) : (
-                  <Placeholder label="gambar Denah Lokasi" />
+                  <div className="w-full h-56 sm:h-64 skeleton-shimmer rounded-xl" />
                 )}
               </div>
 
@@ -641,7 +673,7 @@ export default async function Home({
                     <span>↗</span>
                   </a>
                 ) : (
-                  <Placeholder label="tautan Google Maps" />
+                  <div className="h-10 w-44 skeleton-shimmer rounded-full my-1 mx-auto" />
                 )}
               </div>
             </div>
@@ -692,7 +724,7 @@ export default async function Home({
             {settings.love_story ? (
               <LoveStory story={settings.love_story} />
             ) : (
-              <Placeholder label="teks cerita cinta kami dari pemilik" />
+              <Placeholder label="teks cerita cinta kami dari pemilik" lines={4} card />
             )}
           </div>
         </div>
