@@ -142,26 +142,24 @@ export default function InvitationShell({
                 className="absolute inset-0 h-full w-full rounded-sm object-cover shadow-md"
               />
 
-              <div className="relative z-10 flex h-full w-full flex-col items-center justify-center px-1">
-                {/* Nama Pasangan */}
-                <h2 className="animate-fade-in-up animate-delay-200 font-display font-bold tracking-tight text-[#3e2b2f] leading-tight text-[clamp(11px,4.2vw,22px)] landscape:text-[clamp(8px,2.4dvh,11px)] md:landscape:text-[clamp(13px,2.8vw,19px)]">
-                  {coupleNames}
-                </h2>
+              <div className="relative z-10 flex h-full w-full flex-col items-center justify-center px-[12%] pt-[2%] pb-[7%] text-center">
+                {/* Label Yth - Ukuran Sedang */}
+                <p className="animate-fade-in-up font-normal text-[#8c656d] leading-none text-[clamp(9.5px,2.5vw,13px)] landscape:text-[clamp(7px,1.9dvh,8.5px)] md:landscape:text-[clamp(10px,1.8vw,12.5px)]">
+                  Kepada Yth.
+                </p>
 
-                {/* Garis Pemisah */}
-                <div className="my-1 sm:my-1.5 md:my-2 landscape:my-0.5 md:landscape:my-1 h-[1px] w-[28%] max-w-[55px] min-w-[20px] bg-[#7d535b]/25" />
+                {/* Nama Tamu - Ukuran Sedang Besar */}
+                <p className="animate-fade-in-up animate-delay-200 mt-1 sm:mt-1.5 font-display font-bold tracking-wide text-[#3e2b2f] line-clamp-1 leading-snug text-[clamp(12px,3.3vw,17px)] landscape:text-[clamp(8.5px,2.3dvh,11px)] md:landscape:text-[clamp(12px,2.1vw,16px)]">
+                  {guestName}
+                </p>
 
-                <div className="animate-fade-in-up animate-delay-400 w-full">
-                  {/* Label Yth */}
-                  <p className="font-normal text-[#8c656d] leading-none text-[clamp(8.5px,2.6vw,13px)] landscape:text-[clamp(6.5px,1.9dvh,8.5px)] md:landscape:text-[clamp(9.5px,1.8vw,12px)]">
-                    Kepada Yth.
-                  </p>
+                {/* Garis Pemisah Tipis */}
+                <div className="my-1 sm:my-1.5 landscape:my-0.5 h-[1px] w-[24%] max-w-[42px] min-w-[18px] bg-[#7d535b]/25" />
 
-                  {/* Nama Tamu */}
-                  <p className="mt-0.5 font-display font-bold tracking-wide text-[#3e2b2f] line-clamp-1 text-[clamp(9.5px,3.2vw,16px)] landscape:text-[clamp(7.5px,2.2dvh,10px)] md:landscape:text-[clamp(11px,2.2vw,15px)]">
-                    {guestName}
-                  </p>
-                </div>
+                {/* Pesan Kehadiran - Ukuran Sedang Kecil (Aman di dalam batas bingkai & tidak menyentuh tangkai bunga) */}
+                <p className="animate-fade-in-up animate-delay-400 font-normal text-[#7d535b] leading-snug text-[clamp(8px,2vw,10.5px)] landscape:text-[clamp(6px,1.5dvh,7.5px)] md:landscape:text-[clamp(8px,1.4vw,10px)] max-w-[82%]">
+                  Hi, kami tunggu kedatangan dan doa restunya ya. Jangan lupa datang dan ramaikan acara kami.
+                </p>
               </div>
             </div>
 
