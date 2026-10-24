@@ -211,7 +211,7 @@ export default async function Home({
           {/* Ornamen Bunga Hijau Besar di Atas "The Wedding of" (Absolute agar TIDAK mendorong teks "The Wedding of" turun) */}
           <div
             aria-hidden="true"
-            className="pointer-events-none select-none absolute bottom-full left-1/2 -translate-x-1/2 w-[min(92vw,340px)] xs:w-[380px] sm:w-[480px] md:w-[580px] lg:w-[680px] xl:w-[760px] aspect-square translate-y-[24%] landscape:w-[220px] sm:landscape:w-[260px] md:landscape:w-[340px] lg:landscape:w-[420px] landscape:translate-y-[31%] sm:landscape:translate-y-[32%] md:landscape:translate-y-[36%] lg:landscape:translate-y-[39%] xl:landscape:translate-y-[39%]"
+            className="pointer-events-none select-none absolute bottom-full left-1/2 -translate-x-1/2 w-[min(92vw,340px)] xs:w-[380px] sm:w-[400px] md:w-[580px] lg:w-[680px] xl:w-[760px] aspect-square translate-y-[24%] sm:translate-y-[33%] md:translate-y-[24%] landscape:w-[220px] sm:landscape:w-[260px] md:landscape:w-[340px] lg:landscape:w-[420px] landscape:translate-y-[31%] sm:landscape:translate-y-[32%] md:landscape:translate-y-[36%] lg:landscape:translate-y-[39%] xl:landscape:translate-y-[39%]"
           >
             {/* flower_green (sisi kiri) */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -233,7 +233,7 @@ export default async function Home({
             The Wedding of
           </p>
 
-          <h1 className="mt-4 sm:mt-6 landscape:mt-1.5 sm:landscape:mt-2 md:landscape:mt-4 lg:landscape:mt-6 font-display text-4xl sm:text-2xl md:text-6xl lg:text-7xl text-gold-shimmer leading-tight md:whitespace-nowrap">
+          <h1 className="mt-4 sm:mt-6 landscape:mt-1.5 sm:landscape:mt-2 md:landscape:mt-4 lg:landscape:mt-6 font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-gold-shimmer leading-tight md:whitespace-nowrap">
             {W.groom.shortName} &amp; {W.bride.shortName}
           </h1>
         </div>
