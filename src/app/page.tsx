@@ -77,8 +77,8 @@ export default async function Home() {
       {/* Hero */}
       <section className="section-wedding hero-bg relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-4 py-12 text-center" id="hero">
 
-        {/* Konten Utama Teks - Tetap Presisi di Tengah Layar */}
-        <div className="relative z-10 mx-auto flex w-full max-w-[280px] sm:max-w-md md:max-w-none flex-col items-center" data-reveal>
+        {/* Konten Utama Teks - Posisi Lebih ke Atas */}
+        <div className="relative z-10 mx-auto flex w-full max-w-[280px] sm:max-w-md md:max-w-none flex-col items-center -translate-y-16 sm:-translate-y-20 md:-translate-y-24 lg:-translate-y-28 landscape:-translate-y-10 sm:landscape:-translate-y-12 md:landscape:-translate-y-20 lg:landscape:-translate-y-24 xl:landscape:-translate-y-28" data-reveal>
           <p className="text-[14px] sm:text-l uppercase tracking-[0.3em] sm:tracking-[0.4em] text-gold-300">
             The Wedding of
           </p>
@@ -91,7 +91,7 @@ export default async function Home() {
         {/* Ornamen Wayang Gunungan Kiri - Sejajar Nama Rifqi & Gagang Tersembunyi */}
         <div
           aria-hidden
-          className="pointer-events-none select-none z-0 absolute top-1/2
+          className="pointer-events-none select-none z-0 absolute top-[calc(50%-4rem)] sm:top-[calc(50%-5rem)] md:top-[calc(50%-6rem)] lg:top-[calc(50%-7rem)] landscape:top-[calc(50%-2.5rem)] sm:landscape:top-[calc(50%-3rem)] md:landscape:top-[calc(50%-5rem)] lg:landscape:top-[calc(50%-6rem)] xl:landscape:top-[calc(50%-7rem)]
             /* Mobile: Ditarik ke atas (-translate-y-[60%]) agar puncak & badan sejajar teks nama, gagang tenggelam di bawah */
             -left-34 -translate-y-[60%] w-44 opacity-85
             /* Tablet Kecil */
@@ -112,7 +112,7 @@ export default async function Home() {
         {/* Ornamen Wayang Gunungan Kanan - Sejajar Nama Dilla & Gagang Tersembunyi */}
         <div
           aria-hidden
-          className="pointer-events-none select-none z-0 absolute top-1/2
+          className="pointer-events-none select-none z-0 absolute top-[calc(50%-4rem)] sm:top-[calc(50%-5rem)] md:top-[calc(50%-6rem)] lg:top-[calc(50%-7rem)] landscape:top-[calc(50%-2.5rem)] sm:landscape:top-[calc(50%-3rem)] md:landscape:top-[calc(50%-5rem)] lg:landscape:top-[calc(50%-6rem)] xl:landscape:top-[calc(50%-7rem)]
             /* Mobile: Ditarik ke atas (-translate-y-[60%]) agar puncak & badan sejajar teks nama, gagang tenggelam di bawah */
             -right-34 -translate-y-[60%] w-44 opacity-85
             /* Tablet Kecil */
@@ -130,29 +130,28 @@ export default async function Home() {
           />
         </div>
 
-        {/* Karakter Animasi Pengantin Berbingkai Jawa - Paling Bawah Section */}
+        {/* Karakter Animasi Pengantin Naufal & Dilla - Paling Bawah Section */}
         <div
           aria-hidden="true"
           data-reveal
           className="pointer-events-none select-none z-10 absolute bottom-0 left-0 right-0 flex justify-center items-end"
         >
-          <div className="relative aspect-square w-[min(72vw,250px)] sm:w-[290px] md:w-[360px] lg:w-[420px] xl:w-[460px] landscape:w-auto landscape:h-[38dvh] landscape:max-h-[175px] md:landscape:h-[42dvh] md:landscape:max-h-[220px] flex items-center justify-center drop-shadow-[0_16px_40px_rgba(0,0,0,0.65)]">
-            {/* Kartu Dalam */}
-            <div className="absolute inset-[9%] sm:inset-[8%] z-10 overflow-hidden rounded-2xl bg-gradient-to-b from-[#152a19]/85 via-[#0d1d11]/90 to-[#071309]/95 backdrop-blur-sm border border-gold-400/30 flex items-end justify-center p-1 sm:p-1.5 shadow-[inset_0_0_20px_rgba(212,175,55,0.12)]">
-              {/* Gambar Karakter */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/animated_naufaldilla.webp"
-                alt="Ilustrasi Pengantin Rifqi &amp; Dilla"
-                className="max-h-full max-w-full object-contain drop-shadow-md"
-              />
-            </div>
-            {/* Frame Ukiran Jawa */}
+          <div
+            className="relative flex items-end justify-center"
+            style={{
+              WebkitMaskImage: "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.3) 5%, rgba(0,0,0,0.8) 11%, black 16%, black 100%)",
+              maskImage: "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.3) 5%, rgba(0,0,0,0.8) 11%, black 16%, black 100%)",
+            }}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/frame_dillanaufalanimated.png"
-              alt=""
-              className="pointer-events-none absolute inset-0 z-20 h-full w-full object-fill drop-shadow-[0_4px_14px_rgba(212,175,55,0.35)]"
+              src="/animated_naufaldilla.webp"
+              alt="Ilustrasi Pengantin Rifqi Naufal &amp; Dilla"
+              style={{
+                WebkitMaskImage: "linear-gradient(to bottom, black 93%, transparent 100%)",
+                maskImage: "linear-gradient(to bottom, black 93%, transparent 100%)",
+              }}
+              className="w-[min(72vw,250px)] sm:w-[300px] md:w-[400px] lg:w-[480px] xl:w-[540px] landscape:w-auto landscape:h-[52dvh] landscape:max-h-[260px] sm:landscape:h-[54dvh] sm:landscape:max-h-[300px] md:landscape:h-[48dvh] md:landscape:max-h-[380px] lg:landscape:h-[50dvh] lg:landscape:max-h-[440px] xl:landscape:h-[52dvh] xl:landscape:max-h-[490px] h-auto object-contain drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)]"
             />
           </div>
         </div>
