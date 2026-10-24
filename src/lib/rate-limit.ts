@@ -28,3 +28,41 @@ export function clientIp(headers: Headers): string {
     "unknown"
   );
 }
+
+// Fast in-memory rate limiter (Zero DB queries, protects server & DB during surges)
+interface MemoryBucket {
+  count: number;
+  resetAt: number;
+}
+const memoryBuckets = new Map<string, MemoryBucket>();
+
+// Periodic cleanup every 60s
+if (typeof setInterval !== "undefined") {
+  const timer = setInterval(() => {
+    const now = Date.now();
+    for (const [key, record] of memoryBuckets.entries()) {
+      if (record.resetAt <= now) {
+        memoryBuckets.delete(key);
+      }
+    }
+  }, 60000);
+  if (timer.unref) timer.unref();
+}
+
+export function isAllowedInMemory(key: string, max: number, windowSeconds: number): boolean {
+  const now = Date.now();
+  const record = memoryBuckets.get(key);
+
+  if (!record || record.resetAt <= now) {
+    memoryBuckets.set(key, { count: 1, resetAt: now + windowSeconds * 1000 });
+    return true;
+  }
+
+  if (record.count >= max) {
+    return false;
+  }
+
+  record.count += 1;
+  return true;
+}
+

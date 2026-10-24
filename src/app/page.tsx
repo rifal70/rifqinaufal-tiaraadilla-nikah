@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { getSession } from "@/lib/auth/session";
 import { getBanks, getGallery, getSettings, signedUrl, formatWeddingDate } from "@/lib/data";
+import { isAllowedInMemory, clientIp } from "@/lib/rate-limit";
 import { WEDDING } from "@/lib/content";
 import InvitationShell from "@/components/InvitationShell";
 import DigitalGift from "@/components/DigitalGift";
@@ -8,6 +10,7 @@ import Gallery from "@/components/Gallery";
 import CouplePhoto from "@/components/CouplePhoto";
 import ImageModal from "@/components/ImageModal";
 import LoveStory from "@/components/LoveStory";
+import WaitingScreen from "@/components/WaitingScreen";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +26,23 @@ function Placeholder({ label }: { label: string }) {
   return <p className="placeholder-box">[PLACEHOLDER — {label}]</p>;
 }
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams?: Promise<{ status?: string }>;
+}) {
+  const params = searchParams ? await searchParams : undefined;
+  if (params?.status === "busy") {
+    return <WaitingScreen />;
+  }
+
+  const h = await headers();
+  const ip = clientIp(h);
+  // Proteksi lonjakan request: maks 40 request per 10 detik per IP
+  if (!isAllowedInMemory(`home:${ip}`, 40, 10)) {
+    return <WaitingScreen />;
+  }
+
   const session = await getSession();
   if (!session) notFound();
 
