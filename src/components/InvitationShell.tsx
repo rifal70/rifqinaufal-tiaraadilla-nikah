@@ -8,6 +8,7 @@ interface Props {
   coupleNames: string;
   date: string;
   musicUrl: string;
+  envelopeMessage?: string;
   children: ReactNode;
 }
 
@@ -16,6 +17,7 @@ export default function InvitationShell({
   coupleNames,
   date,
   musicUrl,
+  envelopeMessage,
   children,
 }: Props) {
   const [opened, setOpened] = useState(false);
@@ -158,7 +160,7 @@ export default function InvitationShell({
 
                 {/* Pesan Kehadiran - Ukuran Sedang Kecil (Aman di dalam batas bingkai & tidak menyentuh tangkai bunga) */}
                 <p className="animate-fade-in-up animate-delay-400 font-normal text-[#7d535b] leading-snug text-[clamp(8px,2vw,10.5px)] landscape:text-[clamp(6px,1.5dvh,7.5px)] md:landscape:text-[clamp(8px,1.4vw,10px)] max-w-[82%]">
-                  Hi, kami tunggu kedatangan dan doa restunya ya. Jangan lupa datang dan ramaikan acara kami.
+                  {envelopeMessage?.trim() || "Hi, kami tunggu kedatangan dan doa restunya ya. Jangan lupa datang dan ramaikan acara kami."}
                 </p>
               </div>
             </div>

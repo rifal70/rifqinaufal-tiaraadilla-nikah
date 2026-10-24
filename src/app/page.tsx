@@ -164,6 +164,7 @@ export default async function Home({
       coupleNames={`${W.groom.shortName} & ${W.bride.shortName}`}
       date={W.date}
       musicUrl={musicUrl}
+      envelopeMessage={settings.envelope_message}
     >
       {/* Hero */}
       <section className="section-wedding hero-bg relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-4 py-12 text-center" id="hero">

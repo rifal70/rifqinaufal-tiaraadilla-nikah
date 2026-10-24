@@ -53,3 +53,5 @@ Kami nggak pernah menyangka, perkenalan dari game online yang sempat terputus in
 };
 
 export const DIGITAL_GIFT_DEFAULT_TEXT = `Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Dan jika memberi adalah ungkapan tanda kasih Anda, Anda dapat memberi kado secara digital dengan membuka kotak kado di bawah ini:`;
+
+export const DEFAULT_ENVELOPE_MESSAGE = "Hi, kami tunggu kedatangan dan doa restunya ya. Jangan lupa datang dan ramaikan acara kami.";

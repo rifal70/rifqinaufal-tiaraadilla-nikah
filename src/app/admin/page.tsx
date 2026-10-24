@@ -3,7 +3,7 @@ import { requireAdmin } from "@/lib/auth/admin";
 import { query } from "@/lib/neon/db";
 import { getSettings } from "@/lib/data";
 import { getMediaUrl } from "@/lib/media";
-import { LOVE_STORY, DIGITAL_GIFT_DEFAULT_TEXT } from "@/lib/content";
+import { LOVE_STORY, DIGITAL_GIFT_DEFAULT_TEXT, DEFAULT_ENVELOPE_MESSAGE } from "@/lib/content";
 import {
   ActionForm,
   InviteCreator,
@@ -371,6 +371,17 @@ export default async function AdminPage({
                 name="closing_greeting"
                 rows={3}
                 defaultValue={settings.closing_greeting}
+                className="admin-input"
+              />
+            </div>
+
+            <div>
+              <label className="admin-label" htmlFor="envelope_message">Pesan Surat Pembuka (Kertas Amplop)</label>
+              <textarea
+                id="envelope_message"
+                name="envelope_message"
+                rows={3}
+                defaultValue={settings.envelope_message || DEFAULT_ENVELOPE_MESSAGE}
                 className="admin-input"
               />
             </div>

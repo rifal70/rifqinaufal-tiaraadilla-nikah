@@ -22,6 +22,7 @@ export interface SiteSettings {
   event_expiry_days?: string;
   love_story?: string;
   digital_gift_text?: string;
+  envelope_message?: string;
 }
 
 export const SETTING_KEYS = [
@@ -36,6 +37,7 @@ export const SETTING_KEYS = [
   "event_expiry_days",
   "love_story",
   "digital_gift_text",
+  "envelope_message",
 ] as const;
 
 export type SettingKey = (typeof SETTING_KEYS)[number];
@@ -69,6 +71,7 @@ export const getSettings = unstable_cache(
       event_expiry_days: "",
       love_story: "",
       digital_gift_text: "",
+      envelope_message: "",
     };
 
     try {

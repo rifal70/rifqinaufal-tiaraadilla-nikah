@@ -324,6 +324,7 @@ export async function updateSettingsAction(form: FormData): Promise<ActionState>
     const settingKeys = [
       "opening_greeting",
       "closing_greeting",
+      "envelope_message",
       "love_story",
       "digital_gift_text",
       "maps_url",
