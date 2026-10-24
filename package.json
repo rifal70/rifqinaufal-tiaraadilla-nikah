@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:traffic": "node scripts/test-traffic.mjs",
     "invites": "node --env-file=.env.local scripts/generate-invites.mjs"
   },
   "dependencies": {

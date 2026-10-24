@@ -9,7 +9,11 @@ const { validate, allowed, redirect } = vi.hoisted(() => ({
 }));
 
 vi.mock("@/lib/auth/session", () => ({ validateTokenAndCreateSession: validate }));
-vi.mock("@/lib/rate-limit", () => ({ isAllowed: allowed, clientIp: () => "1.2.3.4" }));
+vi.mock("@/lib/rate-limit", () => ({
+  isAllowed: allowed,
+  isAllowedInMemory: () => true,
+  clientIp: () => "1.2.3.4",
+}));
 vi.mock("next/navigation", () => ({ redirect }));
 
 import { GET } from "@/app/invite/[token]/route";
@@ -42,10 +46,11 @@ describe("GET /invite/[token] access control", () => {
     expect(res.headers.get("Referrer-Policy")).toBe("no-referrer");
   });
 
-  it("returns the same 404 when rate limited, without validating", async () => {
+  it("redirects to /?status=busy when rate limited, without validating", async () => {
     allowed.mockResolvedValue(false);
     const res = await call(GOOD);
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(307);
+    expect(res.headers.get("location")).toContain("/?status=busy");
     expect(validate).not.toHaveBeenCalled();
   });
 
