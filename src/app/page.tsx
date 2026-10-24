@@ -13,6 +13,7 @@ import LoveStory from "@/components/LoveStory";
 import WaitingScreen from "@/components/WaitingScreen";
 import ShimmerImage from "@/components/ShimmerImage";
 import ScrollToTop from "@/components/ScrollToTop";
+import WeddingFireworks from "@/components/WeddingFireworks";
 
 export const dynamic = "force-dynamic";
 
@@ -202,6 +203,9 @@ export default async function Home({
     >
       {/* Hero */}
       <section className="section-wedding hero-bg relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-4 py-12 text-center" id="hero">
+        {/* Efek Petasan Emas Lembut & Anggun (Wedding Fireworks) */}
+        <WeddingFireworks />
+
         {/* Konten Utama Teks - Posisi Lebih ke Atas */}
         <div className="relative z-10 mx-auto flex w-full max-w-[280px] sm:max-w-md md:max-w-none flex-col items-center -translate-y-16 sm:-translate-y-20 md:-translate-y-24 lg:-translate-y-28 landscape:-translate-y-10 sm:landscape:-translate-y-12 md:landscape:-translate-y-20 lg:landscape:-translate-y-24 xl:landscape:-translate-y-28" data-reveal>
           {/* Ornamen Bunga Hijau Besar di Atas "The Wedding of" (Absolute agar TIDAK mendorong teks "The Wedding of" turun) */}
