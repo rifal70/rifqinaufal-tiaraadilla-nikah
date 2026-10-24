@@ -553,8 +553,8 @@ export default async function Home({
               <ShimmerImage
                 src="/save_the_date.jpg"
                 alt="Save The Date"
-                className="w-full h-auto object-contain rounded-2xl"
-                containerClassName="w-full aspect-[4/5] min-h-[280px]"
+                className="w-full h-auto block rounded-2xl"
+                containerClassName="w-full"
                 loading="lazy"
               />
             </div>
