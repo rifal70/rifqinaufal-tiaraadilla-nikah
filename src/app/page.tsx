@@ -167,14 +167,34 @@ export default async function Home({
     >
       {/* Hero */}
       <section className="section-wedding hero-bg relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-4 py-12 text-center" id="hero">
-
         {/* Konten Utama Teks - Posisi Lebih ke Atas */}
         <div className="relative z-10 mx-auto flex w-full max-w-[280px] sm:max-w-md md:max-w-none flex-col items-center -translate-y-16 sm:-translate-y-20 md:-translate-y-24 lg:-translate-y-28 landscape:-translate-y-10 sm:landscape:-translate-y-12 md:landscape:-translate-y-20 lg:landscape:-translate-y-24 xl:landscape:-translate-y-28" data-reveal>
-          <p className="text-[14px] sm:text-l uppercase tracking-[0.3em] sm:tracking-[0.4em] text-gold-300">
+          {/* Ornamen Bunga Hijau Besar di Atas "The Wedding of" (Absolute agar TIDAK mendorong teks "The Wedding of" turun) */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none select-none absolute bottom-full left-1/2 -translate-x-1/2 w-[min(92vw,340px)] xs:w-[380px] sm:w-[480px] md:w-[580px] lg:w-[680px] xl:w-[760px] aspect-square translate-y-[24%] landscape:w-[220px] sm:landscape:w-[260px] md:landscape:w-[340px] lg:landscape:w-[420px] landscape:translate-y-[31%] sm:landscape:translate-y-[32%] md:landscape:translate-y-[36%] lg:landscape:translate-y-[39%] xl:landscape:translate-y-[39%]"
+          >
+            {/* flower_green (sisi kiri) */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/flower_green.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)] will-change-transform"
+            />
+            {/* flower_green2 (sisi kanan) */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/flower_green2.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)] will-change-transform"
+            />
+          </div>
+
+          <p className="text-[14px] sm:text-base landscape:text-[10px] sm:landscape:text-xs md:landscape:text-sm uppercase tracking-[0.3em] sm:tracking-[0.4em] landscape:tracking-[0.25em] md:landscape:tracking-[0.35em] text-gold-300 landscape:-translate-y-1 sm:landscape:-translate-y-1.5 md:landscape:translate-y-0">
             The Wedding of
           </p>
 
-          <h1 className="mt-4 sm:mt-6 font-display text-4xl sm:text-2xl md:text-6xl lg:text-7xl text-gold-shimmer leading-tight md:whitespace-nowrap">
+          <h1 className="mt-4 sm:mt-6 landscape:mt-1.5 sm:landscape:mt-2 md:landscape:mt-4 lg:landscape:mt-6 font-display text-4xl sm:text-2xl md:text-6xl lg:text-7xl text-gold-shimmer leading-tight md:whitespace-nowrap">
             {W.groom.shortName} &amp; {W.bride.shortName}
           </h1>
         </div>
